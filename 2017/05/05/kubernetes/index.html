@@ -1,0 +1,966 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="MiniKube环境: MacOS, virtualbox, minikube v0.18.0, kubectl v1.6.0 Kubernetes将底层的计算资源连接在一起对外体现为一个计算集群，并将资源高度抽象化。部署应用时Kubernetes会以更高效的方式自动的将应用分发到集群内的机器上面，并调度运行。 搭建Kubernetes集群Kubernetes集群包含两种类型的资源：  Maste">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Technical Blog">
+<meta property="og:url" content="http://yoursite.com/2017/05/05/kubernetes/index.html">
+<meta property="og:site_name" content="Technical Blog">
+<meta property="og:description" content="MiniKube环境: MacOS, virtualbox, minikube v0.18.0, kubectl v1.6.0 Kubernetes将底层的计算资源连接在一起对外体现为一个计算集群，并将资源高度抽象化。部署应用时Kubernetes会以更高效的方式自动的将应用分发到集群内的机器上面，并调度运行。 搭建Kubernetes集群Kubernetes集群包含两种类型的资源：  Maste">
+<meta property="og:image" content="http://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_01_cluster.svg">
+<meta property="og:image" content="http://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_02_first_app.svg">
+<meta property="og:image" content="http://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_03_pods.svg">
+<meta property="og:image" content="http://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_03_nodes.svg">
+<meta property="og:image" content="http://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_04_services.svg">
+<meta property="og:image" content="http://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_04_labels.svg">
+<meta property="og:updated_time" content="2017-05-05T09:14:44.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Technical Blog">
+<meta name="twitter:description" content="MiniKube环境: MacOS, virtualbox, minikube v0.18.0, kubectl v1.6.0 Kubernetes将底层的计算资源连接在一起对外体现为一个计算集群，并将资源高度抽象化。部署应用时Kubernetes会以更高效的方式自动的将应用分发到集群内的机器上面，并调度运行。 搭建Kubernetes集群Kubernetes集群包含两种类型的资源：  Maste">
+<meta name="twitter:image" content="http://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_01_cluster.svg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/05/05/kubernetes/"/>
+
+
+
+
+
+  <title>  | Technical Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Technical Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/05/kubernetes/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-05T11:00:22+08:00">
+                2017-05-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/05/05/kubernetes/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/05/05/kubernetes/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="MiniKube"><a href="#MiniKube" class="headerlink" title="MiniKube"></a>MiniKube</h2><p>环境: MacOS, virtualbox, minikube v0.18.0, kubectl v1.6.0</p>
+<p>Kubernetes将底层的计算资源连接在一起对外体现为一个计算集群，并将资源高度抽象化。部署应用时Kubernetes会以更高效的方式自动的将应用分发到集群内的机器上面，并调度运行。</p>
+<h2 id="搭建Kubernetes集群"><a href="#搭建Kubernetes集群" class="headerlink" title="搭建Kubernetes集群"></a>搭建Kubernetes集群</h2><p>Kubernetes集群包含两种类型的资源：</p>
+<ul>
+<li>Master节点：协调控制整个集群。Master负责管理整个集群，协调集群内的所有行为。比如调度应用，监控应用的状态等。</li>
+<li>Nodes节点：运行应用的工作节点。Node节点负责运行应用，一般是一台物理机或者虚机。每个Node节点上面都有一个Kubelet，它是一个代理程序，用来管理该节点以及和Master节点通信。除此以外，Node节点上还会有一些管理容器的工具，比如Docker或者rkt等。生产环境中一个Kubernetes集群至少应该包含三个Nodes节点。</li>
+</ul>
+<p>当部署应用的时候，我们通知Master节点启动应用容器。然后Master会调度这些应用将它们运行在Node节点上面。Node节点和Master节点通过Master节点暴露的Kubernetes API通信。当然我们也可以直接通过这些API和集群交互。<br><img src="http://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_01_cluster.svg" alt="kubernetes Cluster"></p>
+<p>Kubernetes提供了一个轻量级的Minikube应用，利用它我们可以很容器的创建一个只包含一个Node节点的Kubernetes Cluster用于日常的开发测试。</p>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>Minikube的安装可以参考: Minikube的Github：<a href="https://github.com/kubernetes/minikube" target="_blank" rel="external">https://github.com/kubernetes/minikube</a></p>
+<p>要正常使用，还必须安装kubectl，并且放在PATH里面。kubectl是一个通过Kubernetes API和Kubernetes集群交互的命令行工具。</p>
+<h3 id="ONLY-FOR-CHINESE"><a href="#ONLY-FOR-CHINESE" class="headerlink" title="ONLY FOR CHINESE"></a>ONLY FOR CHINESE</h3><p>Kubernetes在部署容器应用的时候会先拉一个pause镜像，这个是一个基础容器，主要是负责网络部分的功能的，具体这里不展开讨论。最关键的是Kubernetes里面镜像默认都是从Google的镜像仓库拉的（就跟docker默认从docker hub拉的一样），但是因为GFW的原因，中国用户是访问不了Google的镜像仓库gcr.io的（如果你可以ping通，那恭喜你）。庆幸的是这个镜像被传到了docker hub上面，虽然中国用户访问后者也非常艰难，但通过一些加速器之类的还是可以pull下来的。如果没有VPN等科学上网的工具的话，请先做如下操作：</p>
+<p>See: <a href="https://github.com/kubernetes/kubernetes/issues/6888" target="_blank" rel="external">https://github.com/kubernetes/kubernetes/issues/6888</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">minikube ssh    # 登录到我们的Kubernetes VM里面去</div><div class="line">docker pull registry.hnaresearch.com/public/pause-amd64:3.0  </div><div class="line">docker tag registry.hnaresearch.com/public/pause-amd64:3.0 gcr.io/google_containers/pause-amd64:3.0</div></pre></td></tr></table></figure>
+<p>这样Kubernetes VM就不会从gcr.io拉镜像了，而是会直接使用本地的镜像。</p>
+<h2 id="部署应用"><a href="#部署应用" class="headerlink" title="部署应用"></a>部署应用</h2><p>在Kubernetes Cluster上面部署应用，我们需要先创建一个Kubernetes Deployment。这个Deployment负责创建和更新我们的应用实例。当这个Deployment创建之后，Kubernetes master就会将这个Deployment创建出来的应用实例部署到集群内某个Node节点上。而且自应用实例创建后，Deployment controller还会持续监控应用，直到应用被删除或者部署应用的Node节点不存在。</p>
+<blockquote>
+<p>A Deployment is responsible for creating and updating instances of your application.</p>
+</blockquote>
+<p><img src="http://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_02_first_app.svg" alt=""></p>
+<p>使用kubectl来创建Deployment，创建的时候需要制定容器镜像以及我们要启动的个数（replicas），当然这些信息后面可以再更新。这里我用Go写了一个简单的Webserver，返回“Hello World”，监听端口是8090.我们就来启动这个应用.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">kubectl run helloworld --image=registry.hnaresearch.com/public/hello-world:v1.0 --port=8090</div></pre></td></tr></table></figure></p>
+<p>执行后master寻找一个合适的node来部署我们的应用实例（我们只有一个node）。我们可以使用kubectl get deployment来查看我们创建的Deployment：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">kubectl get deployment</div></pre></td></tr></table></figure></p>
+<p>默认应用部署好之后是只在Kubernetes Cluster内部可见的，有多种方法可以让我们的应用暴露到外部，这里先介绍一种简单的：我们可以通过kubectl proxy命令在我们的终端和Kubernetes Cluster直接创建一个代理。然后，打开一个新的终端，通过Pod名(Pod后面会有讲到，可以通过kubectl get pod查看Pod名字)就可以访问了：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get pod</div><div class="line">NAME                             READY     STATUS             RESTARTS   AGE</div><div class="line">hello-minikube-938614450-xjl4s   0/1       ImagePullBackOff   0          15h</div><div class="line">helloworld-2790924137-bvfhn      1/1       Running            0          2m</div><div class="line"></div><div class="line">xis-macbook-pro:~ xiningwang$ curl http://localhost:8001/api/v1/proxy/namespaces/default/pods/helloworld-2790924137-bvfhn/</div><div class="line">Hello world !</div><div class="line">hostname:helloworld-2790924137-bvfhn</div></pre></td></tr></table></figure></p>
+<h2 id="Pod"><a href="#Pod" class="headerlink" title="Pod"></a>Pod</h2><p>Pod是Kubernetes中一个非常重要的概念，也是区别于其他编排系统的一个设计. Deployment执行时并不是直接创建了容器实例，而是先在Node上面创建了Pod，然后再在Pod里面创建容器。那Pod到底是什么？Pod是Kubernetes里面抽象出来的一个概念，它是能够被创建、调度和管理的最小单元；每个Pod都有一个独立的IP；一个Pod由若干个容器构成。一个Pod之内的容器共享Pod的所有资源，这些资源主要包括：共享存储（以Volumes的形式）、共享网络、共享端口等。Kubernetes虽然也是一个容器编排系统，但不同于其他系统，它的最小操作单元不是单个容器，而是Pod。这个特性给Kubernetes带来了很多优势，比如最显而易见的是同一个Pod内的容器可以非常方便的互相访问（通过localhost就可以访问）和共享数据。</p>
+<blockquote>
+<p>A Pod is a group of one or more application containers (such as Docker or rkt) and includes shared storage (volumes), IP address and information about how to run them.</p>
+</blockquote>
+<p><img src="http://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_03_pods.svg" alt="pod"></p>
+<blockquote>
+<p>A Node is a group of one ore more pods and includes the kubelet and container engine.  </p>
+<p>Containers should only be scheduled together in a single Pod if they are tightly coupled and need to share resources such as disk.</p>
+</blockquote>
+<p><img src="http://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_03_nodes.svg" alt="node"></p>
+<h2 id="Service"><a href="#Service" class="headerlink" title="Service"></a>Service</h2><p>通过proxy实现集群外部可以访问的方式是不太适用于实际生产环境的。<a href="id:service" target="_blank" rel="external">Service</a>是Kubernetes里面抽象出来的一层，它定义了由多个Pods组成的逻辑组（logical set），可以对组内的Pod做一些事情：</p>
+<ul>
+<li>对外暴露流量</li>
+<li>做负载均衡（load balancing）</li>
+<li>服务发现（service-discovery）</li>
+</ul>
+<blockquote>
+<p>A Kubernetes Service is an abstraction layer which defines a logical set of Pods and enables external traffic exposure, load balancing and service discovery for those Pods.</p>
+</blockquote>
+<p>而且每个Service都有一个集群内唯一的私有IP和对外的端口，用于接收流量。如果我们想将一个Service暴露到集群外，有两种方法：</p>
+<ul>
+<li>LoadBalancer - 提供一个公网的IP</li>
+<li>NodePort - 使用NAT将Service的端口暴露出去。Minikube只支持这种方式。</li>
+</ul>
+<p><img src="http://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_04_services.svg" alt="service"></p>
+<p>使用kubectl get service可以查看目前已有的service，Minikube默认创建了一个kubernetes Service。我们使用expose命令再创建一个Service：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get service</div><div class="line">NAME             CLUSTER-IP   EXTERNAL-IP   PORT(S)          AGE</div><div class="line">hello-minikube   10.0.0.188   &lt;nodes&gt;       8080:32710/TCP   16h</div><div class="line">kubernetes       10.0.0.1     &lt;none&gt;        443/TCP          16h</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl expose deployment/helloworld --type=&quot;NodePort&quot; --port 8090</div><div class="line">service &quot;helloworld&quot; exposed</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get service</div><div class="line">NAME             CLUSTER-IP   EXTERNAL-IP   PORT(S)          AGE</div><div class="line">hello-minikube   10.0.0.188   &lt;nodes&gt;       8080:32710/TCP   16h</div><div class="line">helloworld       10.0.0.249   &lt;nodes&gt;       8090:31240/TCP   2m</div><div class="line">kubernetes       10.0.0.1     &lt;none&gt;        443/TCP          16h</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl delete service hello-minikube</div><div class="line">service &quot;hello-minikube&quot; deleted</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get service</div><div class="line">NAME         CLUSTER-IP   EXTERNAL-IP   PORT(S)          AGE</div><div class="line">helloworld   10.0.0.249   &lt;nodes&gt;       8090:31240/TCP   2m</div><div class="line">kubernetes   10.0.0.1     &lt;none&gt;        443/TCP          16h</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl describe service/helloworld</div><div class="line">Name:  			helloworld</div><div class="line">Namespace:     		default</div><div class="line">Labels:			run=helloworld</div><div class="line">Annotations:   		&lt;none&gt;</div><div class="line">Selector:      		run=helloworld</div><div class="line">Type:  			NodePort</div><div class="line">IP:    			10.0.0.249</div><div class="line">Port:  			&lt;unset&gt;	8090/TCP</div><div class="line">NodePort:      		&lt;unset&gt;	31240/TCP</div><div class="line">Endpoints:     		172.17.0.3:8090</div><div class="line">Session Affinity:      	None</div><div class="line">Events:			&lt;none&gt;</div><div class="line">xis-macbook-pro:~ xiningwang$ minikube docker-env</div><div class="line">export DOCKER_TLS_VERIFY=&quot;1&quot;</div><div class="line">export DOCKER_HOST=&quot;tcp://192.168.99.100:2376&quot;</div><div class="line">export DOCKER_CERT_PATH=&quot;/Users/xiningwang/.minikube/certs&quot;</div><div class="line">export DOCKER_API_VERSION=&quot;1.23&quot;</div><div class="line"># Run this command to configure your shell:</div><div class="line"># eval $(minikube docker-env)</div><div class="line">xis-macbook-pro:~ xiningwang$ curl http://192.168.99.100:31240</div><div class="line">Hello world !</div><div class="line">hostname:helloworld-2790924137-bvfhn</div></pre></td></tr></table></figure></p>
+<h2 id="Label"><a href="#Label" class="headerlink" title="Label"></a>Label</h2><p>Service就是靠Label选择器（Label Selectors）来匹配组内的Pod的，而且很多命令都可以操作Label。Label是绑定在对象上（比如Pod）的键值对，主要用来把一些相关的对象组织在一起，并且对于用户来说label是有含义的，比如：</p>
+<ul>
+<li>Production environment (production, test, dev)</li>
+<li>Application version (beta, v1.3)</li>
+<li>Type of service/server (frontend, backend, database)</li>
+</ul>
+<blockquote>
+<p>   Labels are key/value pairs that are attached to objects</p>
+</blockquote>
+<p><img src="http://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_04_labels.svg" alt="Label"></p>
+<p>Pod创建时默认创建的Label如下:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl describe pod helloworld-2790924137-bvfhn</div><div class="line">Name:  		helloworld-2790924137-bvfhn</div><div class="line">Namespace:     	default</div><div class="line">Node:  		minikube/192.168.99.100</div><div class="line">Start Time:    	Fri, 05 May 2017 14:03:56 +0800</div><div class="line">Labels:		pod-template-hash=2790924137</div><div class="line">       		run=helloworld</div><div class="line">```          </div><div class="line">新增一个Label:</div></pre></td></tr></table></figure></p>
+<p>xis-macbook-pro:~ xiningwang$ kubectl label pod helloworld-2790924137-bvfhn app=v1<br>pod “helloworld-2790924137-bvfhn” labeled<br>xis-macbook-pro:~ xiningwang$ kubectl describe pod helloworld-2790924137-bvfhn<br>Name:          helloworld-2790924137-bvfhn<br>Namespace:         default<br>Node:          minikube/192.168.99.100<br>Start Time:        Fri, 05 May 2017 14:03:56 +0800<br>Labels:        app=v1<br>               pod-template-hash=2790924137<br>               run=helloworld<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">使用Label的例子:</div></pre></td></tr></table></figure></p>
+<p>xis-macbook-pro:~ xiningwang$ kubectl get service<br>NAME         CLUSTER-IP   EXTERNAL-IP   PORT(S)          AGE<br>helloworld   10.0.0.249   <nodes>       8090:31240/TCP   46m<br>kubernetes   10.0.0.1     <none>        443/TCP          17h<br>xis-macbook-pro:~ xiningwang$ kubectl get service  -l run=helloworld<br>NAME         CLUSTER-IP   EXTERNAL-IP   PORT(S)          AGE<br>helloworld   10.0.0.249   <nodes>       8090:31240/TCP   46m<br>xis-macbook-pro:~ xiningwang$ kubectl get pod -l app=v1<br>NAME                          READY     STATUS    RESTARTS   AGE<br>helloworld-2790924137-bvfhn   1/1       Running   0          1h<br>xis-macbook-pro:~ xiningwang$ kubectl get pod<br>NAME                             READY     STATUS             RESTARTS   AGE<br>hello-minikube-938614450-b7xwm   0/1       ImagePullBackOff   0          38m<br>helloworld-2790924137-bvfhn      1/1       Running            0          1h<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">## Scale</div><div class="line">随着流量的增加，我们可能需要增加我们应用的规模来满足用户的需求。Kubernetes的Scale功能就可以实现这个需求。</div><div class="line">&gt;    Scaling is accomplished by changing the number of replicas in a Deployment.</div><div class="line"></div><div class="line">扩大应用的规模时，Kubernetes将会在Nodes上面使用可用的资源来创建新的Pod，并运行新增加的应用，缩小规模时做相反的操作。Kubernetes也支持自动规模化Pod。当然我们也可以将应用的数量变为0，这样就会终止所有部署该应用的Pods。应用数量增加后，Service内的负载均衡就会变得非常有用了.</div><div class="line"></div><div class="line">![scale](https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_05_scaling1.svg)</div><div class="line"></div><div class="line"></div><div class="line">![scale](https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_05_scaling2.svg)</div></pre></td></tr></table></figure></nodes></none></nodes></p>
+<p>xis-macbook-pro:~ xiningwang$ kubectl get deployment<br>NAME         DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE<br>helloworld   1         1         1            1           2h<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">可以看到，现在我们只有一个Pod，</div><div class="line">- DESIRED字段表示我们配置的replicas的个数，即实例的个数。</div><div class="line">- CURRENT字段表示目前处于running状态的replicas的个数。</div><div class="line">- UP-TO-DATE字段表示表示和预先配置的期望状态相符的replicas的个数。</div><div class="line">- AVAILABLE字段表示目前实际对用户可用的replicas的个数。</div><div class="line"></div><div class="line">下面我们使用kubectl scale命令将启动4个复制品，语法规则是kubectl scale deployment-type name replicas-number：</div></pre></td></tr></table></figure></p>
+<p>xis-macbook-pro:~ xiningwang$ kubectl scale deployment/helloworld –replicas=4<br>deployment “helloworld” scaled<br>xis-macbook-pro:~ xiningwang$ kubectl get deployment<br>NAME         DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE<br>helloworld   4         4         4            4           2h</p>
+<p>xis-macbook-pro:~ xiningwang$ kubectl get pod -o wide<br>NAME                          READY     STATUS    RESTARTS   AGE       IP           NODE<br>helloworld-2790924137-2kg70   1/1       Running   0          3m        172.17.0.4   minikube<br>helloworld-2790924137-bvfhn   1/1       Running   0          2h        172.17.0.3   minikube<br>helloworld-2790924137-jg15m   1/1       Running   0          3m        172.17.0.5   minikube<br>helloworld-2790924137-tgqr9   1/1       Running   0          3m        172.17.0.2   minikube<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">验证一下这个Service是有负载均衡的：</div></pre></td></tr></table></figure></p>
+<p>xis-macbook-pro:~ xiningwang$ kubectl get deployment<br>NAME         DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE<br>helloworld   4         4         4            4           2h<br>xis-macbook-pro:~ xiningwang$ curl 192.168.99.100:31240<br>Hello world !<br>hostname:helloworld-2790924137-bvfhn<br>xis-macbook-pro:~ xiningwang$ curl 192.168.99.100:31240<br>Hello world !<br>hostname:helloworld-2790924137-tgqr9<br>xis-macbook-pro:~ xiningwang$ curl 192.168.99.100:31240<br>Hello world !<br>hostname:helloworld-2790924137-2kg70<br>xis-macbook-pro:~ xiningwang$ curl 192.168.99.100:31240<br>Hello world !<br>hostname:helloworld-2790924137-bvfhn<br>xis-macbook-pro:~ xiningwang$ curl 192.168.99.100:31240<br>Hello world !<br>hostname:helloworld-2790924137-tgqr9<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">## Rolling Update</div><div class="line">滚动更新（Rolling update）特性的好处就是我们不用停止服务就可以实现应用更新。默认更新的时候是一个Pod一个Pod更新的，所以整个过程服务不会中断。当然你也可以设置一次更新的Pod的百分比。而且更新过程中，Service只会将流量转发到可用的节点上面。更加重要的是，我们可以随时回退到旧版本。</div><div class="line">&gt;Rolling updates allow Deployments&apos; update to take place with zero downtime by incrementally updating Pods instances with new ones.</div><div class="line">If a Deployment is exposed publicly, the Service will load-balance the traffic only to available Pods during the update.</div><div class="line"></div><div class="line">![rollingupdate](https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_06_rollingupdates1.svg)</div><div class="line">![rollingupdate](https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_06_rollingupdates2.svg)</div><div class="line">![rollingupdate](https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_06_rollingupdates3.svg)</div><div class="line">![rollingupdate](https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_06_rollingupdates4.svg)</div><div class="line"></div><div class="line">在原来程序的基础上，多输出一个v2作为新版本，使用set image命令指定新版本镜像.</div></pre></td></tr></table></figure></p>
+<p>xis-macbook-pro:~ xiningwang$ kubectl set image deployments/helloworld helloworld=registry.hnaresearch.com/public/hello-world:v2.0<br>deployment “helloworld” image updated<br>xis-macbook-pro:~ xiningwang$ kubectl get pods<br>NAME                          READY     STATUS              RESTARTS   AGE<br>helloworld-2790924137-2kg70   1/1       Running             0          54m<br>helloworld-2790924137-bvfhn   1/1       Running             0          3h<br>helloworld-2790924137-tgqr9   1/1       Running             0          54m<br>helloworld-2889228138-65lmj   0/1       ContainerCreating   0          9m<br>helloworld-2889228138-q68vx   0/1       ContainerCreating   0          9m<br>xis-macbook-pro:~ xiningwang$ kubectl get pods<br>NAME                          READY     STATUS              RESTARTS   AGE<br>helloworld-2790924137-2kg70   1/1       Terminating         0          54m<br>helloworld-2790924137-bvfhn   1/1       Running             0          3h<br>helloworld-2790924137-tgqr9   0/1       Terminating         0          54m<br>helloworld-2889228138-65lmj   0/1       ContainerCreating   0          9m<br>helloworld-2889228138-bj38m   0/1       Pending             0          9m<br>helloworld-2889228138-dv3ch   1/1       Running             0          9m<br>helloworld-2889228138-q68vx   1/1       Running             0          9m<br>xis-macbook-pro:~ xiningwang$ kubectl get pods<br>NAME                          READY     STATUS    RESTARTS   AGE<br>helloworld-2889228138-65lmj   1/1       Running   0          10m<br>helloworld-2889228138-bj38m   1/1       Running   0          10m<br>helloworld-2889228138-dv3ch   1/1       Running   0          10m<br>helloworld-2889228138-q68vx   1/1       Running   0          10m<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">使用kubectl rollout undo命令回滚到之前的版本：</div></pre></td></tr></table></figure></p>
+<p>xis-macbook-pro:~ xiningwang$ kubectl rollout undo deployment/helloworld<br>deployment “helloworld” rolled back<br>```</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/04/README/" rel="next" title="">
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/08/hello-world/" rel="prev" title="Hello World">
+                Hello World <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="Xi Ning Wang" />
+          <p class="site-author-name" itemprop="name">Xi Ning Wang</p>
+           
+              <p class="site-description motion-element" itemprop="description">专注于分布式技术架构、大数据分析及机器学习</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MiniKube"><span class="nav-number">1.</span> <span class="nav-text">MiniKube</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#搭建Kubernetes集群"><span class="nav-number">2.</span> <span class="nav-text">搭建Kubernetes集群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装"><span class="nav-number">2.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ONLY-FOR-CHINESE"><span class="nav-number">2.2.</span> <span class="nav-text">ONLY FOR CHINESE</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署应用"><span class="nav-number">3.</span> <span class="nav-text">部署应用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pod"><span class="nav-number">4.</span> <span class="nav-text">Pod</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Service"><span class="nav-number">5.</span> <span class="nav-text">Service</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Label"><span class="nav-number">6.</span> <span class="nav-text">Label</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xi Ning Wang</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2017/05/05/kubernetes/';
+          this.page.identifier = '2017/05/05/kubernetes/';
+          this.page.title = '';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

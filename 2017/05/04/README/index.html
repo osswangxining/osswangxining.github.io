@@ -1,0 +1,972 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="分布式架构1. 分布式配置管理 Consul Archaius Kubernetes ConfigMap &amp;amp; Secrets  配置的集中管理：采用consul的KV，将所有微服务的application.properties中的配置内容存入consul。 配置的动态管理：采用archaius，将consul上的配置信息读到spring的PropertySource和archaius的Po">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Technical Blog">
+<meta property="og:url" content="http://yoursite.com/2017/05/04/README/index.html">
+<meta property="og:site_name" content="Technical Blog">
+<meta property="og:description" content="分布式架构1. 分布式配置管理 Consul Archaius Kubernetes ConfigMap &amp;amp; Secrets  配置的集中管理：采用consul的KV，将所有微服务的application.properties中的配置内容存入consul。 配置的动态管理：采用archaius，将consul上的配置信息读到spring的PropertySource和archaius的Po">
+<meta property="og:updated_time" content="2017-05-08T01:55:07.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Technical Blog">
+<meta name="twitter:description" content="分布式架构1. 分布式配置管理 Consul Archaius Kubernetes ConfigMap &amp;amp; Secrets  配置的集中管理：采用consul的KV，将所有微服务的application.properties中的配置内容存入consul。 配置的动态管理：采用archaius，将consul上的配置信息读到spring的PropertySource和archaius的Po">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/05/04/README/"/>
+
+
+
+
+
+  <title>  | Technical Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Technical Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/04/README/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-04T17:22:19+08:00">
+                2017-05-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/05/04/README/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/05/04/README/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="分布式架构"><a href="#分布式架构" class="headerlink" title="分布式架构"></a>分布式架构</h2><h3 id="1-分布式配置管理"><a href="#1-分布式配置管理" class="headerlink" title="1. 分布式配置管理"></a>1. 分布式配置管理</h3><ul>
+<li>Consul</li>
+<li>Archaius</li>
+<li>Kubernetes ConfigMap &amp; Secrets</li>
+</ul>
+<p>配置的集中管理：采用consul的KV，将所有微服务的application.properties中的配置内容存入consul。</p>
+<p>配置的动态管理：采用archaius，将consul上的配置信息读到spring的PropertySource和archaius的PollResult中，当修改了配置信息后，经常改变的值通过DynamicFactory来获取，不经常改变的值可以通过其他方式获取. 大部分情况下，修改了consul上的配置信息后，相应的项目不需要重启，也会读到最新的值。</p>
+<h3 id="2-服务注册与发现"><a href="#2-服务注册与发现" class="headerlink" title="2. 服务注册与发现"></a>2. 服务注册与发现</h3><ul>
+<li><a href="consul.md">Consul</a></li>
+<li>Eureka</li>
+<li><a href="kubernetes.md#service">Kubernetes Service</a> &amp; Ingress Resource</li>
+</ul>
+<h3 id="3-负载平衡"><a href="#3-负载平衡" class="headerlink" title="3. 负载平衡"></a>3. 负载平衡</h3><ul>
+<li>Netflix Ribbon（Spring Cloud）</li>
+<li><p><a href="kubernetes.md#service">Kubernetes Service</a></p>
+<p><a href="consul.md">Client Side Load Balancing</a></p>
+</li>
+</ul>
+<h3 id="4-API网关与智能路由"><a href="#4-API网关与智能路由" class="headerlink" title="4. API网关与智能路由"></a>4. API网关与智能路由</h3><ul>
+<li>Netflix Zuul（SpringCloud）</li>
+<li><p><a href="kubernetes.md#service">Kubernetes Service</a> &amp;Ingress Resource</p>
+<p><a href="gateway.md">Gateway</a></p>
+</li>
+</ul>
+<h3 id="5-分布式服务弹性与容错"><a href="#5-分布式服务弹性与容错" class="headerlink" title="5. 分布式服务弹性与容错"></a>5. 分布式服务弹性与容错</h3><ul>
+<li>弹性服务</li>
+<li>服务降级</li>
+<li>线程池/信号隔离</li>
+<li><p>快速解决依赖隔离</p>
+<p><a href="Hystrix.md">Hystrix架构设计</a></p>
+</li>
+</ul>
+<h3 id="6-日志管理"><a href="#6-日志管理" class="headerlink" title="6. 日志管理"></a>6. 日志管理</h3><ul>
+<li>ELK Stack（LogStash -&gt; ES -&gt; Kibana）</li>
+</ul>
+<h3 id="7-分布式跟踪"><a href="#7-分布式跟踪" class="headerlink" title="7. 分布式跟踪"></a>7. 分布式跟踪</h3><ul>
+<li>Zipkin</li>
+<li><p>SpringCloud Sleuth</p>
+<p><a href="zipkin">Zipkin</a> is a distributed tracing system. It helps gather timing data needed to troubleshoot latency problems in microservice architectures. It manages both the collection and lookup of this data. Zipkin’s design is based on the Google Dapper paper.</p>
+<p>Applications are instrumented to report timing data to Zipkin. The Zipkin UI also presents a Dependency diagram showing how many traced requests went through each application. If you are troubleshooting latency problems or errors, you can filter or sort all traces based on the application, length of trace, annotation, or timestamp. Once you select a trace, you can see the percentage of the total trace time each span takes which allows you to identify the problem application.</p>
+</li>
+</ul>
+<h3 id="8-监控与度量"><a href="#8-监控与度量" class="headerlink" title="8. 监控与度量"></a>8. 监控与度量</h3><ul>
+<li><p>Application/Infrastructure monitoring using StatsD + Graphite + Grafana</p>
+<p><a href="sgg.md">StatsD + Graphite + Grafana</a></p>
+</li>
+</ul>
+<h3 id="9-服务安全"><a href="#9-服务安全" class="headerlink" title="9. 服务安全"></a>9. 服务安全</h3><ul>
+<li>SpringCloud Security</li>
+</ul>
+<h3 id="10-Auto-Scaling"><a href="#10-Auto-Scaling" class="headerlink" title="10. Auto Scaling"></a>10. Auto Scaling</h3><ul>
+<li>Kubernetes Health Check、SelfHealing、Autoscaling</li>
+</ul>
+<h3 id="11-打包部署和调度部署"><a href="#11-打包部署和调度部署" class="headerlink" title="11. 打包部署和调度部署"></a>11. 打包部署和调度部署</h3><ul>
+<li>Spring Boot；</li>
+<li>Docker／Rkt、Kubernetes Scheduler&amp;Deployment</li>
+</ul>
+<h3 id="12-任务工作管理"><a href="#12-任务工作管理" class="headerlink" title="12. 任务工作管理"></a>12. 任务工作管理</h3><ul>
+<li>Spring Batch</li>
+<li>Kubernetes Jobs&amp;Scheduled Jobs</li>
+</ul>
+<h2 id="分布式存储"><a href="#分布式存储" class="headerlink" title="分布式存储"></a>分布式存储</h2><h4 id="1-持久化-分布式文件系统"><a href="#1-持久化-分布式文件系统" class="headerlink" title="1.持久化 - 分布式文件系统"></a>1.持久化 - 分布式文件系统</h4><ul>
+<li><a href="hdfs.md">HDFS分布式文件系统</a></li>
+</ul>
+<h4 id="2-持久化-分布式数据库"><a href="#2-持久化-分布式数据库" class="headerlink" title="2.持久化 - 分布式数据库"></a>2.持久化 - 分布式数据库</h4><ul>
+<li>[传统关系型数据库集群,如MySQL Cluster]</li>
+<li><a href="mongo.md">Mongo</a></li>
+<li><a href="hbase.md">Cassandra,HBase</a></li>
+</ul>
+<h4 id="3-非持久化-分布式缓存-消息系统"><a href="#3-非持久化-分布式缓存-消息系统" class="headerlink" title="3.非持久化 - 分布式缓存/消息系统"></a>3.非持久化 - 分布式缓存/消息系统</h4><ul>
+<li><a href="kafka.md">Kafka</a></li>
+<li>[Redis]</li>
+</ul>
+<h2 id="分布式计算框架"><a href="#分布式计算框架" class="headerlink" title="分布式计算框架"></a>分布式计算框架</h2><ul>
+<li><a href="yarn.md">YARN分布式计算框架</a></li>
+<li><a href="yarn-appdev.md">YARN应用开发的几种方式</a></li>
+<li><a href="running-spark-on-yarn.md">Running Spark on YARN</a></li>
+</ul>
+<h3 id="Spark-Big-Data-Analytics"><a href="#Spark-Big-Data-Analytics" class="headerlink" title="Spark Big Data Analytics"></a>Spark Big Data Analytics</h3><ul>
+<li><a href="spark.md">Spark</a></li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/04/gateway/" rel="next" title="">
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/05/kubernetes/" rel="prev" title="">
+                 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="Xi Ning Wang" />
+          <p class="site-author-name" itemprop="name">Xi Ning Wang</p>
+           
+              <p class="site-description motion-element" itemprop="description">专注于分布式技术架构、大数据分析及机器学习</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式架构"><span class="nav-number">1.</span> <span class="nav-text">分布式架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-分布式配置管理"><span class="nav-number">1.1.</span> <span class="nav-text">1. 分布式配置管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-服务注册与发现"><span class="nav-number">1.2.</span> <span class="nav-text">2. 服务注册与发现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-负载平衡"><span class="nav-number">1.3.</span> <span class="nav-text">3. 负载平衡</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-API网关与智能路由"><span class="nav-number">1.4.</span> <span class="nav-text">4. API网关与智能路由</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-分布式服务弹性与容错"><span class="nav-number">1.5.</span> <span class="nav-text">5. 分布式服务弹性与容错</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-日志管理"><span class="nav-number">1.6.</span> <span class="nav-text">6. 日志管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-分布式跟踪"><span class="nav-number">1.7.</span> <span class="nav-text">7. 分布式跟踪</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-监控与度量"><span class="nav-number">1.8.</span> <span class="nav-text">8. 监控与度量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-服务安全"><span class="nav-number">1.9.</span> <span class="nav-text">9. 服务安全</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-Auto-Scaling"><span class="nav-number">1.10.</span> <span class="nav-text">10. Auto Scaling</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#11-打包部署和调度部署"><span class="nav-number">1.11.</span> <span class="nav-text">11. 打包部署和调度部署</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#12-任务工作管理"><span class="nav-number">1.12.</span> <span class="nav-text">12. 任务工作管理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式存储"><span class="nav-number">2.</span> <span class="nav-text">分布式存储</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-持久化-分布式文件系统"><span class="nav-number">2.0.1.</span> <span class="nav-text">1.持久化 - 分布式文件系统</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-持久化-分布式数据库"><span class="nav-number">2.0.2.</span> <span class="nav-text">2.持久化 - 分布式数据库</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-非持久化-分布式缓存-消息系统"><span class="nav-number">2.0.3.</span> <span class="nav-text">3.非持久化 - 分布式缓存/消息系统</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式计算框架"><span class="nav-number">3.</span> <span class="nav-text">分布式计算框架</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Spark-Big-Data-Analytics"><span class="nav-number">3.1.</span> <span class="nav-text">Spark Big Data Analytics</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xi Ning Wang</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2017/05/04/README/';
+          this.page.identifier = '2017/05/04/README/';
+          this.page.title = '';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

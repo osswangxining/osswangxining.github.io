@@ -1,0 +1,1017 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="Hadoop: Writing YARN Applications 原生开发YARN应用 参考： http://hadoop.apache.org/docs/r3.0.0-alpha2/hadoop-yarn/hadoop-yarn-site/WritingYarnApplications.html 在YARN上编写一个应用程序，你需要开发Client和ApplicationMaster两个模块，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Technical Blog">
+<meta property="og:url" content="http://yoursite.com/2017/03/28/yarn-appdev/index.html">
+<meta property="og:site_name" content="Technical Blog">
+<meta property="og:description" content="Hadoop: Writing YARN Applications 原生开发YARN应用 参考： http://hadoop.apache.org/docs/r3.0.0-alpha2/hadoop-yarn/hadoop-yarn-site/WritingYarnApplications.html 在YARN上编写一个应用程序，你需要开发Client和ApplicationMaster两个模块，">
+<meta property="og:image" content="http://yoursite.com/2017/03/28/yarn-appdev/images/yarn-dev1.png">
+<meta property="og:image" content="http://yoursite.com/2017/03/28/yarn-appdev/images/yarn-dev2.png">
+<meta property="og:image" content="http://yoursite.com/2017/03/28/yarn-appdev/images/yarn-dev3.png">
+<meta property="og:image" content="http://yoursite.com/2017/03/28/yarn-appdev/images/slider.png">
+<meta property="og:image" content="https://spring.io/guides/gs/yarn-basic/images/rm-ui.png">
+<meta property="og:updated_time" content="2017-05-08T09:40:21.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Technical Blog">
+<meta name="twitter:description" content="Hadoop: Writing YARN Applications 原生开发YARN应用 参考： http://hadoop.apache.org/docs/r3.0.0-alpha2/hadoop-yarn/hadoop-yarn-site/WritingYarnApplications.html 在YARN上编写一个应用程序，你需要开发Client和ApplicationMaster两个模块，">
+<meta name="twitter:image" content="http://yoursite.com/2017/03/28/yarn-appdev/images/yarn-dev1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/28/yarn-appdev/"/>
+
+
+
+
+
+  <title>  | Technical Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Technical Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/28/yarn-appdev/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-28T22:17:15+08:00">
+                2017-03-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/03/28/yarn-appdev/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/03/28/yarn-appdev/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Hadoop-Writing-YARN-Applications"><a href="#Hadoop-Writing-YARN-Applications" class="headerlink" title="Hadoop: Writing YARN Applications"></a>Hadoop: Writing YARN Applications</h1><ul>
+<li>原生开发YARN应用<ul>
+<li>参考： <a href="http://hadoop.apache.org/docs/r3.0.0-alpha2/hadoop-yarn/hadoop-yarn-site/WritingYarnApplications.html" target="_blank" rel="external">http://hadoop.apache.org/docs/r3.0.0-alpha2/hadoop-yarn/hadoop-yarn-site/WritingYarnApplications.html</a></li>
+<li>在YARN上编写一个应用程序，你需要开发Client和ApplicationMaster两个模块，并了解涉及到的几个协议的若干API和参数列表，其中ApplicationMaster还要负责资源申请，任务调度、容错等，总之，整个过程非常复杂。</li>
+</ul>
+</li>
+<li>基于Twill开发<ul>
+<li>参考： <a href="http://twill.apache.org/GettingStarted.html" target="_blank" rel="external">http://twill.apache.org/GettingStarted.html</a></li>
+<li>优点： 简化了YARN开发的复杂性；</li>
+<li>缺点： 不容易trouble shooting,封装部分不易detect问题，另外也不能支持最新的Hadoop cluster；文档也太少；</li>
+</ul>
+</li>
+<li>基于Slider开发<ul>
+<li>参考： <a href="http://slider.incubator.apache.org" target="_blank" rel="external">http://slider.incubator.apache.org</a></li>
+<li>优点： 简化了YARN开发的复杂性；</li>
+<li>缺点： 不容易trouble shooting,封装部分不易detect问题，另外也不能支持最新的Hadoop cluster；本身的框架也很复杂，</li>
+</ul>
+</li>
+<li>基于Spring Hadoop开发<ul>
+<li>参考： <a href="https://spring.io/guides/gs/yarn-basic/" target="_blank" rel="external">https://spring.io/guides/gs/yarn-basic/</a></li>
+<li>优点： 简化了YARN开发的复杂性；</li>
+<li>缺点： 不容易trouble shooting,封装部分不易detect问题，另外也不能支持最新的Hadoop cluster；</li>
+</ul>
+</li>
+</ul>
+<h2 id="开发Client和ApplicationMaster"><a href="#开发Client和ApplicationMaster" class="headerlink" title="开发Client和ApplicationMaster"></a>开发Client和ApplicationMaster</h2><p>当用户向YARN中提交一个应用程序后，YARN将分两个阶段运行该应用程序： 第一个阶段是启动ApplicationMaster； 第二个阶段是由ApplicationMaster创建应用程序，为它申请资源，并监控它的整个运行过程，直到运行完成。</p>
+<h3 id="1-开发Client启动AM"><a href="#1-开发Client启动AM" class="headerlink" title="1.开发Client启动AM"></a>1.开发Client启动AM</h3><p>Client部分是用于将应用提交到YARN, 从而可以启动application master.<br>客户端通常只需与ResourceManager交互，期间涉及到多个数据结构和一个RPC协议，具体如下：</p>
+<p><img src="images/yarn-dev1.png" alt=""></p>
+<ul>
+<li><p>客户端通过RPC协议ApplicationClientProtocol向ResourceManager(也称之为ApplicationsManager、ASM)发送应用程序提交请求GetNewApplicationRequest，ResourceManager为其返回应答GetNewApplicationResponse，该数据结构中包含多种信息，包括ApplicationId、可资源使用上限和下限等。初始化并启动一个yarnClient:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">YarnClient yarnClient = YarnClient.createYarnClient();</div><div class="line">yarnClient.init(conf);</div><div class="line">yarnClient.start();</div><div class="line">YarnClientApplication app = yarnClient.createApplication();</div><div class="line">GetNewApplicationResponse appResponse = app.getNewApplicationResponse();</div></pre></td></tr></table></figure>
+</li>
+<li><p>Client部分最关键的是构建一个ApplicationSubmissionContext。启动ApplicationMaster所需的所有信息打包到数据结构ApplicationSubmissionContext中，主要包括以下几种信息：</p>
+<ul>
+<li>(1) application id</li>
+<li>(2) application 名称</li>
+<li>(3) application优先级</li>
+<li>(4) application 所属队列</li>
+<li>(5) application 启动用户名</li>
+<li>(6)  ApplicationMaster对应的Container信息ContainerLaunchContext，包括：启动ApplicationMaster所需各种文件资源、jar包、环境变量、启动命令、运行ApplicationMaster所需的资源（主要指内存）等。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">// set the application name</div><div class="line">ApplicationSubmissionContext appContext = app.getApplicationSubmissionContext();</div><div class="line">ApplicationId appId = appContext.getApplicationId();</div><div class="line"></div><div class="line">appContext.setKeepContainersAcrossApplicationAttempts(keepContainers);</div><div class="line">appContext.setApplicationName(appName);</div><div class="line">// Set up the container launch context for the application master</div><div class="line">ContainerLaunchContext amContainer = ContainerLaunchContext.newInstance(</div><div class="line">  localResources, env, commands, null, null, null);</div><div class="line"></div><div class="line">// Set up resource type requirements</div><div class="line">// For now, both memory and vcores are supported, so we set memory and</div><div class="line">// vcores requirements</div><div class="line">Resource capability = Resource.newInstance(amMemory, amVCores);</div><div class="line">appContext.setResource(capability);</div></pre></td></tr></table></figure>
+</li>
+<li><p>客户端调用ClientRMProtocol#submitApplication(ApplicationSubmissionContext)将ApplicationMaster提交到ResourceManager上。ResourceManager收到请求后，会为ApplicationMaster寻找合适的节点，并在该节点上启动它。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">LOG.info(&quot;Submitting application to ASM&quot;);</div><div class="line">yarnClient.submitApplication(appContext);</div></pre></td></tr></table></figure>
+</li>
+<li><p>客户端可通过多种方式查询应用程序的运行状态，其中一种是调用RPC函数ClientRMProtocol#getApplicationReport获取一个应用程序当前运行状况报告，该报告内容包括应用程序名称、所属用户、所在队列、ApplicationMaster所在节点、一些诊断信息、启动时间等。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">// Get application report for the appId we are interested in</div><div class="line">ApplicationReport report = yarnClient.getApplicationReport(appId);</div><div class="line"></div><div class="line">LOG.info(&quot;Got application report from ASM for&quot;</div><div class="line">    + &quot;, appId=&quot; + appId.getId()</div><div class="line">    + &quot;, clientToAMToken=&quot; + report.getClientToAMToken()</div><div class="line">    + &quot;, appDiagnostics=&quot; + report.getDiagnostics()</div><div class="line">    + &quot;, appMasterHost=&quot; + report.getHost()</div><div class="line">    + &quot;, appQueue=&quot; + report.getQueue()</div><div class="line">    + &quot;, appMasterRpcPort=&quot; + report.getRpcPort()</div><div class="line">    + &quot;, appStartTime=&quot; + report.getStartTime()</div><div class="line">    + &quot;, yarnAppState=&quot; + report.getYarnApplicationState().toString()</div><div class="line">    + &quot;, distributedFinalState=&quot; + report.getFinalApplicationStatus().toString()</div><div class="line">    + &quot;, appTrackingUrl=&quot; + report.getTrackingUrl()</div><div class="line">    + &quot;, appUser=&quot; + report.getUser());</div><div class="line"></div><div class="line">YarnApplicationState state = report.getYarnApplicationState();</div><div class="line">FinalApplicationStatus dsStatus = report.getFinalApplicationStatus();</div></pre></td></tr></table></figure>
+</li>
+<li><p>如果有异常或者其他情况，可以通过yarnClient.killApplication(appId);来kill掉应用；</p>
+</li>
+</ul>
+<h3 id="2-开发ApplicationMaster"><a href="#2-开发ApplicationMaster" class="headerlink" title="2.开发ApplicationMaster"></a>2.开发ApplicationMaster</h3><p>ApplicationMaster需要与ResoureManager和NodeManager交互，以申请资源和启动Container，期间涉及到多个数据结构和两个RPC协议。具体步骤如下：</p>
+<ul>
+<li>ApplicationMaster首先需通过RPC协议AMRMProtocol向ResourceManager发送注册请求RegisterApplicationMasterRequest，该数据结构中包含ApplicationMaster所在节点的host、RPC port和TrackingUrl等信息，而ResourceManager将返回RegisterApplicationMasterResponse，该数据结构中包含多种信息，包括该应用程序的ACL列表、可资源使用上限和下限等。</li>
+</ul>
+<p><img src="images/yarn-dev2.png" alt=""></p>
+<ul>
+<li><p>ApplicationMaster与RM之间的心跳：整个运行过程中，ApplicationMaster需通过心跳与ResourceManager保持联系，这是因为，如果一段时间内（默认是10min），ResourceManager未收到ApplicationMaster信息，则认为它死掉了，会重新调度或者让其失败。通常而言，ApplicationMaster周期性调用RPC函数ApplicationMasterProtocol.allocate向其发送空的AllocateRequest请求即可。</p>
+</li>
+<li><p>构造Container：根据每个任务的资源需求，ApplicationMaster可向ResourceManager申请一系列用于运行任务的Container，ApplicationMaster使用ResourceRequest类描述每个Container（一个container只能运行一个任务）：</p>
+<ul>
+<li>1）Hostname：期望Container所在的节点，如果是*，表示可以为任意节点。</li>
+<li>2）Resource capability：运行该任务所需的资源量，如(memory/disk/cpu)。</li>
+<li>3）Priority：任务优先级。一个应用程序中的任务可能有多种优先级，ResourceManager会优先为高优先级的任务分配资源。</li>
+<li>4）numContainers：符合以上条件的container数目。</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>申请资源分配Container：一旦为任务构造了Container后，ApplicationMaster会使用RPC函数AMRMProtocol#allocate向ResourceManager发送一个AllocateRequest对象，以请求分配这些Container，AllocateRequest中包含以下信息：<ul>
+<li>1）Requested containers：所需的Container列表</li>
+<li>2）Released containers：有些情况下，比如有些任务在某些节点上失败过，则ApplicationMaster不想再在这些节点上运行任务，此时可要求释放这些节点上的Container。</li>
+<li>3）Progress update information：应用程序执行进度</li>
+<li>4）ResponseId：RPC响应ID，每次调用RPC，该值会加1。</li>
+</ul>
+</li>
+<li>ResourceManager会为ApplicationMaster返回一个AllocateResponse对象，该对象中主要信息包含在AMResponse中：<ul>
+<li>1）reboot：ApplicationMaster是否需要重新初始化.当ResourceManager端出现不一致状态时，会要求对应的ApplicationMaster重新初始化。</li>
+<li>2）Allocated Containers：新分配的container列表。</li>
+<li>3）Completed Containers：已运行完成的container列表，该列表中包含运行成功和未成功的Container，ApplicationMaster可能需要重新运行那些未运行成功的Container。</li>
+</ul>
+</li>
+<li>ApplicationMaster会不断追踪已经获取的container，且只有当需求发生变化时，才允许重新为Container申请资源。</li>
+</ul>
+<p><img src="images/yarn-dev3.png" alt=""></p>
+<ul>
+<li>启动Container：当ApplicationMaster（从ResourceManager端）收到新分配的Container列表后，会使用ContainerManagementProtocol#startContainer向对应的NodeManager发送ContainerLaunchContext以启动Container，ContainerLaunchContext包含以下内容：<ul>
+<li>1）ContainerId：Container id</li>
+<li>2）Resource：该Container可使用的资源量（当前仅支持内存）</li>
+<li>3）User：Container所属用户</li>
+<li>4）Security tokens：安全令牌，只有持有该令牌才可启动container</li>
+<li>5）LocalResource：运行Container所需的本地资源，比如jar包、二进制文件、其他外部文件等。</li>
+<li>6）ServiceData：应用程序可能使用其他外部服务，这些服务相关的数据通过该参数指定。</li>
+<li>7）Environment：启动container所需的环境变量</li>
+<li>8）command：启动container的命令</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>监控Container：ApplicationMaster可以通过2种途径监控启动的Container：<ul>
+<li>使用ApplicationMasterProtocol.allocate向ResourceManager发送查询请求；</li>
+<li>使用ContainerManagementProtocol查询指定的ContainerId对应的Container的状态；</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>ApplicationMaster会不断重复前面的步骤，直到所有任务运行成功，此时，它会发送FinishApplicationMasterRequest，以告诉ResourceManage自己运行结束。</li>
+</ul>
+<h2 id="基于Twill开发"><a href="#基于Twill开发" class="headerlink" title="基于Twill开发"></a>基于Twill开发</h2><p>Apache Twill这个项目则是为简化YARN上应用程序开发而成立的项目，该项目把与YARN相关的重复性的工作封装成库，使得用户可以专注于自己的应用程序逻辑。</p>
+<p>下面代码示例是使用Apache Twill开发一个运行在YARN上的helloworld程序：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">public class HelloWorld &#123;</div><div class="line"> static Logger LOG = LoggerFactory.getLogger(HelloWorld.class);</div><div class="line"> static class HelloWorldRunnable extends AbstractTwillRunnable &#123;</div><div class="line"></div><div class="line"> public void run() &#123;</div><div class="line">   OG.info(&quot;Hello World&quot;);</div><div class="line">   &#125;</div><div class="line"> &#125;</div><div class="line"></div><div class="line">public static void main(String[] args) throws Exception &#123;</div><div class="line"> YarnConfiguration conf = new YarnConfiguration();</div><div class="line"> TwillRunnerService runner = new YarnTwillRunnerService(conf, &quot;localhost:2181&quot;);</div><div class="line"> runner.startAndWait();</div><div class="line"> </div><div class="line"> HelloWorldRunnable helloworldRunner = new HelloWorldRunnable();</div><div class="line"> TwillController controller = runner.prepare(helloworldRunner).start();</div><div class="line"> Services.getCompletionFuture(controller).get();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="编译Twill"><a href="#编译Twill" class="headerlink" title="编译Twill"></a>编译Twill</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mvn clean install -DskipTests=true</div></pre></td></tr></table></figure>
+<h4 id="启动zookeeper"><a href="#启动zookeeper" class="headerlink" title="启动zookeeper"></a>启动zookeeper</h4><p>Start a Zookeeper server instance<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ docker run --name zk1 --restart always -d -P zookeeper</div></pre></td></tr></table></figure></p>
+<p>This image includes EXPOSE 2181 2888 3888 (the zookeeper client port, follower port, election port respectively), so standard container linking will make it automatically available to the linked containers. Since the Zookeeper “fails fast” it’s better to always restart it.</p>
+<h4 id="Run-Twill-sample"><a href="#Run-Twill-sample" class="headerlink" title="Run Twill sample"></a>Run Twill sample</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ export CP=twill-examples-yarn-0.11.0-SNAPSHOT.jar:`/Users/xiningwang/hadoop/hadoop-2.7.3/bin/hadoop classpath`</div><div class="line"></div><div class="line">$ java -cp $CP org.apache.twill.example.yarn.HelloWorld &#123;zookeeper_host:port&#125;</div></pre></td></tr></table></figure>
+<h4 id="BundledJarExample-Application"><a href="#BundledJarExample-Application" class="headerlink" title="BundledJarExample Application"></a>BundledJarExample Application</h4><p>The BundledJarExample application demonstrates the Twill functionality that allows you to run any Java application in Twill without worrying about library version conflicts between your application and Hadoop. The example calls the main class in a sample application Echo, which simply logs the command line argument(s) passed to it. The Echo application uses a different version of Guava from Twill and Hadoop distributions. BundledJarExample looks for the dependency in a lib folder packaged at the root of the Echo jar.</p>
+<p>You can run the BundleJarExample application from any node of the Hadoop cluster using the below command (be sure to add your ZooKeeper Host and Port):<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">$ export CP=twill-examples-yarn-0.10.0.jar:`hadoop classpath`</div><div class="line"></div><div class="line">$ java -cp $CP org.apache.twill.example.yarn.BundledJarExample &#123;zookeeper_host:port&#125; \</div><div class="line">    twill-examples-echo-0.10.0.jar echo.EchoMain arg1</div></pre></td></tr></table></figure></p>
+<h2 id="Slider"><a href="#Slider" class="headerlink" title="Slider"></a>Slider</h2><p>由SliderAM负责给cluster申请资源，并负责容错（component挂掉之后，SliderAM重新找RM申请资源，并进行相应的分配），每个component的实例运行在YARN container中，一个cluster在YARN中的运行流程大致如下：</p>
+<p><img src="images/slider.png" alt="Slider"></p>
+<h2 id="Spring-Hadoop"><a href="#Spring-Hadoop" class="headerlink" title="Spring Hadoop"></a>Spring Hadoop</h2><p><img src="https://spring.io/guides/gs/yarn-basic/images/rm-ui.png" alt="spring-hadoop"></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/26/yarn/" rel="next" title="">
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/01/kafka/" rel="prev" title="">
+                 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="Xi Ning Wang" />
+          <p class="site-author-name" itemprop="name">Xi Ning Wang</p>
+           
+              <p class="site-description motion-element" itemprop="description">专注于分布式技术架构、大数据分析及机器学习</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Hadoop-Writing-YARN-Applications"><span class="nav-number">1.</span> <span class="nav-text">Hadoop: Writing YARN Applications</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#开发Client和ApplicationMaster"><span class="nav-number">1.1.</span> <span class="nav-text">开发Client和ApplicationMaster</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-开发Client启动AM"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.开发Client启动AM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-开发ApplicationMaster"><span class="nav-number">1.1.2.</span> <span class="nav-text">2.开发ApplicationMaster</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基于Twill开发"><span class="nav-number">1.2.</span> <span class="nav-text">基于Twill开发</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#编译Twill"><span class="nav-number">1.2.0.1.</span> <span class="nav-text">编译Twill</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动zookeeper"><span class="nav-number">1.2.0.2.</span> <span class="nav-text">启动zookeeper</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Run-Twill-sample"><span class="nav-number">1.2.0.3.</span> <span class="nav-text">Run Twill sample</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#BundledJarExample-Application"><span class="nav-number">1.2.0.4.</span> <span class="nav-text">BundledJarExample Application</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Slider"><span class="nav-number">1.3.</span> <span class="nav-text">Slider</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring-Hadoop"><span class="nav-number">1.4.</span> <span class="nav-text">Spring Hadoop</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xi Ning Wang</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2017/03/28/yarn-appdev/';
+          this.page.identifier = '2017/03/28/yarn-appdev/';
+          this.page.title = '';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
