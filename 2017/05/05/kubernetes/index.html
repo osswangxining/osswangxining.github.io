@@ -89,7 +89,7 @@
 
 <meta name="description" content="MiniKube环境: MacOS, virtualbox, minikube v0.18.0, kubectl v1.6.0 Kubernetes将底层的计算资源连接在一起对外体现为一个计算集群，并将资源高度抽象化。部署应用时Kubernetes会以更高效的方式自动的将应用分发到集群内的机器上面，并调度运行。 搭建Kubernetes集群Kubernetes集群包含两种类型的资源：  Maste">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Technical Blog">
+<meta property="og:title" content="Kubernetes">
 <meta property="og:url" content="http://yoursite.com/2017/05/05/kubernetes/index.html">
 <meta property="og:site_name" content="Technical Blog">
 <meta property="og:description" content="MiniKube环境: MacOS, virtualbox, minikube v0.18.0, kubectl v1.6.0 Kubernetes将底层的计算资源连接在一起对外体现为一个计算集群，并将资源高度抽象化。部署应用时Kubernetes会以更高效的方式自动的将应用分发到集群内的机器上面，并调度运行。 搭建Kubernetes集群Kubernetes集群包含两种类型的资源：  Maste">
@@ -99,9 +99,15 @@
 <meta property="og:image" content="http://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_03_nodes.svg">
 <meta property="og:image" content="http://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_04_services.svg">
 <meta property="og:image" content="http://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_04_labels.svg">
-<meta property="og:updated_time" content="2017-05-05T09:14:44.000Z">
+<meta property="og:image" content="https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_05_scaling1.svg">
+<meta property="og:image" content="https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_05_scaling2.svg">
+<meta property="og:image" content="https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_06_rollingupdates1.svg">
+<meta property="og:image" content="https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_06_rollingupdates2.svg">
+<meta property="og:image" content="https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_06_rollingupdates3.svg">
+<meta property="og:image" content="https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_06_rollingupdates4.svg">
+<meta property="og:updated_time" content="2017-05-08T13:29:03.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Technical Blog">
+<meta name="twitter:title" content="Kubernetes">
 <meta name="twitter:description" content="MiniKube环境: MacOS, virtualbox, minikube v0.18.0, kubectl v1.6.0 Kubernetes将底层的计算资源连接在一起对外体现为一个计算集群，并将资源高度抽象化。部署应用时Kubernetes会以更高效的方式自动的将应用分发到集群内的机器上面，并调度运行。 搭建Kubernetes集群Kubernetes集群包含两种类型的资源：  Maste">
 <meta name="twitter:image" content="http://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_01_cluster.svg">
 
@@ -112,7 +118,7 @@
   var CONFIG = {
     root: '/',
     scheme: 'Pisces',
-    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
     fancybox: true,
     motion: true,
     duoshuo: {
@@ -137,7 +143,7 @@
 
 
 
-  <title>  | Technical Blog </title>
+  <title> Kubernetes | Technical Blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -247,55 +253,11 @@
           </a>
         </li>
       
-        
-        <li class="menu-item menu-item-commonweal">
-          <a href="/404.html" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
-            
-            公益404
-          </a>
-        </li>
-      
 
-      
-        <li class="menu-item menu-item-search">
-          
-            <a href="javascript:;" class="popup-trigger">
-          
-            
-              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
-            
-            搜索
-          </a>
-        </li>
       
     </ul>
   
 
-  
-    <div class="site-search">
-      
-  <div class="popup search-popup local-search-popup">
-  <div class="local-search-header clearfix">
-    <span class="search-icon">
-      <i class="fa fa-search"></i>
-    </span>
-    <span class="popup-btn-close">
-      <i class="fa fa-times-circle"></i>
-    </span>
-    <div class="local-search-input-wrapper">
-      <input autocapitalize="off" autocomplete="off" autocorrect="off"
-             placeholder="搜索..." spellcheck="false"
-             type="text" id="local-search-input">
-    </div>
-  </div>
-  <div id="local-search-result"></div>
-</div>
-
-
-
-    </div>
   
 </nav>
 
@@ -341,7 +303,7 @@
             
             
               
-                
+                Kubernetes
               
             
           </h1>
@@ -462,15 +424,33 @@
 <p>   Labels are key/value pairs that are attached to objects</p>
 </blockquote>
 <p><img src="http://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_04_labels.svg" alt="Label"></p>
-<p>Pod创建时默认创建的Label如下:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl describe pod helloworld-2790924137-bvfhn</div><div class="line">Name:  		helloworld-2790924137-bvfhn</div><div class="line">Namespace:     	default</div><div class="line">Node:  		minikube/192.168.99.100</div><div class="line">Start Time:    	Fri, 05 May 2017 14:03:56 +0800</div><div class="line">Labels:		pod-template-hash=2790924137</div><div class="line">       		run=helloworld</div><div class="line">```          </div><div class="line">新增一个Label:</div></pre></td></tr></table></figure></p>
-<p>xis-macbook-pro:~ xiningwang$ kubectl label pod helloworld-2790924137-bvfhn app=v1<br>pod “helloworld-2790924137-bvfhn” labeled<br>xis-macbook-pro:~ xiningwang$ kubectl describe pod helloworld-2790924137-bvfhn<br>Name:          helloworld-2790924137-bvfhn<br>Namespace:         default<br>Node:          minikube/192.168.99.100<br>Start Time:        Fri, 05 May 2017 14:03:56 +0800<br>Labels:        app=v1<br>               pod-template-hash=2790924137<br>               run=helloworld<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">使用Label的例子:</div></pre></td></tr></table></figure></p>
-<p>xis-macbook-pro:~ xiningwang$ kubectl get service<br>NAME         CLUSTER-IP   EXTERNAL-IP   PORT(S)          AGE<br>helloworld   10.0.0.249   <nodes>       8090:31240/TCP   46m<br>kubernetes   10.0.0.1     <none>        443/TCP          17h<br>xis-macbook-pro:~ xiningwang$ kubectl get service  -l run=helloworld<br>NAME         CLUSTER-IP   EXTERNAL-IP   PORT(S)          AGE<br>helloworld   10.0.0.249   <nodes>       8090:31240/TCP   46m<br>xis-macbook-pro:~ xiningwang$ kubectl get pod -l app=v1<br>NAME                          READY     STATUS    RESTARTS   AGE<br>helloworld-2790924137-bvfhn   1/1       Running   0          1h<br>xis-macbook-pro:~ xiningwang$ kubectl get pod<br>NAME                             READY     STATUS             RESTARTS   AGE<br>hello-minikube-938614450-b7xwm   0/1       ImagePullBackOff   0          38m<br>helloworld-2790924137-bvfhn      1/1       Running            0          1h<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">## Scale</div><div class="line">随着流量的增加，我们可能需要增加我们应用的规模来满足用户的需求。Kubernetes的Scale功能就可以实现这个需求。</div><div class="line">&gt;    Scaling is accomplished by changing the number of replicas in a Deployment.</div><div class="line"></div><div class="line">扩大应用的规模时，Kubernetes将会在Nodes上面使用可用的资源来创建新的Pod，并运行新增加的应用，缩小规模时做相反的操作。Kubernetes也支持自动规模化Pod。当然我们也可以将应用的数量变为0，这样就会终止所有部署该应用的Pods。应用数量增加后，Service内的负载均衡就会变得非常有用了.</div><div class="line"></div><div class="line">![scale](https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_05_scaling1.svg)</div><div class="line"></div><div class="line"></div><div class="line">![scale](https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_05_scaling2.svg)</div></pre></td></tr></table></figure></nodes></none></nodes></p>
-<p>xis-macbook-pro:~ xiningwang$ kubectl get deployment<br>NAME         DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE<br>helloworld   1         1         1            1           2h<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">可以看到，现在我们只有一个Pod，</div><div class="line">- DESIRED字段表示我们配置的replicas的个数，即实例的个数。</div><div class="line">- CURRENT字段表示目前处于running状态的replicas的个数。</div><div class="line">- UP-TO-DATE字段表示表示和预先配置的期望状态相符的replicas的个数。</div><div class="line">- AVAILABLE字段表示目前实际对用户可用的replicas的个数。</div><div class="line"></div><div class="line">下面我们使用kubectl scale命令将启动4个复制品，语法规则是kubectl scale deployment-type name replicas-number：</div></pre></td></tr></table></figure></p>
-<p>xis-macbook-pro:~ xiningwang$ kubectl scale deployment/helloworld –replicas=4<br>deployment “helloworld” scaled<br>xis-macbook-pro:~ xiningwang$ kubectl get deployment<br>NAME         DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE<br>helloworld   4         4         4            4           2h</p>
-<p>xis-macbook-pro:~ xiningwang$ kubectl get pod -o wide<br>NAME                          READY     STATUS    RESTARTS   AGE       IP           NODE<br>helloworld-2790924137-2kg70   1/1       Running   0          3m        172.17.0.4   minikube<br>helloworld-2790924137-bvfhn   1/1       Running   0          2h        172.17.0.3   minikube<br>helloworld-2790924137-jg15m   1/1       Running   0          3m        172.17.0.5   minikube<br>helloworld-2790924137-tgqr9   1/1       Running   0          3m        172.17.0.2   minikube<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">验证一下这个Service是有负载均衡的：</div></pre></td></tr></table></figure></p>
-<p>xis-macbook-pro:~ xiningwang$ kubectl get deployment<br>NAME         DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE<br>helloworld   4         4         4            4           2h<br>xis-macbook-pro:~ xiningwang$ curl 192.168.99.100:31240<br>Hello world !<br>hostname:helloworld-2790924137-bvfhn<br>xis-macbook-pro:~ xiningwang$ curl 192.168.99.100:31240<br>Hello world !<br>hostname:helloworld-2790924137-tgqr9<br>xis-macbook-pro:~ xiningwang$ curl 192.168.99.100:31240<br>Hello world !<br>hostname:helloworld-2790924137-2kg70<br>xis-macbook-pro:~ xiningwang$ curl 192.168.99.100:31240<br>Hello world !<br>hostname:helloworld-2790924137-bvfhn<br>xis-macbook-pro:~ xiningwang$ curl 192.168.99.100:31240<br>Hello world !<br>hostname:helloworld-2790924137-tgqr9<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">## Rolling Update</div><div class="line">滚动更新（Rolling update）特性的好处就是我们不用停止服务就可以实现应用更新。默认更新的时候是一个Pod一个Pod更新的，所以整个过程服务不会中断。当然你也可以设置一次更新的Pod的百分比。而且更新过程中，Service只会将流量转发到可用的节点上面。更加重要的是，我们可以随时回退到旧版本。</div><div class="line">&gt;Rolling updates allow Deployments&apos; update to take place with zero downtime by incrementally updating Pods instances with new ones.</div><div class="line">If a Deployment is exposed publicly, the Service will load-balance the traffic only to available Pods during the update.</div><div class="line"></div><div class="line">![rollingupdate](https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_06_rollingupdates1.svg)</div><div class="line">![rollingupdate](https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_06_rollingupdates2.svg)</div><div class="line">![rollingupdate](https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_06_rollingupdates3.svg)</div><div class="line">![rollingupdate](https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_06_rollingupdates4.svg)</div><div class="line"></div><div class="line">在原来程序的基础上，多输出一个v2作为新版本，使用set image命令指定新版本镜像.</div></pre></td></tr></table></figure></p>
-<p>xis-macbook-pro:~ xiningwang$ kubectl set image deployments/helloworld helloworld=registry.hnaresearch.com/public/hello-world:v2.0<br>deployment “helloworld” image updated<br>xis-macbook-pro:~ xiningwang$ kubectl get pods<br>NAME                          READY     STATUS              RESTARTS   AGE<br>helloworld-2790924137-2kg70   1/1       Running             0          54m<br>helloworld-2790924137-bvfhn   1/1       Running             0          3h<br>helloworld-2790924137-tgqr9   1/1       Running             0          54m<br>helloworld-2889228138-65lmj   0/1       ContainerCreating   0          9m<br>helloworld-2889228138-q68vx   0/1       ContainerCreating   0          9m<br>xis-macbook-pro:~ xiningwang$ kubectl get pods<br>NAME                          READY     STATUS              RESTARTS   AGE<br>helloworld-2790924137-2kg70   1/1       Terminating         0          54m<br>helloworld-2790924137-bvfhn   1/1       Running             0          3h<br>helloworld-2790924137-tgqr9   0/1       Terminating         0          54m<br>helloworld-2889228138-65lmj   0/1       ContainerCreating   0          9m<br>helloworld-2889228138-bj38m   0/1       Pending             0          9m<br>helloworld-2889228138-dv3ch   1/1       Running             0          9m<br>helloworld-2889228138-q68vx   1/1       Running             0          9m<br>xis-macbook-pro:~ xiningwang$ kubectl get pods<br>NAME                          READY     STATUS    RESTARTS   AGE<br>helloworld-2889228138-65lmj   1/1       Running   0          10m<br>helloworld-2889228138-bj38m   1/1       Running   0          10m<br>helloworld-2889228138-dv3ch   1/1       Running   0          10m<br>helloworld-2889228138-q68vx   1/1       Running   0          10m<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">使用kubectl rollout undo命令回滚到之前的版本：</div></pre></td></tr></table></figure></p>
-<p>xis-macbook-pro:~ xiningwang$ kubectl rollout undo deployment/helloworld<br>deployment “helloworld” rolled back<br>```</p>
+<h3 id="Pod创建时默认创建的Label"><a href="#Pod创建时默认创建的Label" class="headerlink" title="Pod创建时默认创建的Label"></a>Pod创建时默认创建的Label</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl describe pod helloworld-2790924137-bvfhn</div><div class="line">Name:  		helloworld-2790924137-bvfhn</div><div class="line">Namespace:     	default</div><div class="line">Node:  		minikube/192.168.99.100</div><div class="line">Start Time:    	Fri, 05 May 2017 14:03:56 +0800</div><div class="line">Labels:		pod-template-hash=2790924137</div><div class="line">       		run=helloworld</div></pre></td></tr></table></figure>
+<h3 id="新增一个Label"><a href="#新增一个Label" class="headerlink" title="新增一个Label"></a>新增一个Label</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl label pod helloworld-2790924137-bvfhn app=v1</div><div class="line">pod &quot;helloworld-2790924137-bvfhn&quot; labeled</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl describe pod helloworld-2790924137-bvfhn</div><div class="line">Name:  		helloworld-2790924137-bvfhn</div><div class="line">Namespace:     	default</div><div class="line">Node:  		minikube/192.168.99.100</div><div class="line">Start Time:    	Fri, 05 May 2017 14:03:56 +0800</div><div class="line">Labels:		app=v1</div><div class="line">       		pod-template-hash=2790924137</div><div class="line">       		run=helloworld</div></pre></td></tr></table></figure>
+<h3 id="使用Label的例子"><a href="#使用Label的例子" class="headerlink" title="使用Label的例子"></a>使用Label的例子</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get service</div><div class="line">NAME         CLUSTER-IP   EXTERNAL-IP   PORT(S)          AGE</div><div class="line">helloworld   10.0.0.249   &lt;nodes&gt;       8090:31240/TCP   46m</div><div class="line">kubernetes   10.0.0.1     &lt;none&gt;        443/TCP          17h</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get service  -l run=helloworld</div><div class="line">NAME         CLUSTER-IP   EXTERNAL-IP   PORT(S)          AGE</div><div class="line">helloworld   10.0.0.249   &lt;nodes&gt;       8090:31240/TCP   46m</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get pod -l app=v1</div><div class="line">NAME                          READY     STATUS    RESTARTS   AGE</div><div class="line">helloworld-2790924137-bvfhn   1/1       Running   0          1h</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get pod</div><div class="line">NAME                             READY     STATUS             RESTARTS   AGE</div><div class="line">hello-minikube-938614450-b7xwm   0/1       ImagePullBackOff   0          38m</div><div class="line">helloworld-2790924137-bvfhn      1/1       Running            0          1h</div></pre></td></tr></table></figure>
+<h2 id="Scale"><a href="#Scale" class="headerlink" title="Scale"></a>Scale</h2><p>随着流量的增加，我们可能需要增加我们应用的规模来满足用户的需求。Kubernetes的Scale功能就可以实现这个需求。</p>
+<blockquote>
+<p>   Scaling is accomplished by changing the number of replicas in a Deployment.</p>
+</blockquote>
+<p>扩大应用的规模时，Kubernetes将会在Nodes上面使用可用的资源来创建新的Pod，并运行新增加的应用，缩小规模时做相反的操作。Kubernetes也支持自动规模化Pod。当然我们也可以将应用的数量变为0，这样就会终止所有部署该应用的Pods。应用数量增加后，Service内的负载均衡就会变得非常有用了.</p>
+<p><img src="https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_05_scaling1.svg" alt="scale"></p>
+<p><img src="https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_05_scaling2.svg" alt="scale"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get deployment</div><div class="line">NAME         DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE</div><div class="line">helloworld   1         1         1            1           2h</div></pre></td></tr></table></figure>
+<p>可以看到，现在我们只有一个Pod，</p>
+<ul>
+<li>DESIRED字段表示我们配置的replicas的个数，即实例的个数。</li>
+<li>CURRENT字段表示目前处于running状态的replicas的个数。</li>
+<li>UP-TO-DATE字段表示表示和预先配置的期望状态相符的replicas的个数。</li>
+<li>AVAILABLE字段表示目前实际对用户可用的replicas的个数。</li>
+</ul>
+<p>下面我们使用kubectl scale命令将启动4个复制品，语法规则是kubectl scale deployment-type name replicas-number：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl scale deployment/helloworld --replicas=4</div><div class="line">deployment &quot;helloworld&quot; scaled</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get deployment</div><div class="line">NAME         DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE</div><div class="line">helloworld   4         4         4            4           2h</div><div class="line"></div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get pod -o wide</div><div class="line">NAME                          READY     STATUS    RESTARTS   AGE       IP           NODE</div><div class="line">helloworld-2790924137-2kg70   1/1       Running   0          3m        172.17.0.4   minikube</div><div class="line">helloworld-2790924137-bvfhn   1/1       Running   0          2h        172.17.0.3   minikube</div><div class="line">helloworld-2790924137-jg15m   1/1       Running   0          3m        172.17.0.5   minikube</div><div class="line">helloworld-2790924137-tgqr9   1/1       Running   0          3m        172.17.0.2   minikube</div></pre></td></tr></table></figure></p>
+<p>验证一下这个Service是有负载均衡的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get deployment</div><div class="line">NAME         DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE</div><div class="line">helloworld   4         4         4            4           2h</div><div class="line">xis-macbook-pro:~ xiningwang$ curl 192.168.99.100:31240</div><div class="line">Hello world !</div><div class="line">hostname:helloworld-2790924137-bvfhn</div><div class="line">xis-macbook-pro:~ xiningwang$ curl 192.168.99.100:31240</div><div class="line">Hello world !</div><div class="line">hostname:helloworld-2790924137-tgqr9</div><div class="line">xis-macbook-pro:~ xiningwang$ curl 192.168.99.100:31240</div><div class="line">Hello world !</div><div class="line">hostname:helloworld-2790924137-2kg70</div><div class="line">xis-macbook-pro:~ xiningwang$ curl 192.168.99.100:31240</div><div class="line">Hello world !</div><div class="line">hostname:helloworld-2790924137-bvfhn</div><div class="line">xis-macbook-pro:~ xiningwang$ curl 192.168.99.100:31240</div><div class="line">Hello world !</div><div class="line">hostname:helloworld-2790924137-tgqr9</div></pre></td></tr></table></figure></p>
+<h2 id="Rolling-Update"><a href="#Rolling-Update" class="headerlink" title="Rolling Update"></a>Rolling Update</h2><p>滚动更新（Rolling update）特性的好处就是我们不用停止服务就可以实现应用更新。默认更新的时候是一个Pod一个Pod更新的，所以整个过程服务不会中断。当然你也可以设置一次更新的Pod的百分比。而且更新过程中，Service只会将流量转发到可用的节点上面。更加重要的是，我们可以随时回退到旧版本。</p>
+<blockquote>
+<p>Rolling updates allow Deployments’ update to take place with zero downtime by incrementally updating Pods instances with new ones.<br>If a Deployment is exposed publicly, the Service will load-balance the traffic only to available Pods during the update.</p>
+</blockquote>
+<p><img src="https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_06_rollingupdates1.svg" alt="rollingupdate"><br><img src="https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_06_rollingupdates2.svg" alt="rollingupdate"><br><img src="https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_06_rollingupdates3.svg" alt="rollingupdate"><br><img src="https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_06_rollingupdates4.svg" alt="rollingupdate"></p>
+<p>在原来程序的基础上，多输出一个v2作为新版本，使用set image命令指定新版本镜像.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl set image deployments/helloworld helloworld=registry.hnaresearch.com/public/hello-world:v2.0</div><div class="line">deployment &quot;helloworld&quot; image updated</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get pods</div><div class="line">NAME                          READY     STATUS              RESTARTS   AGE</div><div class="line">helloworld-2790924137-2kg70   1/1       Running             0          54m</div><div class="line">helloworld-2790924137-bvfhn   1/1       Running             0          3h</div><div class="line">helloworld-2790924137-tgqr9   1/1       Running             0          54m</div><div class="line">helloworld-2889228138-65lmj   0/1       ContainerCreating   0          9m</div><div class="line">helloworld-2889228138-q68vx   0/1       ContainerCreating   0          9m</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get pods</div><div class="line">NAME                          READY     STATUS              RESTARTS   AGE</div><div class="line">helloworld-2790924137-2kg70   1/1       Terminating         0          54m</div><div class="line">helloworld-2790924137-bvfhn   1/1       Running             0          3h</div><div class="line">helloworld-2790924137-tgqr9   0/1       Terminating         0          54m</div><div class="line">helloworld-2889228138-65lmj   0/1       ContainerCreating   0          9m</div><div class="line">helloworld-2889228138-bj38m   0/1       Pending             0          9m</div><div class="line">helloworld-2889228138-dv3ch   1/1       Running             0          9m</div><div class="line">helloworld-2889228138-q68vx   1/1       Running             0          9m</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get pods</div><div class="line">NAME                          READY     STATUS    RESTARTS   AGE</div><div class="line">helloworld-2889228138-65lmj   1/1       Running   0          10m</div><div class="line">helloworld-2889228138-bj38m   1/1       Running   0          10m</div><div class="line">helloworld-2889228138-dv3ch   1/1       Running   0          10m</div><div class="line">helloworld-2889228138-q68vx   1/1       Running   0          10m</div></pre></td></tr></table></figure></p>
+<p>使用kubectl rollout undo命令回滚到之前的版本：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl rollout undo deployment/helloworld</div><div class="line">deployment &quot;helloworld&quot; rolled back</div></pre></td></tr></table></figure></p>
 
       
     </div>
@@ -507,8 +487,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/05/04/README/" rel="next" title="">
-                <i class="fa fa-chevron-left"></i> 
+              <a href="/2017/05/04/README/" rel="next" title="分布式架构">
+                <i class="fa fa-chevron-left"></i> 分布式架构
               </a>
             
           </div>
@@ -516,10 +496,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/05/08/hello-world/" rel="prev" title="Hello World">
-                Hello World <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -598,14 +574,32 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
           
 
           
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
 
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
           
 
         </nav>
@@ -637,7 +631,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MiniKube"><span class="nav-number">1.</span> <span class="nav-text">MiniKube</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#搭建Kubernetes集群"><span class="nav-number">2.</span> <span class="nav-text">搭建Kubernetes集群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装"><span class="nav-number">2.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ONLY-FOR-CHINESE"><span class="nav-number">2.2.</span> <span class="nav-text">ONLY FOR CHINESE</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署应用"><span class="nav-number">3.</span> <span class="nav-text">部署应用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pod"><span class="nav-number">4.</span> <span class="nav-text">Pod</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Service"><span class="nav-number">5.</span> <span class="nav-text">Service</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Label"><span class="nav-number">6.</span> <span class="nav-text">Label</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MiniKube"><span class="nav-number">1.</span> <span class="nav-text">MiniKube</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#搭建Kubernetes集群"><span class="nav-number">2.</span> <span class="nav-text">搭建Kubernetes集群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装"><span class="nav-number">2.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ONLY-FOR-CHINESE"><span class="nav-number">2.2.</span> <span class="nav-text">ONLY FOR CHINESE</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署应用"><span class="nav-number">3.</span> <span class="nav-text">部署应用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pod"><span class="nav-number">4.</span> <span class="nav-text">Pod</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Service"><span class="nav-number">5.</span> <span class="nav-text">Service</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Label"><span class="nav-number">6.</span> <span class="nav-text">Label</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Pod创建时默认创建的Label"><span class="nav-number">6.1.</span> <span class="nav-text">Pod创建时默认创建的Label</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#新增一个Label"><span class="nav-number">6.2.</span> <span class="nav-text">新增一个Label</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用Label的例子"><span class="nav-number">6.3.</span> <span class="nav-text">使用Label的例子</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Scale"><span class="nav-number">7.</span> <span class="nav-text">Scale</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rolling-Update"><span class="nav-number">8.</span> <span class="nav-text">Rolling Update</span></a></li></ol></div>
             
 
           </div>
@@ -783,7 +777,7 @@
         var disqus_config = function () {
           this.page.url = 'http://yoursite.com/2017/05/05/kubernetes/';
           this.page.identifier = '2017/05/05/kubernetes/';
-          this.page.title = '';
+          this.page.title = 'Kubernetes';
         };
         var d = document, s = d.createElement('script');
         s.src = 'https://.disqus.com/embed.js';
@@ -823,132 +817,6 @@
 
 
   
-
-  <script type="text/javascript">
-    // Popup Window;
-    var isfetched = false;
-    // Search DB path;
-    var search_path = "search.xml";
-    if (search_path.length == 0) {
-      search_path = "search.xml";
-    }
-    var path = "/" + search_path;
-    // monitor main search box;
-
-    function proceedsearch() {
-      $("body")
-        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
-        .css('overflow', 'hidden');
-      $('.popup').toggle();
-    }
-    // search function;
-    var searchFunc = function(path, search_id, content_id) {
-      'use strict';
-      $.ajax({
-        url: path,
-        dataType: "xml",
-        async: true,
-        success: function( xmlResponse ) {
-          // get the contents from search data
-          isfetched = true;
-          $('.popup').detach().appendTo('.header-inner');
-          var datas = $( "entry", xmlResponse ).map(function() {
-            return {
-              title: $( "title", this ).text(),
-              content: $("content",this).text(),
-              url: $( "url" , this).text()
-            };
-          }).get();
-          var $input = document.getElementById(search_id);
-          var $resultContent = document.getElementById(content_id);
-          $input.addEventListener('input', function(){
-            var matchcounts = 0;
-            var str='<ul class=\"search-result-list\">';
-            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
-            $resultContent.innerHTML = "";
-            if (this.value.trim().length > 1) {
-              // perform local searching
-              datas.forEach(function(data) {
-                var isMatch = false;
-                var content_index = [];
-                var data_title = data.title.trim().toLowerCase();
-                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
-                var data_url = decodeURIComponent(data.url);
-                var index_title = -1;
-                var index_content = -1;
-                var first_occur = -1;
-                // only match artiles with not empty titles and contents
-                if(data_title != '') {
-                  keywords.forEach(function(keyword, i) {
-                    index_title = data_title.indexOf(keyword);
-                    index_content = data_content.indexOf(keyword);
-                    if( index_title >= 0 || index_content >= 0 ){
-                      isMatch = true;
-                      if (i == 0) {
-                        first_occur = index_content;
-                      }
-                    }
-
-                  });
-                }
-                // show search results
-                if (isMatch) {
-                  matchcounts += 1;
-                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
-                  var content = data.content.trim().replace(/<[^>]+>/g,"");
-                  if (first_occur >= 0) {
-                    // cut out 100 characters
-                    var start = first_occur - 20;
-                    var end = first_occur + 80;
-                    if(start < 0){
-                      start = 0;
-                    }
-                    if(start == 0){
-                      end = 50;
-                    }
-                    if(end > content.length){
-                      end = content.length;
-                    }
-                    var match_content = content.substring(start, end);
-                    // highlight all keywords
-                    keywords.forEach(function(keyword){
-                      var regS = new RegExp(keyword, "gi");
-                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
-                    });
-
-                    str += "<p class=\"search-result\">" + match_content +"...</p>"
-                  }
-                  str += "</li>";
-                }
-              })};
-            str += "</ul>";
-            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
-            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
-            $resultContent.innerHTML = str;
-          });
-          proceedsearch();
-        }
-      });}
-
-    // handle and trigger popup window;
-    $('.popup-trigger').click(function(e) {
-      e.stopPropagation();
-      if (isfetched == false) {
-        searchFunc(path, 'local-search-input', 'local-search-result');
-      } else {
-        proceedsearch();
-      };
-    });
-
-    $('.popup-btn-close').click(function(e){
-      $('.popup').hide();
-      $(".local-search-pop-overlay").remove();
-      $('body').css('overflow', '');
-    });
-    $('.popup').click(function(e){
-      e.stopPropagation();
-    });
-  </script>
 
 
 

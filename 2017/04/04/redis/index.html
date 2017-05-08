@@ -89,13 +89,13 @@
 
 <meta name="description" content="docker run –name myredis -v /Users/xiningwang/nosql/redis/redis-3.2.8/data:/data -p 6379:6379 -d redis redis-server –appendonly yes">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Technical Blog">
+<meta property="og:title" content="Redis">
 <meta property="og:url" content="http://yoursite.com/2017/04/04/redis/index.html">
 <meta property="og:site_name" content="Technical Blog">
 <meta property="og:description" content="docker run –name myredis -v /Users/xiningwang/nosql/redis/redis-3.2.8/data:/data -p 6379:6379 -d redis redis-server –appendonly yes">
-<meta property="og:updated_time" content="2017-04-04T12:04:24.000Z">
+<meta property="og:updated_time" content="2017-05-08T13:32:07.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Technical Blog">
+<meta name="twitter:title" content="Redis">
 <meta name="twitter:description" content="docker run –name myredis -v /Users/xiningwang/nosql/redis/redis-3.2.8/data:/data -p 6379:6379 -d redis redis-server –appendonly yes">
 
 
@@ -105,7 +105,7 @@
   var CONFIG = {
     root: '/',
     scheme: 'Pisces',
-    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
     fancybox: true,
     motion: true,
     duoshuo: {
@@ -130,7 +130,7 @@
 
 
 
-  <title>  | Technical Blog </title>
+  <title> Redis | Technical Blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -240,55 +240,11 @@
           </a>
         </li>
       
-        
-        <li class="menu-item menu-item-commonweal">
-          <a href="/404.html" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
-            
-            公益404
-          </a>
-        </li>
-      
 
-      
-        <li class="menu-item menu-item-search">
-          
-            <a href="javascript:;" class="popup-trigger">
-          
-            
-              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
-            
-            搜索
-          </a>
-        </li>
       
     </ul>
   
 
-  
-    <div class="site-search">
-      
-  <div class="popup search-popup local-search-popup">
-  <div class="local-search-header clearfix">
-    <span class="search-icon">
-      <i class="fa fa-search"></i>
-    </span>
-    <span class="popup-btn-close">
-      <i class="fa fa-times-circle"></i>
-    </span>
-    <div class="local-search-input-wrapper">
-      <input autocapitalize="off" autocomplete="off" autocorrect="off"
-             placeholder="搜索..." spellcheck="false"
-             type="text" id="local-search-input">
-    </div>
-  </div>
-  <div id="local-search-result"></div>
-</div>
-
-
-
-    </div>
   
 </nav>
 
@@ -334,7 +290,7 @@
             
             
               
-                
+                Redis
               
             
           </h1>
@@ -396,7 +352,7 @@
       
 
       
-        <p>docker run –name myredis -v /Users/xiningwang/nosql/redis/redis-3.2.8/data:/data -p 6379:6379 -d redis redis-server –appendonly yes </p>
+        <p>docker run –name myredis -v /Users/xiningwang/nosql/redis/redis-3.2.8/data:/data -p 6379:6379 -d redis redis-server –appendonly yes</p>
 
       
     </div>
@@ -433,8 +389,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/04/01/running-spark-on-yarn/" rel="next" title="">
-                <i class="fa fa-chevron-left"></i> 
+              <a href="/2017/04/01/running-spark-on-yarn/" rel="next" title="Running Spark on YARN">
+                <i class="fa fa-chevron-left"></i> Running Spark on YARN
               </a>
             
           </div>
@@ -443,8 +399,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2017/04/10/spark/" rel="prev" title="">
-                 <i class="fa fa-chevron-right"></i>
+              <a href="/2017/04/10/spark/" rel="prev" title="Spark">
+                Spark <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -515,14 +471,32 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
           
 
           
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
 
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
           
 
         </nav>
@@ -684,7 +658,7 @@
         var disqus_config = function () {
           this.page.url = 'http://yoursite.com/2017/04/04/redis/';
           this.page.identifier = '2017/04/04/redis/';
-          this.page.title = '';
+          this.page.title = 'Redis';
         };
         var d = document, s = d.createElement('script');
         s.src = 'https://.disqus.com/embed.js';
@@ -724,132 +698,6 @@
 
 
   
-
-  <script type="text/javascript">
-    // Popup Window;
-    var isfetched = false;
-    // Search DB path;
-    var search_path = "search.xml";
-    if (search_path.length == 0) {
-      search_path = "search.xml";
-    }
-    var path = "/" + search_path;
-    // monitor main search box;
-
-    function proceedsearch() {
-      $("body")
-        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
-        .css('overflow', 'hidden');
-      $('.popup').toggle();
-    }
-    // search function;
-    var searchFunc = function(path, search_id, content_id) {
-      'use strict';
-      $.ajax({
-        url: path,
-        dataType: "xml",
-        async: true,
-        success: function( xmlResponse ) {
-          // get the contents from search data
-          isfetched = true;
-          $('.popup').detach().appendTo('.header-inner');
-          var datas = $( "entry", xmlResponse ).map(function() {
-            return {
-              title: $( "title", this ).text(),
-              content: $("content",this).text(),
-              url: $( "url" , this).text()
-            };
-          }).get();
-          var $input = document.getElementById(search_id);
-          var $resultContent = document.getElementById(content_id);
-          $input.addEventListener('input', function(){
-            var matchcounts = 0;
-            var str='<ul class=\"search-result-list\">';
-            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
-            $resultContent.innerHTML = "";
-            if (this.value.trim().length > 1) {
-              // perform local searching
-              datas.forEach(function(data) {
-                var isMatch = false;
-                var content_index = [];
-                var data_title = data.title.trim().toLowerCase();
-                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
-                var data_url = decodeURIComponent(data.url);
-                var index_title = -1;
-                var index_content = -1;
-                var first_occur = -1;
-                // only match artiles with not empty titles and contents
-                if(data_title != '') {
-                  keywords.forEach(function(keyword, i) {
-                    index_title = data_title.indexOf(keyword);
-                    index_content = data_content.indexOf(keyword);
-                    if( index_title >= 0 || index_content >= 0 ){
-                      isMatch = true;
-                      if (i == 0) {
-                        first_occur = index_content;
-                      }
-                    }
-
-                  });
-                }
-                // show search results
-                if (isMatch) {
-                  matchcounts += 1;
-                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
-                  var content = data.content.trim().replace(/<[^>]+>/g,"");
-                  if (first_occur >= 0) {
-                    // cut out 100 characters
-                    var start = first_occur - 20;
-                    var end = first_occur + 80;
-                    if(start < 0){
-                      start = 0;
-                    }
-                    if(start == 0){
-                      end = 50;
-                    }
-                    if(end > content.length){
-                      end = content.length;
-                    }
-                    var match_content = content.substring(start, end);
-                    // highlight all keywords
-                    keywords.forEach(function(keyword){
-                      var regS = new RegExp(keyword, "gi");
-                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
-                    });
-
-                    str += "<p class=\"search-result\">" + match_content +"...</p>"
-                  }
-                  str += "</li>";
-                }
-              })};
-            str += "</ul>";
-            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
-            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
-            $resultContent.innerHTML = str;
-          });
-          proceedsearch();
-        }
-      });}
-
-    // handle and trigger popup window;
-    $('.popup-trigger').click(function(e) {
-      e.stopPropagation();
-      if (isfetched == false) {
-        searchFunc(path, 'local-search-input', 'local-search-result');
-      } else {
-        proceedsearch();
-      };
-    });
-
-    $('.popup-btn-close').click(function(e){
-      $('.popup').hide();
-      $(".local-search-pop-overlay").remove();
-      $('body').css('overflow', '');
-    });
-    $('.popup').click(function(e){
-      e.stopPropagation();
-    });
-  </script>
 
 
 
