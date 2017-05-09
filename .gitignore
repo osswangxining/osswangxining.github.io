@@ -5,3 +5,5 @@ scaffolds
 .DS_Store
 
 *.html
+
+db.json

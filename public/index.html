@@ -270,7 +270,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/09/kubernetes-secrets/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/README/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Xi Ning Wang">
@@ -292,8 +292,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/05/09/kubernetes-secrets/" itemprop="url">
-                  Kubernetes Secrets
+                <a class="post-title-link" href="/README/" itemprop="url">
+                  分布式架构
                 </a>
               
             
@@ -309,7 +309,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-09T14:20:00+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-09T20:46:25+08:00">
                 2017-05-09
               </time>
             
@@ -350,9 +350,540 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2017/05/09/kubernetes-secrets/#comments" itemprop="discussionUrl">
+                <a href="/README/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/05/09/kubernetes-secrets/" itemprop="commentCount"></span>
+                        data-disqus-identifier="README/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="分布式配置管理"><a href="#分布式配置管理" class="headerlink" title="分布式配置管理"></a>分布式配置管理</h2><ul>
+<li><a href="/consul">Consul</a></li>
+<li>Archaius</li>
+<li><a href="/kubernetes-configmap/">Kubernetes ConfigMap</a></li>
+<li><a href="/kubernetes-secrets/">Kubernetes Secrets</a></li>
+</ul>
+<p>配置的集中管理：采用consul的KV，将所有微服务的application.properties中的配置内容存入consul。</p>
+<p>配置的动态管理：采用archaius，将consul上的配置信息读到spring的PropertySource和archaius的PollResult中，当修改了配置信息后，经常改变的值通过DynamicFactory来获取，不经常改变的值可以通过其他方式获取. 大部分情况下，修改了consul上的配置信息后，相应的项目不需要重启，也会读到最新的值。</p>
+<h2 id="服务注册与发现"><a href="#服务注册与发现" class="headerlink" title="服务注册与发现"></a>服务注册与发现</h2><ul>
+<li><a href="/consul/">Consul</a></li>
+<li>Eureka</li>
+<li><a href="/kubernetes/#service">Kubernetes Service</a></li>
+</ul>
+<h2 id="负载平衡"><a href="#负载平衡" class="headerlink" title="负载平衡"></a>负载平衡</h2><ul>
+<li>Netflix Ribbon（Spring Cloud）</li>
+<li><p><a href="/kubernetes/#service">Kubernetes Service</a></p>
+<p><a href="/consul/">Client Side Load Balancing</a></p>
+</li>
+</ul>
+<h2 id="API网关与智能路由"><a href="#API网关与智能路由" class="headerlink" title="API网关与智能路由"></a>API网关与智能路由</h2><ul>
+<li>Netflix Zuul（SpringCloud）</li>
+<li><a href="/kubernetes/#service">Kubernetes Service</a></li>
+<li><p><a href="/kubernetes-ingress/">Kubernetes Ingress</a></p>
+<p><a href="/gateway/">Gateway</a></p>
+</li>
+</ul>
+<h2 id="分布式服务弹性与容错"><a href="#分布式服务弹性与容错" class="headerlink" title="分布式服务弹性与容错"></a>分布式服务弹性与容错</h2><ul>
+<li>弹性服务</li>
+<li>服务降级</li>
+<li>线程池/信号隔离</li>
+<li><p>快速解决依赖隔离</p>
+<p><a href="/Hystrix/">Hystrix架构设计</a></p>
+</li>
+</ul>
+<h2 id="日志管理"><a href="#日志管理" class="headerlink" title="日志管理"></a>日志管理</h2><ul>
+<li>ELK Stack（LogStash -&gt; ES -&gt; Kibana）</li>
+</ul>
+<h2 id="分布式跟踪"><a href="#分布式跟踪" class="headerlink" title="分布式跟踪"></a>分布式跟踪</h2><ul>
+<li>Zipkin</li>
+<li><p>SpringCloud Sleuth</p>
+<p><a href="/zipkin/">Zipkin</a> is a distributed tracing system. It helps gather timing data needed to troubleshoot latency problems in microservice architectures. It manages both the collection and lookup of this data. Zipkin’s design is based on the Google Dapper paper.</p>
+<p>Applications are instrumented to report timing data to Zipkin. The Zipkin UI also presents a Dependency diagram showing how many traced requests went through each application. If you are troubleshooting latency problems or errors, you can filter or sort all traces based on the application, length of trace, annotation, or timestamp. Once you select a trace, you can see the percentage of the total trace time each span takes which allows you to identify the problem application.</p>
+</li>
+</ul>
+<h2 id="监控与度量"><a href="#监控与度量" class="headerlink" title="监控与度量"></a>监控与度量</h2><ul>
+<li><p>Application/Infrastructure monitoring using StatsD + Graphite + Grafana</p>
+<p><a href="/sgg/">StatsD + Graphite + Grafana</a></p>
+</li>
+</ul>
+<h2 id="服务安全"><a href="#服务安全" class="headerlink" title="服务安全"></a>服务安全</h2><ul>
+<li>SpringCloud Security</li>
+</ul>
+<h2 id="Auto-Scaling"><a href="#Auto-Scaling" class="headerlink" title="Auto Scaling"></a>Auto Scaling</h2><ul>
+<li><a href="/kubernetes/#Autoscaling">Kubernetes Autoscaling</a></li>
+</ul>
+<h2 id="打包部署和调度部署"><a href="#打包部署和调度部署" class="headerlink" title="打包部署和调度部署"></a>打包部署和调度部署</h2><ul>
+<li>Spring Boot；</li>
+<li><a href="/kubernetes/#Deployment">Docker／Rkt、Kubernetes Scheduler&amp;Deployment</a></li>
+</ul>
+<h2 id="任务工作管理"><a href="#任务工作管理" class="headerlink" title="任务工作管理"></a>任务工作管理</h2><ul>
+<li>Spring Batch</li>
+<li><a href="/kubernetes/#Job">Kubernetes Jobs</a></li>
+</ul>
+<h2 id="分布式存储"><a href="#分布式存储" class="headerlink" title="分布式存储"></a>分布式存储</h2><h3 id="持久化-分布式文件系统"><a href="#持久化-分布式文件系统" class="headerlink" title="持久化 - 分布式文件系统"></a>持久化 - 分布式文件系统</h3><ul>
+<li><a href="/hdfs/">HDFS分布式文件系统</a></li>
+</ul>
+<h3 id="持久化-分布式数据库"><a href="#持久化-分布式数据库" class="headerlink" title="持久化 - 分布式数据库"></a>持久化 - 分布式数据库</h3><ul>
+<li>[传统关系型数据库集群,如MySQL Cluster]</li>
+<li><a href="/mongo/">Mongo</a></li>
+<li><a href="/hbase/">Cassandra,HBase</a></li>
+</ul>
+<h3 id="非持久化-分布式缓存-消息系统"><a href="#非持久化-分布式缓存-消息系统" class="headerlink" title="非持久化 - 分布式缓存/消息系统"></a>非持久化 - 分布式缓存/消息系统</h3><ul>
+<li><a href="/kafka/">Kafka</a></li>
+<li>[Redis]</li>
+</ul>
+<h2 id="分布式计算框架"><a href="#分布式计算框架" class="headerlink" title="分布式计算框架"></a>分布式计算框架</h2><ul>
+<li><a href="/yarn/">YARN分布式计算框架</a></li>
+<li><a href="/yarn-appdev/">YARN应用开发的几种方式</a></li>
+<li><a href="/running-spark-on-yarn/">Running Spark on YARN</a></li>
+<li><a href="spark.md">Spark Big Data Analytics</a></li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/sgg/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/sgg/" itemprop="url">
+                  StatsD - Graphite - Grafana
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-09T20:46:25+08:00">
+                2017-04-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/sgg/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="sgg/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>#1. StatsD - metrics data collecting</p>
+<ul>
+<li>In your application code, use the StatsD client (e.g. Java client library) to collect and send the statistics and aggregation data to StatsD server;</li>
+<li>Not need to pre-define the metrics in anywhere, just place them into your application code;</li>
+<li>By default, stats data are aggregated and sent to Graphite server by every 10 seconds, so think this near-realtime;</li>
+</ul>
+<p>#2. Graphite - metrics data graphing and storage</p>
+<ul>
+<li>Store numeric time-series data: The metric data would be stored into Graphite server (include a Whisper database);</li>
+<li>Render the graph for metrics data per the metrics demand;</li>
+<li>The pre-built UI dashboard is not powerful shown as below, but can easily use it to view the metrics data;</li>
+<li>For production environment, Graphite server should be running as cluster instead of stand-alone server;</li>
+</ul>
+<p>#3. Grafana - powerful dashboard for visualizing the metrics data</p>
+<ul>
+<li>easy to integrate with Graphite to visualize the metrics data;</li>
+<li>input the Graphite HTTP URL to link to Graphite as data source;</li>
+<li>powerful pre-built reporting charts and dashboard;</li>
+</ul>
+<p>#4.  Sample Code:</p>
+<ul>
+<li>easy to feed the data to StatsD -&gt; Graphite -&gt; Grafana<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">private static final StatsDClient statsd = new NonBlockingStatsDClient(&quot;app.api-analytics.sample&quot;, &quot;127.0.0.1&quot;,</div><div class="line">     8125);</div><div class="line">statsd.count(&quot;get.request&quot;, (long)(Math.random()* 10)); // Request count of this API</div></pre></td></tr></table></figure>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/spark/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/spark/" itemprop="url">
+                  Spark
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-09T20:46:25+08:00">
+                2017-04-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/spark/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="spark/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/kubernetes-secrets/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/kubernetes-secrets/" itemprop="url">
+                  Kubernetes Secrets
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-10T20:46:25+08:00">
+                2017-03-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式&云计算</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/kubernetes-secrets/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="kubernetes-secrets/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -385,7 +916,36 @@
 <p>为了使用Secret对象，pod必须引用这个Secret，同样可以手动或者自动来执行引用操作。</p>
 <h2 id="Built-in-Secrets"><a href="#Built-in-Secrets" class="headerlink" title="Built-in Secrets"></a>Built-in Secrets</h2><p>Kubernetes会自动创建包含证书信息的Secret，并且使用它来访问api, Kubernetes也将自动修改pod来使用这个Secret。</p>
 <p>自动创建的Secret以及所使用的api证书,可以根据需要disable或者override。如果仅仅需要安全访问apiserver，那么上述的流程是推荐的方式。</p>
-<h2 id="自定义Secrets"><a href="#自定义Secrets" class="headerlink" title="自定义Secrets"></a>自定义Secrets</h2>
+<h2 id="自定义Secrets"><a href="#自定义Secrets" class="headerlink" title="自定义Secrets"></a>自定义Secrets</h2><h3 id="通过kubectl自定义Secrets"><a href="#通过kubectl自定义Secrets" class="headerlink" title="通过kubectl自定义Secrets"></a>通过kubectl自定义Secrets</h3><p>数据中的字段为map类型。其中keys必须符合dns_subdomain规则，values可以为任意类型，使用base64编码。上述例子中，username和password的数据值在base64编码前的值为value-1 和 value-2。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ echo -n &quot;admin&quot; &gt; ./username.txt</div><div class="line">xis-macbook-pro:~ xiningwang$  echo -n &quot;1f2d1e2e67df&quot; &gt; ./password.txt</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl create secret generic db-user-pass --from-file=./username.txt --from-file=./password.txt</div><div class="line">secret &quot;db-user-pass&quot; created</div></pre></td></tr></table></figure></p>
+<p>查看创建的Secrets:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get secrets</div><div class="line">NAME                  TYPE                                  DATA      AGE</div><div class="line">db-user-pass          Opaque                                2         6m</div><div class="line">default-token-t5bk8   kubernetes.io/service-account-token   3         4d</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl describe secrets/db-user-pass</div><div class="line">Name:  		db-user-pass</div><div class="line">Namespace:     	default</div><div class="line">Labels:		&lt;none&gt;</div><div class="line">Annotations:   	&lt;none&gt;</div><div class="line"></div><div class="line">Type:  	Opaque</div><div class="line"></div><div class="line">Data</div><div class="line">====</div><div class="line">password.txt:  	12 bytes</div><div class="line">username.txt:  	5 bytes</div></pre></td></tr></table></figure></p>
+<h3 id="手工创建Secrets"><a href="#手工创建Secrets" class="headerlink" title="手工创建Secrets"></a>手工创建Secrets</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ echo -n &quot;admin&quot; | base64</div><div class="line">YWRtaW4=</div><div class="line">xis-macbook-pro:~ xiningwang$ echo -n &quot;1f2d1e2e67df&quot; | base64</div><div class="line">MWYyZDFlMmU2N2Rm</div><div class="line">xis-macbook-pro:~ xiningwang$ vi mysecrect.yaml</div><div class="line">apiVersion: v1</div><div class="line">kind: Secret</div><div class="line">metadata:</div><div class="line">  name: mysecret</div><div class="line">type: Opaque</div><div class="line">data:</div><div class="line">  username: YWRtaW4=</div><div class="line">  password: MWYyZDFlMmU2N2Rm</div></pre></td></tr></table></figure>
+<p>使用yaml文件创建Secrets:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl create -f ./mysecrect.yaml</div><div class="line">secret &quot;mysecret&quot; created</div><div class="line">```   </div><div class="line"></div><div class="line">## 查看Secrets</div><div class="line">使用如下命令获取创建的Secrets内容:</div></pre></td></tr></table></figure></p>
+<p>xis-macbook-pro:~ xiningwang$ kubectl get secret db-user-pass -o yaml<br>apiVersion: v1<br>data:<br>  password.txt: MWYyZDFlMmU2N2Rm<br>  username.txt: YWRtaW4=<br>kind: Secret<br>metadata:<br>  creationTimestamp: 2017-05-09T07:54:29Z<br>  name: db-user-pass<br>  namespace: default<br>  resourceVersion: “84609”<br>  selfLink: /api/v1/namespaces/default/secrets/db-user-pass<br>  uid: bb23a365-348c-11e7-ab36-080027fd8883<br>type: Opaque<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">base64解密:</div></pre></td></tr></table></figure></p>
+<p>$ echo “MWYyZDFlMmU2N2Rm” | base64 –decode<br>1f2d1e2e67df<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">## 使用Secrets</div><div class="line">### 手动为pod绑定secret</div><div class="line">必须有spec.volumes才能使用secret。 如果一个pod中有多个container，每个container需要他们单独对应的volumeMounts ，但是一个secret只能对应一个spec.volumes。</div></pre></td></tr></table></figure></p>
+<p>{<br> “apiVersion”: “v1”,<br> “kind”: “Pod”,<br>  “metadata”: {<br>    “name”: “mypod”,<br>    “namespace”: “myns”<br>  },<br>  “spec”: {<br>    “containers”: [{<br>      “name”: “mypod”,<br>      “image”: “redis”,<br>      “volumeMounts”: [{<br>        “name”: “foo”,<br>        “mountPath”: “/etc/foo”,<br>        “readOnly”: true<br>      }]<br>    }],<br>    “volumes”: [{<br>      “name”: “foo”,<br>      “secret”: {<br>        “secretName”: “mysecret”<br>      }<br>    }]<br>  }<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">查看Secrets的值:</div></pre></td></tr></table></figure></p>
+<p>$ ls /etc/foo/<br>username<br>password<br>$ cat /etc/foo/username<br>admin<br>$ cat /etc/foo/password<br>1f2d1e2e67df<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">### 使用Secrets作为环境变量</div><div class="line">&gt;  定义对Secrets的引用: env[x].valueFrom.secretKeyRef.</div></pre></td></tr></table></figure></p>
+<p>apiVersion: v1<br>kind: Pod<br>metadata:<br>  name: secret-env-pod<br>spec:<br>  containers:</p>
+<pre><code>- name: mycontainer
+  image: redis
+  env:
+    - name: SECRET_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: mysecret
+          key: username
+    - name: SECRET_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: mysecret
+          key: password
+</code></pre><p>  restartPolicy: Never<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">查看Secrets的值:</div></pre></td></tr></table></figure></p>
+<p>$ echo $SECRET_USERNAME<br>admin<br>$ echo $SECRET_PASSWORD<br>1f2d1e2e67df<br>```</p>
+<h2 id="Secret与Pod的生命周期"><a href="#Secret与Pod的生命周期" class="headerlink" title="Secret与Pod的生命周期"></a>Secret与Pod的生命周期</h2><p>当通过api创建一个pod后，不会去检查所引用的secret是否存在。一旦这个pod被使用，kubelet将会尝试去获取引用的secret的值。如果这个secret不存在，或者kubelet暂时链接不上apiserver，kubelet将会定期重试，并发送一个event来解释pod没有启动的原因。如果获取到了对应的secret，kubelet将会创建对应的volume并绑定到container。</p>
+<p>一旦kubelet创建了一个pod，则container使用的相关secret volume不会在改变，即使对应的secret对象被修改。如果为了改变使用的secret，则必须删除旧的pod，并重新创建一个新的pod。</p>
+<p>##限制<br>在使用之前，Secret volume 资源被验证，以确保指定的对象引用真是指向一个secret对象。因此，在pod使用它之前必须保证需要的secret被成功创建。Secret api对象从属于namespace，一个Secret对象只能被同namespace的pod所使用。</p>
+<p>单个secret限制在1Mb之内，防止过大的secret耗尽apiserver &amp; kubelet的内存。然而，创建许多类似的secret同样也会无用的消耗掉apiserver&amp;kubelet的内存。</p>
+<p>kubelet目前只支持pod使用来自于apiserver的secret。pods包括了被 kubectl创建的pod 或者 被replication controller间接创建的。</p>
+
           
         
       
@@ -428,7 +988,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/05/kubernetes/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/kubernetes-ingress/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Xi Ning Wang">
@@ -450,8 +1010,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/05/05/kubernetes/" itemprop="url">
-                  Kubernetes
+                <a class="post-title-link" href="/kubernetes-ingress/" itemprop="url">
+                  Kubernetes Ingress
                 </a>
               
             
@@ -467,8 +1027,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-05T11:00:22+08:00">
-                2017-05-05
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-09T20:46:25+08:00">
+                2017-03-09
               </time>
             
 
@@ -497,6 +1057,17 @@
 
                 
                 
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
               
             </span>
           
@@ -508,9 +1079,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2017/05/05/kubernetes/#comments" itemprop="discussionUrl">
+                <a href="/kubernetes-ingress/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/05/05/kubernetes/" itemprop="commentCount"></span>
+                        data-disqus-identifier="kubernetes-ingress/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -538,17 +1109,555 @@
       
         
           
-            <h2 id="MiniKube"><a href="#MiniKube" class="headerlink" title="MiniKube"></a>MiniKube</h2><p>环境: MacOS, virtualbox, minikube v0.18.0, kubectl v1.6.0</p>
-<p>Kubernetes将底层的计算资源连接在一起对外体现为一个计算集群，并将资源高度抽象化。部署应用时Kubernetes会以更高效的方式自动的将应用分发到集群内的机器上面，并调度运行。</p>
-<h2 id="搭建Kubernetes集群"><a href="#搭建Kubernetes集群" class="headerlink" title="搭建Kubernetes集群"></a>搭建Kubernetes集群</h2><p>Kubernetes集群包含两种类型的资源：</p>
+            <h2 id="相关术语"><a href="#相关术语" class="headerlink" title="相关术语"></a>相关术语</h2><ul>
+<li>节点：Kubernetes集群中的一台物理机或者虚拟机。</li>
+<li>集群：位于Internet防火墙后的节点，这是kubernetes管理的主要计算资源。</li>
+<li>边界路由器：为集群强制执行防火墙策略的路由器。 这可能是由云提供商或物理硬件管理的网关。</li>
+<li>集群网络：一组逻辑或物理链接，可根据Kubernetes 网络模型 实现群集内的通信。 集群网络的实现包括Overlay模型的 flannel 和基于SDN的 OVS 。</li>
+<li>服务：使用标签选择器标识一组pod成为的Kubernetes 服务 。 除非另有说明，否则服务假定在集群网络内仅可通过虚拟IP访问。</li>
+</ul>
+<h2 id="什么是Ingress"><a href="#什么是Ingress" class="headerlink" title="什么是Ingress"></a>什么是Ingress</h2><p>通常情况下，service和pod仅可在集群内部网络中通过IP地址访问。所有到达边界路由器的流量或被丢弃或被转发到其他地方。从概念上讲，可能像下面这样：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">  internet</div><div class="line">      |</div><div class="line">------------</div><div class="line">[ Services ]</div></pre></td></tr></table></figure></p>
+<p>Ingress是授权入站连接到达集群服务的规则集合。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"> internet</div><div class="line">     |</div><div class="line">[ Ingress ]</div><div class="line">--|-----|--</div><div class="line">[ Services ]</div></pre></td></tr></table></figure>
+<p>可以给Ingress配置提供外部可访问的URL、负载均衡、SSL、基于名称的虚拟主机等。用户通过POST Ingress资源到API server的方式来请求ingress。 Ingress controller 负责实现Ingress，通常使用负载平衡器，它还可以配置边界路由和其他前端，这有助于以HA方式处理流量。</p>
+<h2 id="自定义Secrets"><a href="#自定义Secrets" class="headerlink" title="自定义Secrets"></a>自定义Secrets</h2><p>最简化的Ingress配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">apiVersion: extensions/v1beta1</div><div class="line">kind: Ingress</div><div class="line">metadata:</div><div class="line">  name: test-ingress</div><div class="line">spec:</div><div class="line">  rules:</div><div class="line">  - http:</div><div class="line">      paths:</div><div class="line">      - path: /testpath</div><div class="line">        backend:</div><div class="line">          serviceName: test</div><div class="line">          servicePort: 80</div></pre></td></tr></table></figure>
+<p>1-4行：跟Kubernetes的其他配置一样，ingress的配置也需要 apiVersion ， kind 和 metadata 字段。配置文件的详细说明请查看 部署应用 , 配置容器 和 使用resources .</p>
+<p>5-7行: Ingress spec 中包含配置一个loadbalancer或proxy server的所有信息。最重要的是，它包含了一个匹配所有入站请求的规则列表。目前ingress只支持http规则。</p>
+<p>8-9行：每条http规则包含以下信息：一个 host 配置项（比如for.bar.com，在这个例子中默认是*）， path 列表（比如：/testpath），每个path都关联一个 backend (比如test:80)。在loadbalancer将流量转发到backend之前，所有的入站请求都要先匹配host和path。</p>
+<p>10-12行：正如 services doc 中描述的那样，backend是一个 service:port 的组合。Ingress的流量被转发到它所匹配的backend。</p>
+<h2 id="Ingress类型"><a href="#Ingress类型" class="headerlink" title="Ingress类型"></a>Ingress类型</h2><h3 id="单Service-Ingress"><a href="#单Service-Ingress" class="headerlink" title="单Service Ingress"></a>单Service Ingress</h3><p>Kubernetes中已经存在一些概念可以暴露单个service（查看 替代方案 ），但是你仍然可以通过Ingress来实现，通过指定一个没有rule的默认backend的方式。</p>
+<p>ingress.yaml定义文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">apiVersion: extensions/v1beta1</div><div class="line">kind: Ingress</div><div class="line">metadata:</div><div class="line">  name: test-ingress</div><div class="line">spec:</div><div class="line">  backend:</div><div class="line">    serviceName: testsvc</div><div class="line">    servicePort: 80</div></pre></td></tr></table></figure></p>
+<p>使用 kubectl create -f 命令创建，然后查看ingress：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ kubectl get ing</div><div class="line">NAME                RULE          BACKEND        ADDRESS</div><div class="line">test-ingress        -             testsvc:80     107.178.254.228</div></pre></td></tr></table></figure></p>
+<h3 id="简单展开"><a href="#简单展开" class="headerlink" title="简单展开"></a>简单展开</h3><p>如前面描述的那样，kubernete pod中的IP只在集群网络内部可见，我们需要在边界设置一个东西，让它能够接收ingress的流量并将它们转发到正确的端点上。这个东西一般是高可用的loadbalancer。使用Ingress能够允许你将loadbalancer的个数降低到最少，例如，嫁入你想要创建这样的一个设置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">foo.bar.com -&gt; 178.91.123.132 -&gt; / foo    s1:80</div><div class="line">                                 / bar    s2:80</div></pre></td></tr></table></figure></p>
+<p>需要一个这样的ingress：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">apiVersion: extensions/v1beta1</div><div class="line">kind: Ingress</div><div class="line">metadata:</div><div class="line">  name: test</div><div class="line">spec:</div><div class="line">  rules:</div><div class="line">  - host: foo.bar.com</div><div class="line">    http:</div><div class="line">      paths:</div><div class="line">      - path: /foo</div><div class="line">        backend:</div><div class="line">          serviceName: s1</div><div class="line">          servicePort: 80</div><div class="line">      - path: /bar</div><div class="line">        backend:</div><div class="line">          serviceName: s2</div><div class="line">          servicePort: 80</div></pre></td></tr></table></figure></p>
+<p>使用 kubectl create -f 创建完ingress后：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$ kubectl get ing</div><div class="line">NAME      RULE          BACKEND   ADDRESS</div><div class="line">test      -</div><div class="line">          foo.bar.com</div><div class="line">          /foo          s1:80</div><div class="line">          /bar          s2:80</div></pre></td></tr></table></figure></p>
+<h3 id="基于名称的虚拟主机"><a href="#基于名称的虚拟主机" class="headerlink" title="基于名称的虚拟主机"></a>基于名称的虚拟主机</h3><p>Name-based的虚拟主机在同一个IP地址下拥有多个主机名。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">foo.bar.com --|                 |-&gt; foo.bar.com s1:80</div><div class="line">              | 178.91.123.132  |</div><div class="line">bar.foo.com --|                 |-&gt; bar.foo.com s2:80</div></pre></td></tr></table></figure></p>
+<p>下面这个ingress说明基于 Host header 的后端loadbalancer的路由请求：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">apiVersion: extensions/v1beta1</div><div class="line">kind: Ingress</div><div class="line">metadata:</div><div class="line">  name: test</div><div class="line">spec:</div><div class="line">  rules:</div><div class="line">  - host: foo.bar.com</div><div class="line">    http:</div><div class="line">      paths:</div><div class="line">      - backend:</div><div class="line">          serviceName: s1</div><div class="line">          servicePort: 80</div><div class="line">  - host: bar.foo.com</div><div class="line">    http:</div><div class="line">      paths:</div><div class="line">      - backend:</div><div class="line">          serviceName: s2</div><div class="line">          servicePort: 80</div></pre></td></tr></table></figure></p>
+<h2 id="替代方案"><a href="#替代方案" class="headerlink" title="替代方案"></a>替代方案</h2><p>可以通过很多种方式暴露service而不必直接使用ingress：</p>
+<ul>
+<li>使用 Service.Type=LoadBalancer</li>
+<li>使用 Service.Type=NodePort</li>
+<li>使用 Port Proxy</li>
+<li>部署一个 Service loadbalancer 这允许你在多个service之间共享单个IP，并通过Service Annotations实现更高级的负载平衡。</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/kubernetes-configmap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/kubernetes-configmap/" itemprop="url">
+                  Kubernetes ConfigMap
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-09T20:46:25+08:00">
+                2017-03-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式&云计算</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/kubernetes-configmap/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="kubernetes-configmap/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="相关术语"><a href="#相关术语" class="headerlink" title="相关术语"></a>相关术语</h2><p>很多应用程序的配置需要通过配置文件，命令行参数和环境变量的组合配置来完成。这些配置应该从image内容中解耦，以此来保持容器化应用程序的便携性。ConfigMap API资源提供了将配置数据注入容器的方式，同时保持容器是不知道Kubernetes的。ConfigMap可以被用来保存单个属性，也可以用来保存整个配置文件或者JSON二进制大对象。</p>
+<blockquote>
+<p>kubernetes通过ConfigMap来实现对容器中应用的配置管理。</p>
+</blockquote>
+<p>从数据角度来看，ConfigMap的类型只是键值组。应用可以从不同角度来配置，所以关于给用户如何存储和使用配置数据，我们需要给他们一些弹性。在一个pod里面使用ConfigMap大致有三种方式：</p>
+<ul>
+<li>环境变量</li>
+<li>命令行参数</li>
+<li>数据卷文件</li>
+</ul>
+<h2 id="创建ConfigMap"><a href="#创建ConfigMap" class="headerlink" title="创建ConfigMap"></a>创建ConfigMap</h2><p>创建ConfigMap的方式有两种，一种是通过yaml文件来创建，另一种是通过kubectl直接在命令行下创建。</p>
+<h3 id="yaml"><a href="#yaml" class="headerlink" title="yaml"></a>yaml</h3><p>在yaml文件中，配置文件以key-value键值对的形式保存，当然也可以直接放一个完整的配置文件，在下面的示例中，cache_hst、cache_port、cache_prefix即是key-value键值对，而app.properties和my.cnf都是配置文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">apiVersion: v1</div><div class="line">kind: ConfigMap</div><div class="line">metadata:</div><div class="line">  name: test-cfg</div><div class="line">  namespace: default</div><div class="line">data:</div><div class="line">  cache_host: memcached-gcxt</div><div class="line">  cache_port: &quot;11211&quot;</div><div class="line">  cache_prefix: gcxt</div><div class="line">  my.cnf: |</div><div class="line">    [mysqld]</div><div class="line">    log-bin = mysql-bin</div><div class="line">  app.properties: |</div><div class="line">    property.1 = value-1</div><div class="line"> property.2 = value-2</div><div class="line"> property.3 = value-3</div></pre></td></tr></table></figure></p>
+<p>创建ConfigMap：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">kubectl create -f test-cfg.yml</div></pre></td></tr></table></figure></p>
+<h3 id="kubectl"><a href="#kubectl" class="headerlink" title="kubectl"></a>kubectl</h3><p>直接将一个目录下的所有配置文件创建为一个ConfigMap：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">kubectl create configmap test-config --from-file=./configs</div></pre></td></tr></table></figure></p>
+<p>直接将一个配置文件创建为一个ConfigMap：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">kubectl create configmap test-config2 --from-file=./configs/db.conf --from-file=./configs/cache.conf</div></pre></td></tr></table></figure></p>
+<p>在使用kubectl创建的时候，通过在命令行直接传递键值对创建：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">kubectl create configmap test-config3 --from-literal=db.host=10.5.10.116 --from-listeral=db.port=&apos;3306&apos;</div></pre></td></tr></table></figure></p>
+<p>可以通过如下方式查看创建的ConfigMap：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">kubectl get configmaps</div><div class="line">kubectl get configmap test-config -o yaml</div><div class="line">kubectl describe configmap test-config</div></pre></td></tr></table></figure></p>
+<h2 id="使用ConfigMap"><a href="#使用ConfigMap" class="headerlink" title="使用ConfigMap"></a>使用ConfigMap</h2><h3 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h3><p>通过环境变量的方式，直接传递pod.<br>ConfigMap文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">apiVersion: v1</div><div class="line">kind: ConfigMap</div><div class="line">metadata:</div><div class="line">  name: special-config</div><div class="line">  namespace: default</div><div class="line">data:</div><div class="line">  special.how: very</div><div class="line">  special.type: charm</div></pre></td></tr></table></figure></p>
+<p>第一个pod示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: dapi-test-pod</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">    - name: test-container</div><div class="line">      image: gcr.io/google_containers/busybox</div><div class="line">      command: [ &quot;/bin/sh&quot;, &quot;-c&quot;, &quot;env&quot; ]</div><div class="line">      env:</div><div class="line">        - name: SPECIAL_LEVEL_KEY</div><div class="line">          valueFrom:</div><div class="line">            configMapKeyRef:</div><div class="line">              name: special-config</div><div class="line">              key: special.how</div><div class="line">        - name: SPECIAL_TYPE_KEY</div><div class="line">          valueFrom:</div><div class="line">            configMapKeyRef:</div><div class="line">              name: special-config</div><div class="line">              key: special.type</div><div class="line">  restartPolicy: Never</div></pre></td></tr></table></figure></p>
+<p>第二个pod示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: dapi-test-pod</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">    - name: test-container</div><div class="line">      image: gcr.io/google_containers/busybox</div><div class="line">      command: [ &quot;/bin/sh&quot;, &quot;-c&quot;, &quot;env&quot; ]</div><div class="line">      env:</div><div class="line">        - name: CACHE_HOST</div><div class="line">          valueFrom:</div><div class="line">            configMapKeyRef:</div><div class="line">              name: test-cfg</div><div class="line">              key: cache_host</div><div class="line">              optional: true</div><div class="line">  restartPolicy: Never</div></pre></td></tr></table></figure></p>
+<h3 id="命令行参数"><a href="#命令行参数" class="headerlink" title="命令行参数"></a>命令行参数</h3><p>在命令行下引用时，需要先设置为环境变量，之后 可以通过$(VAR_NAME)设置容器启动命令的启动参数.<br>ConfigMap文件示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">apiVersion: v1</div><div class="line">kind: ConfigMap</div><div class="line">metadata:</div><div class="line">  name: special-config</div><div class="line">  namespace: default</div><div class="line">data:</div><div class="line">  special.how: very</div><div class="line">  special.type: charm</div></pre></td></tr></table></figure></p>
+<p>Pod示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: dapi-test-pod</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">    - name: test-container</div><div class="line">      image: gcr.io/google_containers/busybox</div><div class="line">      command: [ &quot;/bin/sh&quot;, &quot;-c&quot;, &quot;echo $(SPECIAL_LEVEL_KEY) $(SPECIAL_TYPE_KEY)&quot; ]</div><div class="line">      env:</div><div class="line">        - name: SPECIAL_LEVEL_KEY</div><div class="line">          valueFrom:</div><div class="line">            configMapKeyRef:</div><div class="line">              name: special-config</div><div class="line">              key: special.how</div><div class="line">        - name: SPECIAL_TYPE_KEY</div><div class="line">          valueFrom:</div><div class="line">            configMapKeyRef:</div><div class="line">              name: special-config</div><div class="line">              key: special.type</div><div class="line">  restartPolicy: Never</div></pre></td></tr></table></figure></p>
+<h3 id="数据卷文件"><a href="#数据卷文件" class="headerlink" title="数据卷文件"></a>数据卷文件</h3><p>使用volume将ConfigMap作为文件或目录直接挂载，其中每一个key-value键值对都会生成一个文件，key为文件名，value为内容.<br>ConfigMap示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">apiVersion: v1</div><div class="line">kind: ConfigMap</div><div class="line">metadata:</div><div class="line">  name: special-config</div><div class="line">  namespace: default</div><div class="line">data:</div><div class="line">  special.how: very</div><div class="line">  special.type: charm</div></pre></td></tr></table></figure></p>
+<p>第一个pod示例，简单的将上面创建的ConfigMap直接挂载至pod的/etc/config目录下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: dapi-test-pod</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">    - name: test-container</div><div class="line">      image: gcr.io/google_containers/busybox</div><div class="line">      command: [ &quot;/bin/sh&quot;, &quot;-c&quot;, &quot;cat /etc/config/special.how&quot; ]</div><div class="line">      volumeMounts:</div><div class="line">      - name: config-volume</div><div class="line">        mountPath: /etc/config</div><div class="line">  volumes:</div><div class="line">    - name: config-volume</div><div class="line">      configMap:</div><div class="line">        name: special-config</div><div class="line">  restartPolicy: Never</div></pre></td></tr></table></figure></p>
+<p>第二个pod示例，只将ConfigMap的special.how这个key挂载到/etc/config目录下的一个相对路径path/to/special-key，如果存在同名文件，直接覆盖。其他的key不挂载：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: dapi-test-pod</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">    - name: test-container</div><div class="line">      image: gcr.io/google_containers/busybox</div><div class="line">      command: [ &quot;/bin/sh&quot;,&quot;-c&quot;,&quot;cat /etc/config/path/to/special-key&quot; ]</div><div class="line">      volumeMounts:</div><div class="line">      - name: config-volume</div><div class="line">        mountPath: /etc/config</div><div class="line">  volumes:</div><div class="line">    - name: config-volume</div><div class="line">      configMap:</div><div class="line">        name: special-config</div><div class="line">        items:</div><div class="line">        - key: special.how</div><div class="line">          path: path/to/special-key</div><div class="line">  restartPolicy: Never</div></pre></td></tr></table></figure></p>
+<h2 id="Note"><a href="#Note" class="headerlink" title="Note"></a>Note</h2><ul>
+<li>ConfigMap必须在Pod之前创建</li>
+<li>只有与当前ConfigMap在同一个namespace内的pod才能使用这个ConfigMap，换句话说，ConfigMap不能跨命名空间调用。</li>
+<li>很多生产环境中的应用程序配置较为复杂，可能需要多个config文件、命令行参数和环境变量的组合。并且，这些配置信息应该从应用程序镜像中解耦出来，以保证镜像的可移植性以及配置信息不被泄露。社区引入ConfigMap这个API资源来满足这一需求。</li>
+<li>ConfigMap包含了一系列的键值对，用于存储被Pod或者系统组件（如controller）访问的信息。这与secret的设计理念有异曲同工之妙，它们的主要区别在于ConfigMap通常不用于存储敏感信息，而只存储简单的文本信息。</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/redis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/redis/" itemprop="url">
+                  Redis
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-02T20:46:25+08:00">
+                2017-03-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/redis/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="redis/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>docker run –name myredis -v /Users/xiningwang/nosql/redis/redis-3.2.8/data:/data -p 6379:6379 -d redis redis-server –appendonly yes</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/kubernetes/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/kubernetes/" itemprop="url">
+                  Kubernetes
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-12T20:46:25+08:00">
+                2017-02-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式&云计算</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/kubernetes/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="kubernetes/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="基础架构"><a href="#基础架构" class="headerlink" title="基础架构"></a>基础架构</h2><p>Kubernetes将底层的计算资源连接在一起对外体现为一个计算集群，并将资源高度抽象化。部署应用时Kubernetes会以更高效的方式自动的将应用分发到集群内的机器上面，并调度运行。</p>
+<p>Kubernetes集群包含两种类型的资源：</p>
 <ul>
 <li>Master节点：协调控制整个集群。Master负责管理整个集群，协调集群内的所有行为。比如调度应用，监控应用的状态等。</li>
 <li>Nodes节点：运行应用的工作节点。Node节点负责运行应用，一般是一台物理机或者虚机。每个Node节点上面都有一个Kubelet，它是一个代理程序，用来管理该节点以及和Master节点通信。除此以外，Node节点上还会有一些管理容器的工具，比如Docker或者rkt等。生产环境中一个Kubernetes集群至少应该包含三个Nodes节点。</li>
 </ul>
 <p>当部署应用的时候，我们通知Master节点启动应用容器。然后Master会调度这些应用将它们运行在Node节点上面。Node节点和Master节点通过Master节点暴露的Kubernetes API通信。当然我们也可以直接通过这些API和集群交互。<br><img src="http://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_01_cluster.svg" alt="kubernetes Cluster"></p>
+<h3 id="Master"><a href="#Master" class="headerlink" title="Master"></a>Master</h3><p>Master节点上面主要由四个模块组成：APIServer、scheduler、controller manager、etcd。</p>
+<ul>
+<li>APIServer<br>APIServer负责对外提供RESTful的Kubernetes API服务，它是系统管理指令的统一入口，任何对资源进行增删改查的操作都要交给APIServer处理后再提交给etcd。如架构图中所示，kubectl（Kubernetes提供的客户端工具，该工具内部就是对Kubernetes API的调用）是直接和APIServer交互的。</li>
+<li>Scheduler<br>Scheduler的职责很明确，就是负责调度pod到合适的Node上。如果把scheduler看成一个黑匣子，那么它的输入是pod和由多个Node组成的列表，输出是Pod和一个Node的绑定，即将这个pod部署到这个Node上。Kubernetes目前提供了调度算法，但是同样也保留了接口，用户可以根据自己的需求定义自己的调度算法。</li>
+<li>Controller manager<br>如果说APIServer做的是“前台”的工作的话，那controller manager就是负责“后台”的。每个资源一般都对应有一个控制器，而controller manager就是负责管理这些控制器的。比如我们通过APIServer创建一个pod，当这个pod创建成功后，APIServer的任务就算完成了。而后面保证Pod的状态始终和我们预期的一样的重任就由controller manager去保证了。</li>
+<li>etcd<br>etcd是一个高可用的键值存储系统，Kubernetes使用它来存储各个资源的状态，从而实现了Restful的API。</li>
+</ul>
+<h3 id="Node"><a href="#Node" class="headerlink" title="Node"></a>Node</h3><p>每个Node节点主要由三个模块组成：kubelet、kube-proxy、runtime。</p>
+<ul>
+<li>kubelet。Kubelet是Master在每个Node节点上面的agent，是Node节点上面最重要的模块，它负责维护和管理该Node上面的所有容器，但是如果容器不是通过Kubernetes创建的，它并不会管理。本质上，它负责使Pod得运行状态与期望的状态一致。</li>
+<li>kube-proxy。该模块实现了Kubernetes中的服务发现和反向代理功能。反向代理方面：kube-proxy支持TCP和UDP连接转发，默认基于Round Robin算法将客户端流量转发到与service对应的一组后端pod。服务发现方面，kube-proxy使用etcd的watch机制，监控集群中service和endpoint对象数据的动态变化，并且维护一个service到endpoint的映射关系，从而保证了后端pod的IP变化不会对访问者造成影响。另外kube-proxy还支持session affinity。</li>
+<li>runtime。runtime指的是容器运行环境，目前Kubernetes支持docker和rkt两种容器。</li>
+</ul>
+<h2 id="搭建MiniKube"><a href="#搭建MiniKube" class="headerlink" title="搭建MiniKube"></a>搭建MiniKube</h2><p>环境: MacOS, virtualbox, minikube v0.18.0, kubectl v1.6.0</p>
 <p>Kubernetes提供了一个轻量级的Minikube应用，利用它我们可以很容器的创建一个只包含一个Node节点的Kubernetes Cluster用于日常的开发测试。</p>
 <h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>Minikube的安装可以参考: Minikube的Github：<a href="https://github.com/kubernetes/minikube" target="_blank" rel="external">https://github.com/kubernetes/minikube</a></p>
 <p>要正常使用，还必须安装kubectl，并且放在PATH里面。kubectl是一个通过Kubernetes API和Kubernetes集群交互的命令行工具。</p>
+<h3 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h3><p>可以通过minikube查看cluster运行状态,启动或者停止cluster.例如:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">minikube start</div></pre></td></tr></table></figure>
 <h3 id="ONLY-FOR-CHINESE"><a href="#ONLY-FOR-CHINESE" class="headerlink" title="ONLY FOR CHINESE"></a>ONLY FOR CHINESE</h3><p>Kubernetes在部署容器应用的时候会先拉一个pause镜像，这个是一个基础容器，主要是负责网络部分的功能的，具体这里不展开讨论。最关键的是Kubernetes里面镜像默认都是从Google的镜像仓库拉的（就跟docker默认从docker hub拉的一样），但是因为GFW的原因，中国用户是访问不了Google的镜像仓库gcr.io的（如果你可以ping通，那恭喜你）。庆幸的是这个镜像被传到了docker hub上面，虽然中国用户访问后者也非常艰难，但通过一些加速器之类的还是可以pull下来的。如果没有VPN等科学上网的工具的话，请先做如下操作：</p>
 <p>See: <a href="https://github.com/kubernetes/kubernetes/issues/6888" target="_blank" rel="external">https://github.com/kubernetes/kubernetes/issues/6888</a></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">minikube ssh    # 登录到我们的Kubernetes VM里面去</div><div class="line">docker pull registry.hnaresearch.com/public/pause-amd64:3.0  </div><div class="line">docker tag registry.hnaresearch.com/public/pause-amd64:3.0 gcr.io/google_containers/pause-amd64:3.0</div></pre></td></tr></table></figure>
@@ -571,7 +1680,11 @@
 <p>Containers should only be scheduled together in a single Pod if they are tightly coupled and need to share resources such as disk.</p>
 </blockquote>
 <p><img src="http://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_03_nodes.svg" alt="node"></p>
-<h2 id="Service"><a href="#Service" class="headerlink" title="Service"></a>Service</h2><p>通过proxy实现集群外部可以访问的方式是不太适用于实际生产环境的。<a href="id:service" target="_blank" rel="external">Service</a>是Kubernetes里面抽象出来的一层，它定义了由多个Pods组成的逻辑组（logical set），可以对组内的Pod做一些事情：</p>
+<h2 id="Job"><a href="#Job" class="headerlink" title="Job"></a>Job</h2><p>从程序的运行形态上来区分，我们可以将Pod分为两类：长时运行服务（jboss、mysql等）和一次性任务（数据计算、测试）。Replication Controller创建的Pod都是长时运行的服务，而Job创建的Pod都是一次性任务。</p>
+<p>在Job的定义中，restartPolicy（重启策略）只能是Never和OnFailure。Job可以控制一次性任务的Pod的完成次数（Job–&gt;spec–&gt;completions）和并发执行数（Job–&gt;spec–&gt;parallelism），当Pod成功执行指定次数后，即认为Job执行完毕。</p>
+<h2 id="Replication-Controller"><a href="#Replication-Controller" class="headerlink" title="Replication Controller"></a>Replication Controller</h2><p>Replication Controller（RC）是Kubernetes中的另一个核心概念，应用托管在Kubernetes之后，Kubernetes需要保证应用能够持续运行，这是RC的工作内容，它会确保任何时间Kubernetes中都有指定数量的Pod在运行。在此基础上，RC还提供了一些更高级的特性，比如滚动升级、升级回滚等。</p>
+<h3 id="Replica-Set"><a href="#Replica-Set" class="headerlink" title="Replica Set"></a>Replica Set</h3><p>新一代副本控制器replica set，可以被认为 是“升级版”的Replication Controller。也就是说。replica set也是用于保证与label selector匹配的pod数量维持在期望状态。区别在于，replica set引入了对基于子集的selector查询条件，而Replication Controller仅支持基于值相等的selecto条件查询。这是目前从用户角度肴，两者唯一的显著差异。 社区引入这一API的初衷是用于取代vl中的Replication Controller，也就是说．当v1版本被废弃时，Replication Controller就完成了它的历史使命，而由replica set来接管其工作。虽然replica set可以被单独使用，但是目前它多被Deployment用于进行pod的创建、更新与删除。</p>
+<h2 id="Service"><a href="#Service" class="headerlink" title="Service"></a>Service</h2><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p><a href="id:service" target="_blank" rel="external">Service</a>是Kubernetes里面抽象出来的一层，它定义了由多个Pods组成的逻辑组（logical set），可以对组内的Pod做一些事情：</p>
 <ul>
 <li>对外暴露流量</li>
 <li>做负载均衡（load balancing）</li>
@@ -580,13 +1693,29 @@
 <blockquote>
 <p>A Kubernetes Service is an abstraction layer which defines a logical set of Pods and enables external traffic exposure, load balancing and service discovery for those Pods.</p>
 </blockquote>
-<p>而且每个Service都有一个集群内唯一的私有IP和对外的端口，用于接收流量。如果我们想将一个Service暴露到集群外，有两种方法：</p>
-<ul>
-<li>LoadBalancer - 提供一个公网的IP</li>
-<li>NodePort - 使用NAT将Service的端口暴露出去。Minikube只支持这种方式。</li>
-</ul>
-<p><img src="http://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_04_services.svg" alt="service"></p>
+<p>在Kubernetes中，在受到Replication Controller调控的时候，Pod副本是变化的，对于的虚拟IP也是变化的，比如发生迁移或者伸缩的时候。这对于Pod的访问者来说是不可接受的。Kubernetes中的Service是一种抽象概念，它定义了一个Pod逻辑集合以及访问它们的策略，Service同Pod的关联同样是居于Label来完成的。Service的目标是提供一种桥梁， 它会为访问者提供一个固定访问地址，用于在访问时重定向到相应的后端，这使得非 Kubernetes原生应用程序，在无须为Kubemces编写特定代码的前提下，轻松访问后端。</p>
+<p>Service同RC一样，都是通过Label来关联Pod的。当你在Service的yaml文件中定义了该Service的selector中的label为app:my-web，那么这个Service会将Pod–&gt;metadata–&gt;labeks中label为app:my-web的Pod作为分发请求的后端。当Pod发生变化时（增加、减少、重建等），Service会及时更新。这样一来，Service就可以作为Pod的访问入口，起到代理服务器的作用，而对于访问者来说，通过Service进行访问，无需直接感知Pod。</p>
+<p>需要注意的是，Kubernetes分配给Service的固定IP是一个虚拟IP，并不是一个真实的IP，在外部是无法寻址的。真实的系统实现上，Kubernetes是通过Kube-proxy组件来实现的虚拟IP路由及转发。所以在之前集群部署的环节上，我们在每个Node上均部署了Proxy这个组件，从而实现了Kubernetes层级的虚拟转发网络。</p>
+<h3 id="Service代理服务"><a href="#Service代理服务" class="headerlink" title="Service代理服务"></a>Service代理服务</h3><p><img src="http://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_04_services.svg" alt="service"></p>
 <p>使用kubectl get service可以查看目前已有的service，Minikube默认创建了一个kubernetes Service。我们使用expose命令再创建一个Service：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get service</div><div class="line">NAME             CLUSTER-IP   EXTERNAL-IP   PORT(S)          AGE</div><div class="line">hello-minikube   10.0.0.188   &lt;nodes&gt;       8080:32710/TCP   16h</div><div class="line">kubernetes       10.0.0.1     &lt;none&gt;        443/TCP          16h</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl expose deployment/helloworld --type=&quot;NodePort&quot; --port 8090</div><div class="line">service &quot;helloworld&quot; exposed</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get service</div><div class="line">NAME             CLUSTER-IP   EXTERNAL-IP   PORT(S)          AGE</div><div class="line">hello-minikube   10.0.0.188   &lt;nodes&gt;       8080:32710/TCP   16h</div><div class="line">helloworld       10.0.0.249   &lt;nodes&gt;       8090:31240/TCP   2m</div><div class="line">kubernetes       10.0.0.1     &lt;none&gt;        443/TCP          16h</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl delete service hello-minikube</div><div class="line">service &quot;hello-minikube&quot; deleted</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get service</div><div class="line">NAME         CLUSTER-IP   EXTERNAL-IP   PORT(S)          AGE</div><div class="line">helloworld   10.0.0.249   &lt;nodes&gt;       8090:31240/TCP   2m</div><div class="line">kubernetes   10.0.0.1     &lt;none&gt;        443/TCP          16h</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl describe service/helloworld</div><div class="line">Name:  			helloworld</div><div class="line">Namespace:     		default</div><div class="line">Labels:			run=helloworld</div><div class="line">Annotations:   		&lt;none&gt;</div><div class="line">Selector:      		run=helloworld</div><div class="line">Type:  			NodePort</div><div class="line">IP:    			10.0.0.249</div><div class="line">Port:  			&lt;unset&gt;	8090/TCP</div><div class="line">NodePort:      		&lt;unset&gt;	31240/TCP</div><div class="line">Endpoints:     		172.17.0.3:8090</div><div class="line">Session Affinity:      	None</div><div class="line">Events:			&lt;none&gt;</div><div class="line">xis-macbook-pro:~ xiningwang$ minikube docker-env</div><div class="line">export DOCKER_TLS_VERIFY=&quot;1&quot;</div><div class="line">export DOCKER_HOST=&quot;tcp://192.168.99.100:2376&quot;</div><div class="line">export DOCKER_CERT_PATH=&quot;/Users/xiningwang/.minikube/certs&quot;</div><div class="line">export DOCKER_API_VERSION=&quot;1.23&quot;</div><div class="line"># Run this command to configure your shell:</div><div class="line"># eval $(minikube docker-env)</div><div class="line">xis-macbook-pro:~ xiningwang$ curl http://192.168.99.100:31240</div><div class="line">Hello world !</div><div class="line">hostname:helloworld-2790924137-bvfhn</div></pre></td></tr></table></figure></p>
+<h3 id="Service内部负载均衡"><a href="#Service内部负载均衡" class="headerlink" title="Service内部负载均衡"></a>Service内部负载均衡</h3><p>当Service的Endpoints包含多个IP的时候，及服务代理存在多个后端，将进行请求的负载均衡。默认的负载均衡策略是轮训或者随机（有kube-proxy的模式决定）。同时，Service上通过设置Service–&gt;spec–&gt;sessionAffinity=ClientIP，来实现基于源IP地址的会话保持。</p>
+<h3 id="发布Service"><a href="#发布Service" class="headerlink" title="发布Service"></a>发布Service</h3><p>Service的虚拟IP是由Kubernetes虚拟出来的内部网络，外部是无法寻址到的。但是有些服务又需要被外部访问到，例如web前段。这时候就需要加一层网络转发，即外网到内网的转发。Kubernetes提供了NodePort、LoadBalancer、Ingress三种方式。</p>
+<ul>
+<li>NodePort<br>在之前的Guestbook示例中，已经延时了NodePort的用法。NodePort的原理是，Kubernetes会在每一个Node上暴露出一个端口：nodePort，外部网络可以通过（任一Node）[NodeIP]:[NodePort]访问到后端的Service。Minikube只支持这种方式。</li>
+<li>LoadBalancer<br>在NodePort基础上，Kubernetes可以请求底层云平台创建一个负载均衡器，将每个Node作为后端，进行服务分发。该模式需要底层云平台（例如GCE）支持。</li>
+<li>Ingress<br>是一种HTTP方式的路由转发机制，由Ingress Controller和HTTP代理服务器组合而成。Ingress Controller实时监控Kubernetes API，实时更新HTTP代理服务器的转发规则。HTTP代理服务器有GCE Load-Balancer、HaProxy、Nginx等开源方案。</li>
+</ul>
+<h3 id="自发性"><a href="#自发性" class="headerlink" title="自发性"></a>自发性</h3><p>Kubernetes中有一个很重要的服务自发现特性。一旦一个service被创建，该service的service IP和service port等信息都可以被注入到pod中供它们使用。Kubernetes主要支持两种service发现 机制：环境变量和DNS。</p>
+<ul>
+<li>环境变量方式<br>Kubernetes创建Pod时会自动添加所有可用的service环境变量到该Pod中，如有需要．这些环境变量就被注入Pod内的容器里。需要注意的是，环境变量的注入只发送在Pod创建时，且不会被自动更新。这个特点暗含了service和访问该service的Pod的创建时间的先后顺序，即任何想要访问service的pod都需要在service已经存在后创建，否则与service相关的环境变量就无法注入该Pod的容器中，这样先创建的容器就无法发现后创建的service。</li>
+<li>DNS方式<br>Kubernetes集群现在支持增加一个可选的组件——DNS服务器。这个DNS服务器使用Kubernetes的watchAPI，不间断的监测新的service的创建并为每个service新建一个DNS记录。如果DNS在整个集群范围内都可用，那么所有的Pod都能够自动解析service的域名。</li>
+</ul>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><ul>
+<li><p>多个service如何避免地址和端口冲突<br>此处设计思想是，Kubernetes通过为每个service分配一个唯一的ClusterIP，所以当使用ClusterIP：port的组合访问一个service的时候，不管port是什么，这个组合是一定不会发生重复的。另一方面，kube-proxy为每个service真正打开的是一个绝对不会重复的随机端口，用户在service描述文件中指定的访问端口会被映射到这个随机端口上。这就是为什么用户可以在创建service时随意指定访问端口。</p>
+</li>
+<li><p>目前存在的不足<br>Kubernetes使用iptables和kube-proxy解析service的入口地址，在中小规模的集群中运行良好，但是当service的数量超过一定规模时，仍然有一些小问题。首当其冲的便是service环境变量泛滥，以及service与使用service的pod两者创建时间先后的制约关系。目前来看，很多使用者在使用Kubernetes时往往会开发一套自己的Router组件来替代service，以便更好地掌控和定制这部分功能。</p>
+</li>
+</ul>
 <h2 id="Label"><a href="#Label" class="headerlink" title="Label"></a>Label</h2><p>Service就是靠Label选择器（Label Selectors）来匹配组内的Pod的，而且很多命令都可以操作Label。Label是绑定在对象上（比如Pod）的键值对，主要用来把一些相关的对象组织在一起，并且对于用户来说label是有含义的，比如：</p>
 <ul>
 <li>Production environment (production, test, dev)</li>
@@ -600,7 +1729,25 @@
 <h3 id="Pod创建时默认创建的Label"><a href="#Pod创建时默认创建的Label" class="headerlink" title="Pod创建时默认创建的Label"></a>Pod创建时默认创建的Label</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl describe pod helloworld-2790924137-bvfhn</div><div class="line">Name:  		helloworld-2790924137-bvfhn</div><div class="line">Namespace:     	default</div><div class="line">Node:  		minikube/192.168.99.100</div><div class="line">Start Time:    	Fri, 05 May 2017 14:03:56 +0800</div><div class="line">Labels:		pod-template-hash=2790924137</div><div class="line">       		run=helloworld</div></pre></td></tr></table></figure>
 <h3 id="新增一个Label"><a href="#新增一个Label" class="headerlink" title="新增一个Label"></a>新增一个Label</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl label pod helloworld-2790924137-bvfhn app=v1</div><div class="line">pod &quot;helloworld-2790924137-bvfhn&quot; labeled</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl describe pod helloworld-2790924137-bvfhn</div><div class="line">Name:  		helloworld-2790924137-bvfhn</div><div class="line">Namespace:     	default</div><div class="line">Node:  		minikube/192.168.99.100</div><div class="line">Start Time:    	Fri, 05 May 2017 14:03:56 +0800</div><div class="line">Labels:		app=v1</div><div class="line">       		pod-template-hash=2790924137</div><div class="line">       		run=helloworld</div></pre></td></tr></table></figure>
 <h3 id="使用Label的例子"><a href="#使用Label的例子" class="headerlink" title="使用Label的例子"></a>使用Label的例子</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get service</div><div class="line">NAME         CLUSTER-IP   EXTERNAL-IP   PORT(S)          AGE</div><div class="line">helloworld   10.0.0.249   &lt;nodes&gt;       8090:31240/TCP   46m</div><div class="line">kubernetes   10.0.0.1     &lt;none&gt;        443/TCP          17h</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get service  -l run=helloworld</div><div class="line">NAME         CLUSTER-IP   EXTERNAL-IP   PORT(S)          AGE</div><div class="line">helloworld   10.0.0.249   &lt;nodes&gt;       8090:31240/TCP   46m</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get pod -l app=v1</div><div class="line">NAME                          READY     STATUS    RESTARTS   AGE</div><div class="line">helloworld-2790924137-bvfhn   1/1       Running   0          1h</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get pod</div><div class="line">NAME                             READY     STATUS             RESTARTS   AGE</div><div class="line">hello-minikube-938614450-b7xwm   0/1       ImagePullBackOff   0          38m</div><div class="line">helloworld-2790924137-bvfhn      1/1       Running            0          1h</div></pre></td></tr></table></figure>
-<h2 id="Scale"><a href="#Scale" class="headerlink" title="Scale"></a>Scale</h2><p>随着流量的增加，我们可能需要增加我们应用的规模来满足用户的需求。Kubernetes的Scale功能就可以实现这个需求。</p>
+<h2 id="Pet-Sets-StatefulSet"><a href="#Pet-Sets-StatefulSet" class="headerlink" title="Pet Sets/StatefulSet"></a>Pet Sets/StatefulSet</h2><p>K8s在1.3版本里发布了Alpha版的PetSet功能。在云原生应用的体系里，有下面两组近义词；第一组是无状态（stateless）、牲畜（cattle）、无名（nameless）、可丢弃（disposable）；第二组是有状态（stateful）、宠物（pet）、有名（having name）、不可丢弃（non-disposable）。RC和RS主要是控制提供无状态服务的，其所控制的Pod的名字是随机设置的，一个Pod出故障了就被丢弃掉，在另一个地方重启一个新的Pod，名字变了、名字和启动在哪儿都不重要，重要的只是Pod总数；而PetSet是用来控制有状态服务，PetSet中的每个Pod的名字都是事先确定的，不能更改。PetSet中Pod的名字的作用，是用来关联与该Pod对应的状态。</p>
+<p>对于RC和RS中的Pod，一般不挂载存储或者挂载共享存储，保存的是所有Pod共享的状态，Pod像牲畜一样没有分别；对于PetSet中的Pod，每个Pod挂载自己独立的存储，如果一个Pod出现故障，从其他节点启动一个同样名字的Pod，要挂在上原来Pod的存储继续以它的状态提供服务。</p>
+<p>适合于PetSet的业务包括数据库服务MySQL和PostgreSQL，集群化管理服务Zookeeper、etcd等有状态服务。PetSet的另一种典型应用场景是作为一种比普通容器更稳定可靠的模拟虚拟机的机制。传统的虚拟机正是一种有状态的宠物，运维人员需要不断地维护它，容器刚开始流行时，我们用容器来模拟虚拟机使用，所有状态都保存在容器里，而这已被证明是非常不安全、不可靠的。使用PetSet，Pod仍然可以通过漂移到不同节点提供高可用，而存储也可以通过外挂的存储来提供高可靠性，PetSet做的只是将确定的Pod与确定的存储关联起来保证状态的连续性。</p>
+<h2 id="Volume"><a href="#Volume" class="headerlink" title="Volume"></a>Volume</h2><p>在Docker的设计实现中，容器中的数据是临时的，即当容器被销毁时，其中的数据将会丢失。如果需要持久化数据，需要使用Docker数据卷挂载宿主机上的文件或者目录到容器中。在Kubernetes中，当Pod重建的时候，数据是会丢失的，Kubernetes也是通过数据卷挂载来提供Pod数据的持久化的。Kubernetes数据卷是对Docker数据卷的扩展，Kubernetes数据卷是Pod级别的，可以用来实现Pod中容器的文件共享。目前，Kubernetes支持的数据卷类型如下：</p>
+<ul>
+<li>本地数据卷<br>EmptyDir、HostPath这两种类型的数据卷，只能最用于本地文件系统。本地数据卷中的数据只会存在于一台机器上，所以当Pod发生迁移的时候，数据便会丢失。该类型Volume的用途是：Pod中容器间的文件共享、共享宿主机的文件系统。</li>
+<li>网络数据卷<br>Kubernetes提供了很多类型的数据卷以集成第三方的存储系统，包括一些非常流行的分布式文件系统，也有在IaaS平台上提供的存储支持，这些存储系统都是分布式的，通过网络共享文件系统，因此我们称这一类数据卷为网络数据卷。<br>网络数据卷能够满足数据的持久化需求，Pod通过配置使用网络数据卷，每次Pod创建的时候都会将存储系统的远端文件目录挂载到容器中，数据卷中的数据将被水久保存，即使Pod被删除，只是除去挂载数据卷，数据卷中的数据仍然保存在存储系统中，且当新的Pod被创建的时候，仍是挂载同样的数据卷。网络数据卷包含以下几种：NFS、iSCISI、GlusterFS、RBD（Ceph Block Device）、Flocker、AWS Elastic Block Store、GCE Persistent Disk.</li>
+<li>信息数据卷<br>Kubernetes中有一些数据卷，主要用来给容器传递配置信息，我们称之为信息数据卷，比如Secret（处理敏感配置信息，密码、Token等）、Downward API（通过环境变量的方式告诉容器Pod的信息）、Git Repo（将Git仓库下载到Pod中），都是将Pod的信息以文件形式保存，然后以数据卷方式挂载到容器中，容器通过读取文件获取相应的信息。</li>
+</ul>
+<h2 id="Deployment"><a href="#Deployment" class="headerlink" title="Deployment"></a>Deployment</h2><p>Kubernetes提供了一种更加简单的更新RC和Pod的机制，叫做Deployment。通过在Deployment中描述你所期望的集群状态，Deployment Controller会将现在的集群状态在一个可控的速度下逐步更新成你所期望的集群状态。Deployment主要职责同样是为了保证pod的数量和健康，90%的功能与Replication Controller完全一样，可以看做新一代的Replication Controller。但是，它又具备了Replication Controller之外的新特性：</p>
+<ul>
+<li>Replication Controller全部功能：Deployment继承了上面描述的Replication Controller全部功能。</li>
+<li>事件和状态查看：可以查看Deployment的升级详细进度和状态。</li>
+<li>回滚：当升级pod镜像或者相关参数的时候发现问题，可以使用回滚操作回滚到上一个稳定的版本或者指定的版本。</li>
+<li>版本记录: 每一次对Deployment的操作，都能保存下来，给予后续可能的回滚使用。</li>
+<li>暂停和启动：对于每一次升级，都能够随时暂停和启动。</li>
+<li>多种升级方案：Recreate—-删除所有已存在的pod,重新创建新的; RollingUpdate—-滚动升级，逐步替换的策略，同时滚动升级时，支持更多的附加参数，例如设置最大不可用pod数量，最小升级间隔时间等等。</li>
+</ul>
+<h3 id="Scale"><a href="#Scale" class="headerlink" title="Scale"></a>Scale</h3><p>随着流量的增加，我们可能需要增加我们应用的规模来满足用户的需求。Kubernetes的Scale功能就可以实现这个需求。</p>
 <blockquote>
 <p>   Scaling is accomplished by changing the number of replicas in a Deployment.</p>
 </blockquote>
@@ -617,13 +1764,21 @@
 </ul>
 <p>下面我们使用kubectl scale命令将启动4个复制品，语法规则是kubectl scale deployment-type name replicas-number：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl scale deployment/helloworld --replicas=4</div><div class="line">deployment &quot;helloworld&quot; scaled</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get deployment</div><div class="line">NAME         DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE</div><div class="line">helloworld   4         4         4            4           2h</div><div class="line"></div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get pod -o wide</div><div class="line">NAME                          READY     STATUS    RESTARTS   AGE       IP           NODE</div><div class="line">helloworld-2790924137-2kg70   1/1       Running   0          3m        172.17.0.4   minikube</div><div class="line">helloworld-2790924137-bvfhn   1/1       Running   0          2h        172.17.0.3   minikube</div><div class="line">helloworld-2790924137-jg15m   1/1       Running   0          3m        172.17.0.5   minikube</div><div class="line">helloworld-2790924137-tgqr9   1/1       Running   0          3m        172.17.0.2   minikube</div></pre></td></tr></table></figure></p>
 <p>验证一下这个Service是有负载均衡的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get deployment</div><div class="line">NAME         DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE</div><div class="line">helloworld   4         4         4            4           2h</div><div class="line">xis-macbook-pro:~ xiningwang$ curl 192.168.99.100:31240</div><div class="line">Hello world !</div><div class="line">hostname:helloworld-2790924137-bvfhn</div><div class="line">xis-macbook-pro:~ xiningwang$ curl 192.168.99.100:31240</div><div class="line">Hello world !</div><div class="line">hostname:helloworld-2790924137-tgqr9</div><div class="line">xis-macbook-pro:~ xiningwang$ curl 192.168.99.100:31240</div><div class="line">Hello world !</div><div class="line">hostname:helloworld-2790924137-2kg70</div><div class="line">xis-macbook-pro:~ xiningwang$ curl 192.168.99.100:31240</div><div class="line">Hello world !</div><div class="line">hostname:helloworld-2790924137-bvfhn</div><div class="line">xis-macbook-pro:~ xiningwang$ curl 192.168.99.100:31240</div><div class="line">Hello world !</div><div class="line">hostname:helloworld-2790924137-tgqr9</div></pre></td></tr></table></figure></p>
-<h2 id="Rolling-Update"><a href="#Rolling-Update" class="headerlink" title="Rolling Update"></a>Rolling Update</h2><p>滚动更新（Rolling update）特性的好处就是我们不用停止服务就可以实现应用更新。默认更新的时候是一个Pod一个Pod更新的，所以整个过程服务不会中断。当然你也可以设置一次更新的Pod的百分比。而且更新过程中，Service只会将流量转发到可用的节点上面。更加重要的是，我们可以随时回退到旧版本。</p>
+<h3 id="Rolling-Update"><a href="#Rolling-Update" class="headerlink" title="Rolling Update"></a>Rolling Update</h3><p>滚动更新（Rolling update）特性的好处就是我们不用停止服务就可以实现应用更新。默认更新的时候是一个Pod一个Pod更新的，所以整个过程服务不会中断。当然你也可以设置一次更新的Pod的百分比。而且更新过程中，Service只会将流量转发到可用的节点上面。更加重要的是，我们可以随时回退到旧版本。</p>
 <blockquote>
 <p>Rolling updates allow Deployments’ update to take place with zero downtime by incrementally updating Pods instances with new ones.<br>If a Deployment is exposed publicly, the Service will load-balance the traffic only to available Pods during the update.</p>
 </blockquote>
 <p><img src="https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_06_rollingupdates1.svg" alt="rollingupdate"><br><img src="https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_06_rollingupdates2.svg" alt="rollingupdate"><br><img src="https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_06_rollingupdates3.svg" alt="rollingupdate"><br><img src="https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_06_rollingupdates4.svg" alt="rollingupdate"></p>
-<h3 id="set-image"><a href="#set-image" class="headerlink" title="set image"></a>set image</h3><p>在原来程序的基础上，多输出一个v2作为新版本，使用set image命令指定新版本镜像.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl set image deployments/helloworld helloworld=registry.hnaresearch.com/public/hello-world:v2.0</div><div class="line">deployment &quot;helloworld&quot; image updated</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get pods</div><div class="line">NAME                          READY     STATUS              RESTARTS   AGE</div><div class="line">helloworld-2790924137-2kg70   1/1       Running             0          54m</div><div class="line">helloworld-2790924137-bvfhn   1/1       Running             0          3h</div><div class="line">helloworld-2790924137-tgqr9   1/1       Running             0          54m</div><div class="line">helloworld-2889228138-65lmj   0/1       ContainerCreating   0          9m</div><div class="line">helloworld-2889228138-q68vx   0/1       ContainerCreating   0          9m</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get pods</div><div class="line">NAME                          READY     STATUS              RESTARTS   AGE</div><div class="line">helloworld-2790924137-2kg70   1/1       Terminating         0          54m</div><div class="line">helloworld-2790924137-bvfhn   1/1       Running             0          3h</div><div class="line">helloworld-2790924137-tgqr9   0/1       Terminating         0          54m</div><div class="line">helloworld-2889228138-65lmj   0/1       ContainerCreating   0          9m</div><div class="line">helloworld-2889228138-bj38m   0/1       Pending             0          9m</div><div class="line">helloworld-2889228138-dv3ch   1/1       Running             0          9m</div><div class="line">helloworld-2889228138-q68vx   1/1       Running             0          9m</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get pods</div><div class="line">NAME                          READY     STATUS    RESTARTS   AGE</div><div class="line">helloworld-2889228138-65lmj   1/1       Running   0          10m</div><div class="line">helloworld-2889228138-bj38m   1/1       Running   0          10m</div><div class="line">helloworld-2889228138-dv3ch   1/1       Running   0          10m</div><div class="line">helloworld-2889228138-q68vx   1/1       Running   0          10m</div></pre></td></tr></table></figure></p>
-<h3 id="rollout-undo"><a href="#rollout-undo" class="headerlink" title="rollout undo"></a>rollout undo</h3><p>使用kubectl rollout undo命令回滚到之前的版本：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl rollout undo deployment/helloworld</div><div class="line">deployment &quot;helloworld&quot; rolled back</div></pre></td></tr></table></figure></p>
+<h3 id="Set-image"><a href="#Set-image" class="headerlink" title="Set image"></a>Set image</h3><p>在原来程序的基础上，多输出一个v2作为新版本，使用set image命令指定新版本镜像.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl set image deployments/helloworld helloworld=registry.hnaresearch.com/public/hello-world:v2.0</div><div class="line">deployment &quot;helloworld&quot; image updated</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get pods</div><div class="line">NAME                          READY     STATUS              RESTARTS   AGE</div><div class="line">helloworld-2790924137-2kg70   1/1       Running             0          54m</div><div class="line">helloworld-2790924137-bvfhn   1/1       Running             0          3h</div><div class="line">helloworld-2790924137-tgqr9   1/1       Running             0          54m</div><div class="line">helloworld-2889228138-65lmj   0/1       ContainerCreating   0          9m</div><div class="line">helloworld-2889228138-q68vx   0/1       ContainerCreating   0          9m</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get pods</div><div class="line">NAME                          READY     STATUS              RESTARTS   AGE</div><div class="line">helloworld-2790924137-2kg70   1/1       Terminating         0          54m</div><div class="line">helloworld-2790924137-bvfhn   1/1       Running             0          3h</div><div class="line">helloworld-2790924137-tgqr9   0/1       Terminating         0          54m</div><div class="line">helloworld-2889228138-65lmj   0/1       ContainerCreating   0          9m</div><div class="line">helloworld-2889228138-bj38m   0/1       Pending             0          9m</div><div class="line">helloworld-2889228138-dv3ch   1/1       Running             0          9m</div><div class="line">helloworld-2889228138-q68vx   1/1       Running             0          9m</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get pods</div><div class="line">NAME                          READY     STATUS    RESTARTS   AGE</div><div class="line">helloworld-2889228138-65lmj   1/1       Running   0          10m</div><div class="line">helloworld-2889228138-bj38m   1/1       Running   0          10m</div><div class="line">helloworld-2889228138-dv3ch   1/1       Running   0          10m</div><div class="line">helloworld-2889228138-q68vx   1/1       Running   0          10m</div></pre></td></tr></table></figure></p>
+<h3 id="Rollout-undo"><a href="#Rollout-undo" class="headerlink" title="Rollout undo"></a>Rollout undo</h3><p>使用kubectl rollout undo命令回滚到之前的版本：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl rollout undo deployment/helloworld</div><div class="line">deployment &quot;helloworld&quot; rolled back</div></pre></td></tr></table></figure></p>
+<h2 id="Autoscaling"><a href="#Autoscaling" class="headerlink" title="Autoscaling"></a>Autoscaling</h2><p>系统能够根据负载的变化对计算资源的分配进行自动的扩增或者收缩，无疑是一个非常吸引人的特征，它能够最大可能地减少费用或者其他代价（如电力损耗）。自动扩展主要分为两种，其一为水平扩展，针对于实例数目的增减；其二为垂直扩展，即单个实例可以使用的资源的增减。Horizontal Pod Autoscaler（HPA）属于前者。</p>
+<p>Horizontal Pod Autoscaler的操作对象是Replication Controller、ReplicaSet或Deployment对应的Pod，根据观察到的CPU实际使用量与用户的期望值进行比对，做出是否需要增减实例数量的决策。controller目前使用heapSter来检测CPU使用量，检测周期默认是30秒。</p>
+<h3 id="决策策略"><a href="#决策策略" class="headerlink" title="决策策略"></a>决策策略</h3><p>在HPA Controller检测到CPU的实际使用量之后，会求出当前的CPU使用率（实际使用量与pod 请求量的比率)。然后，HPA Controller会通过调整副本数量使得CPU使用率尽量向期望值靠近．</p>
+<p>另外，考虑到自动扩展的决策可能需要一段时间才会生效，甚至在短时间内会引入一些噪声．</p>
+<ul>
+<li>例如当pod所需要的CPU负荷过大，从而运行一个新的pod进行分流，在创建的过程中，系统的CPU使用量可能会有一个攀升的过程。所以，在每一次作出决策后的一段时间内，将不再进行扩展决策。对于ScaleUp而言，这个时间段为3分钟，Scaledown为5分钟。</li>
+<li>再者HPA Controller允许一定范围内的CPU使用量的不稳定，也就是说，只有当aVg（CurrentPodConsumption／Target低于0.9或者高于1.1时才进行实例调整，这也是出于维护系统稳定性的考虑。</li>
+</ul>
 
           
         
@@ -667,7 +1822,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/04/README/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/hdfs/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Xi Ning Wang">
@@ -689,8 +1844,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/05/04/README/" itemprop="url">
-                  分布式架构
+                <a class="post-title-link" href="/hdfs/" itemprop="url">
+                  HDFS
                 </a>
               
             
@@ -706,8 +1861,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-04T17:22:19+08:00">
-                2017-05-04
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-09T20:46:25+08:00">
+                2017-02-09
               </time>
             
 
@@ -717,28 +1872,6 @@
           </span>
 
           
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/分布式/" itemprop="url" rel="index">
-                    <span itemprop="name">分布式</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
 
           
             
@@ -747,9 +1880,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2017/05/04/README/#comments" itemprop="discussionUrl">
+                <a href="/hdfs/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/05/04/README/" itemprop="commentCount"></span>
+                        data-disqus-identifier="hdfs/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -777,87 +1910,81 @@
       
         
           
-            <h2 id="分布式配置管理"><a href="#分布式配置管理" class="headerlink" title="分布式配置管理"></a>分布式配置管理</h2><ul>
-<li>Consul</li>
-<li>Archaius</li>
-<li>Kubernetes ConfigMap &amp; Secrets</li>
+            <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>HDFS（Hadoop Distributed File System ）Hadoop分布式文件系统。是根据google发表的论文翻版的。论文为GFS（Google File System）Google 文件系统（中文，英文）。</p>
+<p>HDFS有很多特点：</p>
+<ul>
+<li>① 保存多个副本，且提供容错机制，副本丢失或宕机自动恢复。默认存3份。</li>
+<li>② 运行在廉价的机器上。</li>
+<li>③ 适合大数据的处理。多大？多小？HDFS默认会将文件分割成block，64M为1个block。然后将block按键值对存储在HDFS上，并将键值对的映射存到内存中。如果小文件太多，那内存的负担会很重。</li>
 </ul>
-<p>配置的集中管理：采用consul的KV，将所有微服务的application.properties中的配置内容存入consul。</p>
-<p>配置的动态管理：采用archaius，将consul上的配置信息读到spring的PropertySource和archaius的PollResult中，当修改了配置信息后，经常改变的值通过DynamicFactory来获取，不经常改变的值可以通过其他方式获取. 大部分情况下，修改了consul上的配置信息后，相应的项目不需要重启，也会读到最新的值。</p>
-<h2 id="2-服务注册与发现"><a href="#2-服务注册与发现" class="headerlink" title="2. 服务注册与发现"></a>2. 服务注册与发现</h2><ul>
-<li><a href="/2017/03/08/consul/">Consul</a></li>
-<li>Eureka</li>
-<li><a href="kubernetes.md#service">Kubernetes Service</a> &amp; Ingress Resource</li>
+<p><img src="images/hdfs1.jpg" alt="hdfs1"><br>如上图所示，HDFS也是按照Master和Slave的结构。分NameNode、SecondaryNameNode、DataNode这几个角色。</p>
+<ul>
+<li>NameNode：是Master节点，是大领导。管理数据块映射；处理客户端的读写请求；配置副本策略；管理HDFS的名称空间；</li>
+<li>SecondaryNameNode：是一个小弟，分担大哥namenode的工作量；是NameNode的冷备份；合并fsimage和fsedits然后再发给namenode。</li>
+<li>DataNode：Slave节点，奴隶，干活的。负责存储client发来的数据块block；执行数据块的读写操作。</li>
+<li>热备份：b是a的热备份，如果a坏掉。那么b马上运行代替a的工作。</li>
+<li>冷备份：b是a的冷备份，如果a坏掉。那么b不能马上代替a工作。但是b上存储a的一些信息，减少a坏掉之后的损失。</li>
+<li>fsimage:元数据镜像文件（文件系统的目录树。）</li>
+<li>edits：元数据的操作日志（针对文件系统做的修改操作记录）</li>
 </ul>
-<h2 id="3-负载平衡"><a href="#3-负载平衡" class="headerlink" title="3. 负载平衡"></a>3. 负载平衡</h2><ul>
-<li>Netflix Ribbon（Spring Cloud）</li>
-<li><p><a href="kubernetes.md#service">Kubernetes Service</a></p>
-<p><a href="consul.md">Client Side Load Balancing</a></p>
-</li>
+<p>Namenode内存中存储的是=fsimage+edits。</p>
+<p>SecondaryNameNode负责定时默认1小时，从namenode上，获取fsimage和edits来进行合并，然后再发送给namenode。减少namenode的工作量。</p>
+<h2 id="HDFS写操作"><a href="#HDFS写操作" class="headerlink" title="HDFS写操作"></a>HDFS写操作</h2><p>有一个文件FileA，100M大小。Client将FileA写入到HDFS上。HDFS按默认配置。HDFS分布在三个机架上Rack1，Rack2，Rack3。<br><img src="images/hdfs-write.jpg" alt="hdfs-write"></p>
+<ul>
+<li>a. Client将FileA按64M分块。分成两块，block1和Block2;</li>
+<li>b. Client向nameNode发送写数据请求，如图蓝色虚线①——&gt;。</li>
+<li><p>c. NameNode节点，记录block信息。并返回可用的DataNode，如粉色虚线②———&gt;。</p>
+<p>  Block1: host2,host1,host3</p>
+<p>  Block2: host7,host8,host4</p>
+<p>  原理：</p>
+<pre><code>NameNode具有RackAware机架感知功能，这个可以配置。
+若client为DataNode节点，那存储block时，规则为：副本1，同client的节点上；副本2，不同机架节点上；副本3，同第二个副本机架的另一个节点上；其他副本随机挑选。
+若client不为DataNode节点，那存储block时，规则为：副本1，随机选择一个节点上；副本2，不同副本1，机架上；副本3，同副本2相同的另一个节点上；其他副本随机挑选。
+</code></pre></li>
+<li><p>d. client向DataNode发送block1；发送过程是以流式写入。</p>
+<p>  流式写入过程，</p>
+<pre><code>1&gt;将64M的block1按64k的package划分;
+
+2&gt;然后将第一个package发送给host2;
+
+3&gt;host2接收完后，将第一个package发送给host1，同时client想host2发送第二个package；
+
+4&gt;host1接收完第一个package后，发送给host3，同时接收host2发来的第二个package。
+
+5&gt;以此类推，如图红线实线所示，直到将block1发送完毕。
+
+6&gt;host2,host1,host3向NameNode，host2向Client发送通知，说“消息发送完了”。如图粉红颜色实线所示。
+
+7&gt;client收到host2发来的消息后，向namenode发送消息，说我写完了。这样就真完成了。如图黄色粗实线
+
+8&gt;发送完block1后，再向host7，host8，host4发送block2，如图蓝色实线所示。
+
+9&gt;发送完block2后，host7,host8,host4向NameNode，host7向Client发送通知，如图浅绿色实线所示。
+
+10&gt;client向NameNode发送消息，说我写完了，如图黄色粗实线。。。这样就完毕了。
+</code></pre></li>
 </ul>
-<h2 id="4-API网关与智能路由"><a href="#4-API网关与智能路由" class="headerlink" title="4. API网关与智能路由"></a>4. API网关与智能路由</h2><ul>
-<li>Netflix Zuul（SpringCloud）</li>
-<li><p><a href="kubernetes.md#service">Kubernetes Service</a> &amp;Ingress Resource</p>
-<p><a href="gateway.md">Gateway</a></p>
-</li>
-</ul>
-<h2 id="5-分布式服务弹性与容错"><a href="#5-分布式服务弹性与容错" class="headerlink" title="5. 分布式服务弹性与容错"></a>5. 分布式服务弹性与容错</h2><ul>
-<li>弹性服务</li>
-<li>服务降级</li>
-<li>线程池/信号隔离</li>
-<li><p>快速解决依赖隔离</p>
-<p><a href="Hystrix.md">Hystrix架构设计</a></p>
-</li>
-</ul>
-<h2 id="6-日志管理"><a href="#6-日志管理" class="headerlink" title="6. 日志管理"></a>6. 日志管理</h2><ul>
-<li>ELK Stack（LogStash -&gt; ES -&gt; Kibana）</li>
-</ul>
-<h2 id="7-分布式跟踪"><a href="#7-分布式跟踪" class="headerlink" title="7. 分布式跟踪"></a>7. 分布式跟踪</h2><ul>
-<li>Zipkin</li>
-<li><p>SpringCloud Sleuth</p>
-<p><a href="zipkin">Zipkin</a> is a distributed tracing system. It helps gather timing data needed to troubleshoot latency problems in microservice architectures. It manages both the collection and lookup of this data. Zipkin’s design is based on the Google Dapper paper.</p>
-<p>Applications are instrumented to report timing data to Zipkin. The Zipkin UI also presents a Dependency diagram showing how many traced requests went through each application. If you are troubleshooting latency problems or errors, you can filter or sort all traces based on the application, length of trace, annotation, or timestamp. Once you select a trace, you can see the percentage of the total trace time each span takes which allows you to identify the problem application.</p>
-</li>
-</ul>
-<h2 id="8-监控与度量"><a href="#8-监控与度量" class="headerlink" title="8. 监控与度量"></a>8. 监控与度量</h2><ul>
-<li><p>Application/Infrastructure monitoring using StatsD + Graphite + Grafana</p>
-<p><a href="sgg.md">StatsD + Graphite + Grafana</a></p>
-</li>
-</ul>
-<h2 id="9-服务安全"><a href="#9-服务安全" class="headerlink" title="9. 服务安全"></a>9. 服务安全</h2><ul>
-<li>SpringCloud Security</li>
-</ul>
-<h2 id="10-Auto-Scaling"><a href="#10-Auto-Scaling" class="headerlink" title="10. Auto Scaling"></a>10. Auto Scaling</h2><ul>
-<li>Kubernetes Health Check、SelfHealing、Autoscaling</li>
-</ul>
-<h2 id="11-打包部署和调度部署"><a href="#11-打包部署和调度部署" class="headerlink" title="11. 打包部署和调度部署"></a>11. 打包部署和调度部署</h2><ul>
-<li>Spring Boot；</li>
-<li>Docker／Rkt、Kubernetes Scheduler&amp;Deployment</li>
-</ul>
-<h2 id="12-任务工作管理"><a href="#12-任务工作管理" class="headerlink" title="12. 任务工作管理"></a>12. 任务工作管理</h2><ul>
-<li>Spring Batch</li>
-<li>Kubernetes Jobs&amp;Scheduled Jobs</li>
-</ul>
-<h2 id="分布式存储"><a href="#分布式存储" class="headerlink" title="分布式存储"></a>分布式存储</h2><h2 id="1-持久化-分布式文件系统"><a href="#1-持久化-分布式文件系统" class="headerlink" title="1.持久化 - 分布式文件系统"></a>1.持久化 - 分布式文件系统</h2><ul>
-<li><a href="hdfs.md">HDFS分布式文件系统</a></li>
-</ul>
-<h2 id="2-持久化-分布式数据库"><a href="#2-持久化-分布式数据库" class="headerlink" title="2.持久化 - 分布式数据库"></a>2.持久化 - 分布式数据库</h2><ul>
-<li>[传统关系型数据库集群,如MySQL Cluster]</li>
-<li><a href="mongo.md">Mongo</a></li>
-<li><a href="hbase.md">Cassandra,HBase</a></li>
-</ul>
-<h2 id="3-非持久化-分布式缓存-消息系统"><a href="#3-非持久化-分布式缓存-消息系统" class="headerlink" title="3.非持久化 - 分布式缓存/消息系统"></a>3.非持久化 - 分布式缓存/消息系统</h2><ul>
-<li><a href="kafka.md">Kafka</a></li>
-<li>[Redis]</li>
-</ul>
-<h2 id="分布式计算框架"><a href="#分布式计算框架" class="headerlink" title="分布式计算框架"></a>分布式计算框架</h2><ul>
-<li><a href="yarn.md">YARN分布式计算框架</a></li>
-<li><a href="yarn-appdev.md">YARN应用开发的几种方式</a></li>
-<li><a href="running-spark-on-yarn.md">Running Spark on YARN</a></li>
-</ul>
-<h2 id="Spark-Big-Data-Analytics"><a href="#Spark-Big-Data-Analytics" class="headerlink" title="Spark Big Data Analytics"></a>Spark Big Data Analytics</h2><ul>
-<li><a href="spark.md">Spark</a></li>
-</ul>
+<p>分析，通过写过程，我们可以了解到：</p>
+<pre><code>①写1T文件，我们需要3T的存储，3T的网络流量贷款。
+
+②在执行读或写的过程中，NameNode和DataNode通过HeartBeat进行保存通信，确定DataNode活着。如果发现DataNode死掉了，就将死掉的DataNode上的数据，放到其他节点去。读取时，要读其他节点去。
+
+③挂掉一个节点，没关系，还有其他节点可以备份；甚至，挂掉某一个机架，也没关系；其他机架上，也有备份。
+</code></pre><h2 id="HDFS读操作"><a href="#HDFS读操作" class="headerlink" title="HDFS读操作"></a>HDFS读操作</h2><p><img src="images/hdfs-read.jpg" alt="hdfs-read"></p>
+<p>读操作就简单一些了，如图所示，client要从datanode上，读取FileA。而FileA由block1和block2组成。</p>
+<p>那么，读操作流程为：</p>
+<p>a. client向namenode发送读请求。</p>
+<p>b. namenode查看Metadata信息，返回fileA的block的位置。</p>
+<pre><code>block1:host2,host1,host3
+
+block2:host7,host8,host4
+</code></pre><p>c. block的位置是有先后顺序的，先读block1，再读block2。而且block1去host2上读取；然后block2，去host7上读取；</p>
+<p>上面例子中，client位于机架外，那么如果client位于机架内某个DataNode上，例如,client是host6。那么读取的时候，遵循的规律是：</p>
+<p>优选读取本机架上的数据。</p>
+<h2 id="HDFS中常用到的命令"><a href="#HDFS中常用到的命令" class="headerlink" title="HDFS中常用到的命令"></a>HDFS中常用到的命令</h2><p>1、hadoop fs<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">hadoop fs -ls /</div><div class="line">hadoop fs -lsr</div><div class="line">hadoop fs -mkdir /user/hadoop</div><div class="line">hadoop fs -put a.txt /user/hadoop/</div><div class="line">hadoop fs -get /user/hadoop/a.txt /</div><div class="line">hadoop fs -cp src dst</div><div class="line">hadoop fs -mv src dst</div><div class="line">hadoop fs -cat /user/hadoop/a.txt</div><div class="line">hadoop fs -rm /user/hadoop/a.txt</div><div class="line">hadoop fs -rmr /user/hadoop/a.txt</div><div class="line">hadoop fs -text /user/hadoop/a.txt</div><div class="line">hadoop fs -copyFromLocal localsrc dst 与hadoop fs -put功能类似。</div><div class="line">hadoop fs -moveFromLocal localsrc dst 将本地文件上传到hdfs，同时删除本地文件。</div></pre></td></tr></table></figure></p>
+<p>2、hadoop fsadmin<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">hadoop dfsadmin -report</div><div class="line">hadoop dfsadmin -safemode enter | leave | get | wait</div><div class="line">hadoop dfsadmin -setBalancerBandwidth 1000</div></pre></td></tr></table></figure></p>
+<p>3、hadoop fsck</p>
+<p>4、start-balancer.sh</p>
 
           
         
@@ -901,7 +2028,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/04/gateway/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/hbase/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Xi Ning Wang">
@@ -923,139 +2050,7 @@
             
               
                 
-                <a class="post-title-link" href="/2017/05/04/gateway/" itemprop="url">
-                  Gateway
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-04T15:40:07+08:00">
-                2017-05-04
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/05/04/gateway/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/05/04/gateway/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><img src="https://camo.githubusercontent.com/4eb7754152028cdebd5c09d1c6f5acc7683f0094/687474703a2f2f6e6574666c69782e6769746875622e696f2f7a75756c2f696d616765732f7a75756c2d726571756573742d6c6966656379636c652e706e67" alt="zuul"></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/03/hbase/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Xi Ning Wang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Technical Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/05/03/hbase/" itemprop="url">
+                <a class="post-title-link" href="/hbase/" itemprop="url">
                   HBase
                 </a>
               
@@ -1072,8 +2067,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-03T11:57:18+08:00">
-                2017-05-03
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-09T20:46:25+08:00">
+                2017-02-09
               </time>
             
 
@@ -1091,9 +2086,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2017/05/03/hbase/#comments" itemprop="discussionUrl">
+                <a href="/hbase/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/05/03/hbase/" itemprop="commentCount"></span>
+                        data-disqus-identifier="hbase/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -1177,809 +2172,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/10/spark/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Xi Ning Wang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Technical Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/04/10/spark/" itemprop="url">
-                  Spark
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-10T23:15:00+08:00">
-                2017-04-10
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/04/10/spark/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/04/10/spark/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/04/redis/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Xi Ning Wang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Technical Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/04/04/redis/" itemprop="url">
-                  Redis
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-04T19:50:10+08:00">
-                2017-04-04
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/04/04/redis/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/04/04/redis/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>docker run –name myredis -v /Users/xiningwang/nosql/redis/redis-3.2.8/data:/data -p 6379:6379 -d redis redis-server –appendonly yes</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/01/running-spark-on-yarn/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Xi Ning Wang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Technical Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/04/01/running-spark-on-yarn/" itemprop="url">
-                  Running Spark on YARN
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-01T00:44:49+08:00">
-                2017-04-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/04/01/running-spark-on-yarn/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/04/01/running-spark-on-yarn/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="To-launch-a-Spark-application-in-cluster-yarn-mode"><a href="#To-launch-a-Spark-application-in-cluster-yarn-mode" class="headerlink" title="To launch a Spark application in cluster/yarn mode:"></a>To launch a Spark application in cluster/yarn mode:</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ ./bin/spark-submit --class path.to.your.Class --master yarn --deploy-mode cluster [options] &lt;app jar&gt; [app options]</div></pre></td></tr></table></figure>
-<p>For example:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">$ ./bin/spark-submit --class org.apache.spark.examples.SparkPi \</div><div class="line">    --master yarn \</div><div class="line">    --deploy-mode cluster \</div><div class="line">    --driver-memory 4g \</div><div class="line">    --executor-memory 2g \</div><div class="line">    --executor-cores 1 \</div><div class="line">    --queue thequeue \</div><div class="line">    lib/spark-examples*.jar \</div><div class="line">    10</div></pre></td></tr></table></figure></p>
-<p>See the detail from:<br><a href="http://spark.apache.org/docs/latest/running-on-yarn.html" target="_blank" rel="external">http://spark.apache.org/docs/latest/running-on-yarn.html</a></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/01/kafka/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Xi Ning Wang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Technical Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/04/01/kafka/" itemprop="url">
-                  Kafka
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-01T00:29:17+08:00">
-                2017-04-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/04/01/kafka/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/04/01/kafka/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><img src="http://kafka.apache.org/images/logo.png" alt=""></p>
-<h3 id="kafka"><a href="#kafka" class="headerlink" title="kafka"></a>kafka</h3><ol>
-<li><p>Kafka Connect</p>
-<ul>
-<li>Overview (<a href="http://kafka.apache.org/documentation/#connect" target="_blank" rel="external">http://kafka.apache.org/documentation/#connect</a>)</li>
-<li>User Guide</li>
-<li>Connector Development Guide</li>
-</ul>
-</li>
-<li><p>Kafka Streams</p>
-<ul>
-<li>Overview</li>
-<li>Core Concepts</li>
-<li>Architecture<br><img src="http://kafka.apache.org/0102/images/streams-architecture-overview.jpg" alt=""></li>
-<li>Developer Guide<ul>
-<li>Low-Level Processor API</li>
-<li>High-Level Streams DSL</li>
-<li>Application Configuration and Execution</li>
-</ul>
-</li>
-<li>Upgrade Guide and API Changes</li>
-</ul>
-</li>
-</ol>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/28/yarn-appdev/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Xi Ning Wang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Technical Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/03/28/yarn-appdev/" itemprop="url">
-                  Writing YARN Applications
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-28T22:17:15+08:00">
-                2017-03-28
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/03/28/yarn-appdev/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/03/28/yarn-appdev/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Hadoop-Writing-YARN-Applications"><a href="#Hadoop-Writing-YARN-Applications" class="headerlink" title="Hadoop: Writing YARN Applications"></a>Hadoop: Writing YARN Applications</h1><ul>
-<li>原生开发YARN应用<ul>
-<li>参考： <a href="http://hadoop.apache.org/docs/r3.0.0-alpha2/hadoop-yarn/hadoop-yarn-site/WritingYarnApplications.html" target="_blank" rel="external">http://hadoop.apache.org/docs/r3.0.0-alpha2/hadoop-yarn/hadoop-yarn-site/WritingYarnApplications.html</a></li>
-<li>在YARN上编写一个应用程序，你需要开发Client和ApplicationMaster两个模块，并了解涉及到的几个协议的若干API和参数列表，其中ApplicationMaster还要负责资源申请，任务调度、容错等，总之，整个过程非常复杂。</li>
-</ul>
-</li>
-<li>基于Twill开发<ul>
-<li>参考： <a href="http://twill.apache.org/GettingStarted.html" target="_blank" rel="external">http://twill.apache.org/GettingStarted.html</a></li>
-<li>优点： 简化了YARN开发的复杂性；</li>
-<li>缺点： 不容易trouble shooting,封装部分不易detect问题，另外也不能支持最新的Hadoop cluster；文档也太少；</li>
-</ul>
-</li>
-<li>基于Slider开发<ul>
-<li>参考： <a href="http://slider.incubator.apache.org" target="_blank" rel="external">http://slider.incubator.apache.org</a></li>
-<li>优点： 简化了YARN开发的复杂性；</li>
-<li>缺点： 不容易trouble shooting,封装部分不易detect问题，另外也不能支持最新的Hadoop cluster；本身的框架也很复杂，</li>
-</ul>
-</li>
-<li>基于Spring Hadoop开发<ul>
-<li>参考： <a href="https://spring.io/guides/gs/yarn-basic/" target="_blank" rel="external">https://spring.io/guides/gs/yarn-basic/</a></li>
-<li>优点： 简化了YARN开发的复杂性；</li>
-<li>缺点： 不容易trouble shooting,封装部分不易detect问题，另外也不能支持最新的Hadoop cluster；</li>
-</ul>
-</li>
-</ul>
-<h2 id="开发Client和ApplicationMaster"><a href="#开发Client和ApplicationMaster" class="headerlink" title="开发Client和ApplicationMaster"></a>开发Client和ApplicationMaster</h2><p>当用户向YARN中提交一个应用程序后，YARN将分两个阶段运行该应用程序： 第一个阶段是启动ApplicationMaster； 第二个阶段是由ApplicationMaster创建应用程序，为它申请资源，并监控它的整个运行过程，直到运行完成。</p>
-<h3 id="1-开发Client启动AM"><a href="#1-开发Client启动AM" class="headerlink" title="1.开发Client启动AM"></a>1.开发Client启动AM</h3><p>Client部分是用于将应用提交到YARN, 从而可以启动application master.<br>客户端通常只需与ResourceManager交互，期间涉及到多个数据结构和一个RPC协议，具体如下：</p>
-<p><img src="images/yarn-dev1.png" alt=""></p>
-<ul>
-<li><p>客户端通过RPC协议ApplicationClientProtocol向ResourceManager(也称之为ApplicationsManager、ASM)发送应用程序提交请求GetNewApplicationRequest，ResourceManager为其返回应答GetNewApplicationResponse，该数据结构中包含多种信息，包括ApplicationId、可资源使用上限和下限等。初始化并启动一个yarnClient:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">YarnClient yarnClient = YarnClient.createYarnClient();</div><div class="line">yarnClient.init(conf);</div><div class="line">yarnClient.start();</div><div class="line">YarnClientApplication app = yarnClient.createApplication();</div><div class="line">GetNewApplicationResponse appResponse = app.getNewApplicationResponse();</div></pre></td></tr></table></figure>
-</li>
-<li><p>Client部分最关键的是构建一个ApplicationSubmissionContext。启动ApplicationMaster所需的所有信息打包到数据结构ApplicationSubmissionContext中，主要包括以下几种信息：</p>
-<ul>
-<li>(1) application id</li>
-<li>(2) application 名称</li>
-<li>(3) application优先级</li>
-<li>(4) application 所属队列</li>
-<li>(5) application 启动用户名</li>
-<li>(6)  ApplicationMaster对应的Container信息ContainerLaunchContext，包括：启动ApplicationMaster所需各种文件资源、jar包、环境变量、启动命令、运行ApplicationMaster所需的资源（主要指内存）等。</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">// set the application name</div><div class="line">ApplicationSubmissionContext appContext = app.getApplicationSubmissionContext();</div><div class="line">ApplicationId appId = appContext.getApplicationId();</div><div class="line"></div><div class="line">appContext.setKeepContainersAcrossApplicationAttempts(keepContainers);</div><div class="line">appContext.setApplicationName(appName);</div><div class="line">// Set up the container launch context for the application master</div><div class="line">ContainerLaunchContext amContainer = ContainerLaunchContext.newInstance(</div><div class="line">  localResources, env, commands, null, null, null);</div><div class="line"></div><div class="line">// Set up resource type requirements</div><div class="line">// For now, both memory and vcores are supported, so we set memory and</div><div class="line">// vcores requirements</div><div class="line">Resource capability = Resource.newInstance(amMemory, amVCores);</div><div class="line">appContext.setResource(capability);</div></pre></td></tr></table></figure>
-</li>
-<li><p>客户端调用ClientRMProtocol#submitApplication(ApplicationSubmissionContext)将ApplicationMaster提交到ResourceManager上。ResourceManager收到请求后，会为ApplicationMaster寻找合适的节点，并在该节点上启动它。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">LOG.info(&quot;Submitting application to ASM&quot;);</div><div class="line">yarnClient.submitApplication(appContext);</div></pre></td></tr></table></figure>
-</li>
-<li><p>客户端可通过多种方式查询应用程序的运行状态，其中一种是调用RPC函数ClientRMProtocol#getApplicationReport获取一个应用程序当前运行状况报告，该报告内容包括应用程序名称、所属用户、所在队列、ApplicationMaster所在节点、一些诊断信息、启动时间等。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">// Get application report for the appId we are interested in</div><div class="line">ApplicationReport report = yarnClient.getApplicationReport(appId);</div><div class="line"></div><div class="line">LOG.info(&quot;Got application report from ASM for&quot;</div><div class="line">    + &quot;, appId=&quot; + appId.getId()</div><div class="line">    + &quot;, clientToAMToken=&quot; + report.getClientToAMToken()</div><div class="line">    + &quot;, appDiagnostics=&quot; + report.getDiagnostics()</div><div class="line">    + &quot;, appMasterHost=&quot; + report.getHost()</div><div class="line">    + &quot;, appQueue=&quot; + report.getQueue()</div><div class="line">    + &quot;, appMasterRpcPort=&quot; + report.getRpcPort()</div><div class="line">    + &quot;, appStartTime=&quot; + report.getStartTime()</div><div class="line">    + &quot;, yarnAppState=&quot; + report.getYarnApplicationState().toString()</div><div class="line">    + &quot;, distributedFinalState=&quot; + report.getFinalApplicationStatus().toString()</div><div class="line">    + &quot;, appTrackingUrl=&quot; + report.getTrackingUrl()</div><div class="line">    + &quot;, appUser=&quot; + report.getUser());</div><div class="line"></div><div class="line">YarnApplicationState state = report.getYarnApplicationState();</div><div class="line">FinalApplicationStatus dsStatus = report.getFinalApplicationStatus();</div></pre></td></tr></table></figure>
-</li>
-<li><p>如果有异常或者其他情况，可以通过yarnClient.killApplication(appId);来kill掉应用；</p>
-</li>
-</ul>
-<h3 id="2-开发ApplicationMaster"><a href="#2-开发ApplicationMaster" class="headerlink" title="2.开发ApplicationMaster"></a>2.开发ApplicationMaster</h3><p>ApplicationMaster需要与ResoureManager和NodeManager交互，以申请资源和启动Container，期间涉及到多个数据结构和两个RPC协议。具体步骤如下：</p>
-<ul>
-<li>ApplicationMaster首先需通过RPC协议AMRMProtocol向ResourceManager发送注册请求RegisterApplicationMasterRequest，该数据结构中包含ApplicationMaster所在节点的host、RPC port和TrackingUrl等信息，而ResourceManager将返回RegisterApplicationMasterResponse，该数据结构中包含多种信息，包括该应用程序的ACL列表、可资源使用上限和下限等。</li>
-</ul>
-<p><img src="images/yarn-dev2.png" alt=""></p>
-<ul>
-<li><p>ApplicationMaster与RM之间的心跳：整个运行过程中，ApplicationMaster需通过心跳与ResourceManager保持联系，这是因为，如果一段时间内（默认是10min），ResourceManager未收到ApplicationMaster信息，则认为它死掉了，会重新调度或者让其失败。通常而言，ApplicationMaster周期性调用RPC函数ApplicationMasterProtocol.allocate向其发送空的AllocateRequest请求即可。</p>
-</li>
-<li><p>构造Container：根据每个任务的资源需求，ApplicationMaster可向ResourceManager申请一系列用于运行任务的Container，ApplicationMaster使用ResourceRequest类描述每个Container（一个container只能运行一个任务）：</p>
-<ul>
-<li>1）Hostname：期望Container所在的节点，如果是*，表示可以为任意节点。</li>
-<li>2）Resource capability：运行该任务所需的资源量，如(memory/disk/cpu)。</li>
-<li>3）Priority：任务优先级。一个应用程序中的任务可能有多种优先级，ResourceManager会优先为高优先级的任务分配资源。</li>
-<li>4）numContainers：符合以上条件的container数目。</li>
-</ul>
-</li>
-</ul>
-<ul>
-<li>申请资源分配Container：一旦为任务构造了Container后，ApplicationMaster会使用RPC函数AMRMProtocol#allocate向ResourceManager发送一个AllocateRequest对象，以请求分配这些Container，AllocateRequest中包含以下信息：<ul>
-<li>1）Requested containers：所需的Container列表</li>
-<li>2）Released containers：有些情况下，比如有些任务在某些节点上失败过，则ApplicationMaster不想再在这些节点上运行任务，此时可要求释放这些节点上的Container。</li>
-<li>3）Progress update information：应用程序执行进度</li>
-<li>4）ResponseId：RPC响应ID，每次调用RPC，该值会加1。</li>
-</ul>
-</li>
-<li>ResourceManager会为ApplicationMaster返回一个AllocateResponse对象，该对象中主要信息包含在AMResponse中：<ul>
-<li>1）reboot：ApplicationMaster是否需要重新初始化.当ResourceManager端出现不一致状态时，会要求对应的ApplicationMaster重新初始化。</li>
-<li>2）Allocated Containers：新分配的container列表。</li>
-<li>3）Completed Containers：已运行完成的container列表，该列表中包含运行成功和未成功的Container，ApplicationMaster可能需要重新运行那些未运行成功的Container。</li>
-</ul>
-</li>
-<li>ApplicationMaster会不断追踪已经获取的container，且只有当需求发生变化时，才允许重新为Container申请资源。</li>
-</ul>
-<p><img src="images/yarn-dev3.png" alt=""></p>
-<ul>
-<li>启动Container：当ApplicationMaster（从ResourceManager端）收到新分配的Container列表后，会使用ContainerManagementProtocol#startContainer向对应的NodeManager发送ContainerLaunchContext以启动Container，ContainerLaunchContext包含以下内容：<ul>
-<li>1）ContainerId：Container id</li>
-<li>2）Resource：该Container可使用的资源量（当前仅支持内存）</li>
-<li>3）User：Container所属用户</li>
-<li>4）Security tokens：安全令牌，只有持有该令牌才可启动container</li>
-<li>5）LocalResource：运行Container所需的本地资源，比如jar包、二进制文件、其他外部文件等。</li>
-<li>6）ServiceData：应用程序可能使用其他外部服务，这些服务相关的数据通过该参数指定。</li>
-<li>7）Environment：启动container所需的环境变量</li>
-<li>8）command：启动container的命令</li>
-</ul>
-</li>
-</ul>
-<ul>
-<li>监控Container：ApplicationMaster可以通过2种途径监控启动的Container：<ul>
-<li>使用ApplicationMasterProtocol.allocate向ResourceManager发送查询请求；</li>
-<li>使用ContainerManagementProtocol查询指定的ContainerId对应的Container的状态；</li>
-</ul>
-</li>
-</ul>
-<ul>
-<li>ApplicationMaster会不断重复前面的步骤，直到所有任务运行成功，此时，它会发送FinishApplicationMasterRequest，以告诉ResourceManage自己运行结束。</li>
-</ul>
-<h2 id="基于Twill开发"><a href="#基于Twill开发" class="headerlink" title="基于Twill开发"></a>基于Twill开发</h2><p>Apache Twill这个项目则是为简化YARN上应用程序开发而成立的项目，该项目把与YARN相关的重复性的工作封装成库，使得用户可以专注于自己的应用程序逻辑。</p>
-<p>下面代码示例是使用Apache Twill开发一个运行在YARN上的helloworld程序：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">public class HelloWorld &#123;</div><div class="line"> static Logger LOG = LoggerFactory.getLogger(HelloWorld.class);</div><div class="line"> static class HelloWorldRunnable extends AbstractTwillRunnable &#123;</div><div class="line"></div><div class="line"> public void run() &#123;</div><div class="line">   OG.info(&quot;Hello World&quot;);</div><div class="line">   &#125;</div><div class="line"> &#125;</div><div class="line"></div><div class="line">public static void main(String[] args) throws Exception &#123;</div><div class="line"> YarnConfiguration conf = new YarnConfiguration();</div><div class="line"> TwillRunnerService runner = new YarnTwillRunnerService(conf, &quot;localhost:2181&quot;);</div><div class="line"> runner.startAndWait();</div><div class="line"></div><div class="line"> HelloWorldRunnable helloworldRunner = new HelloWorldRunnable();</div><div class="line"> TwillController controller = runner.prepare(helloworldRunner).start();</div><div class="line"> Services.getCompletionFuture(controller).get();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h4 id="编译Twill"><a href="#编译Twill" class="headerlink" title="编译Twill"></a>编译Twill</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mvn clean install -DskipTests=true</div></pre></td></tr></table></figure>
-<h4 id="启动zookeeper"><a href="#启动zookeeper" class="headerlink" title="启动zookeeper"></a>启动zookeeper</h4><p>Start a Zookeeper server instance<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ docker run --name zk1 --restart always -d -P zookeeper</div></pre></td></tr></table></figure></p>
-<p>This image includes EXPOSE 2181 2888 3888 (the zookeeper client port, follower port, election port respectively), so standard container linking will make it automatically available to the linked containers. Since the Zookeeper “fails fast” it’s better to always restart it.</p>
-<h4 id="Run-Twill-sample"><a href="#Run-Twill-sample" class="headerlink" title="Run Twill sample"></a>Run Twill sample</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ export CP=twill-examples-yarn-0.11.0-SNAPSHOT.jar:`/Users/xiningwang/hadoop/hadoop-2.7.3/bin/hadoop classpath`</div><div class="line"></div><div class="line">$ java -cp $CP org.apache.twill.example.yarn.HelloWorld &#123;zookeeper_host:port&#125;</div></pre></td></tr></table></figure>
-<h4 id="BundledJarExample-Application"><a href="#BundledJarExample-Application" class="headerlink" title="BundledJarExample Application"></a>BundledJarExample Application</h4><p>The BundledJarExample application demonstrates the Twill functionality that allows you to run any Java application in Twill without worrying about library version conflicts between your application and Hadoop. The example calls the main class in a sample application Echo, which simply logs the command line argument(s) passed to it. The Echo application uses a different version of Guava from Twill and Hadoop distributions. BundledJarExample looks for the dependency in a lib folder packaged at the root of the Echo jar.</p>
-<p>You can run the BundleJarExample application from any node of the Hadoop cluster using the below command (be sure to add your ZooKeeper Host and Port):<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">$ export CP=twill-examples-yarn-0.10.0.jar:`hadoop classpath`</div><div class="line"></div><div class="line">$ java -cp $CP org.apache.twill.example.yarn.BundledJarExample &#123;zookeeper_host:port&#125; \</div><div class="line">    twill-examples-echo-0.10.0.jar echo.EchoMain arg1</div></pre></td></tr></table></figure></p>
-<h2 id="Slider"><a href="#Slider" class="headerlink" title="Slider"></a>Slider</h2><p>由SliderAM负责给cluster申请资源，并负责容错（component挂掉之后，SliderAM重新找RM申请资源，并进行相应的分配），每个component的实例运行在YARN container中，一个cluster在YARN中的运行流程大致如下：</p>
-<p><img src="images/slider.png" alt="Slider"></p>
-<h2 id="Spring-Hadoop"><a href="#Spring-Hadoop" class="headerlink" title="Spring Hadoop"></a>Spring Hadoop</h2><p><img src="https://spring.io/guides/gs/yarn-basic/images/rm-ui.png" alt="spring-hadoop"></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2029,7 +2221,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-count">19</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2051,7 +2243,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-count">11</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

@@ -270,7 +270,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/26/yarn/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/gateway/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Xi Ning Wang">
@@ -292,8 +292,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/03/26/yarn/" itemprop="url">
-                  YARN基本架构
+                <a class="post-title-link" href="/gateway/" itemprop="url">
+                  Gateway
                 </a>
               
             
@@ -309,8 +309,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-26T22:39:26+08:00">
-                2017-03-26
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-08T20:46:25+08:00">
+                2017-02-08
               </time>
             
 
@@ -328,9 +328,1199 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2017/03/26/yarn/#comments" itemprop="discussionUrl">
+                <a href="/gateway/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/03/26/yarn/" itemprop="commentCount"></span>
+                        data-disqus-identifier="gateway/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><img src="https://camo.githubusercontent.com/4eb7754152028cdebd5c09d1c6f5acc7683f0094/687474703a2f2f6e6574666c69782e6769746875622e696f2f7a75756c2f696d616765732f7a75756c2d726571756573742d6c6966656379636c652e706e67" alt="zuul"></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/consul/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/consul/" itemprop="url">
+                  Consul
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-01-09T20:46:25+08:00">
+                2017-01-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/consul/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="consul/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="Consul-服务注册管理"><a href="#Consul-服务注册管理" class="headerlink" title="Consul 服务注册管理"></a>Consul 服务注册管理</h3><h4 id="启动Consul-Docker"><a href="#启动Consul-Docker" class="headerlink" title="启动Consul Docker"></a>启动Consul Docker</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run -d -p 8400:8400 -p 8500:8500/tcp -p 8600:53/udp -e &apos;CONSUL_LOCAL_CONFIG=&#123;&quot;acl_datacenter&quot;:&quot;dc1&quot;,&quot;acl_default_policy”:&quot;write&quot;,&quot;acl_down_policy&quot;:&quot;extend-cache&quot;,&quot;acl_master_token&quot;:&quot;the_one_ring&quot;,&quot;bootstrap_expect&quot;:1,&quot;datacenter&quot;:&quot;dc1&quot;,&quot;data_dir&quot;:&quot;/usr/local/bin/consul.d/data&quot;,&quot;server&quot;:true&#125;&apos; consul agent -server -bind=127.0.0.1 -client=0.0.0.0</div></pre></td></tr></table></figure>
+<p>or</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run -d --name myconsul -p 8400:8400 -p 8500:8500/tcp -p 8600:53/udp -e &apos;CONSUL_LOCAL_CONFIG=&#123;&quot;acl_datacenter&quot;:&quot;dc1&quot;,&quot;acl_default_policy&quot;:&quot;allow&quot;,&quot;acl_down_policy&quot;:&quot;extend-cache&quot;,&quot;acl_master_token&quot;:&quot;the_one_ring&quot;,&quot;bootstrap_expect&quot;:1,&quot;datacenter&quot;:&quot;dc1&quot;,&quot;data_dir&quot;:&quot;/usr/local/bin/consul.d/data&quot;,&quot;server&quot;:true&#125;&apos; consul agent -server -bind=127.0.0.1 -client=0.0.0.0 -ui</div></pre></td></tr></table></figure>
+<h4 id="1-注册服务"><a href="#1-注册服务" class="headerlink" title="1. 注册服务:"></a>1. 注册服务:</h4><p><a href="http://{IP}:8500/v1/agent/service/register" target="_blank" rel="external">http://{IP}:8500/v1/agent/service/register</a></p>
+<p>PUT<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    &quot;id&quot;: &quot;Analytics_Job_Free_JobID0001&quot;,</div><div class="line">    &quot;name&quot;: &quot;Analytics_Job_Free_JobID0001&quot;,</div><div class="line">    &quot;tags&quot;: [</div><div class="line">        &quot;RTI&quot;</div><div class="line">    ]</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="2-注销服务："><a href="#2-注销服务：" class="headerlink" title="2. 注销服务："></a>2. 注销服务：</h4><p><a href="http://{IP}:8500/v1/agent/service/deregister/jetty" target="_blank" rel="external">http://{IP}:8500/v1/agent/service/deregister/jetty</a></p>
+<h4 id="3-注册check"><a href="#3-注册check" class="headerlink" title="3. 注册check"></a>3. 注册check</h4><p><a href="http://{IP}:8500/v1/agent/check/register" target="_blank" rel="external">http://{IP}:8500/v1/agent/check/register</a></p>
+<p>PUT<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">&#123;  </div><div class="line">            &quot;http&quot;: &quot;http://192.168.1.200:8080/health?appId=app001&quot;,  </div><div class="line">            &quot;interval&quot;: “20s&quot;,</div><div class="line">            &quot;id&quot;: &quot;app001&quot;,</div><div class="line">              &quot;name&quot;: &quot;Analytics YARN Application 001&quot;,</div><div class="line">            &quot;applicationId&quot;:&quot;app001&quot;,</div><div class="line">            &quot;service_id&quot;:&quot;Analytics_Job_Free_JobID0001&quot;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">&#123;  </div><div class="line">            &quot;http&quot;: &quot;http://192.168.1.200:8080/health?appId=app002&quot;,  </div><div class="line">            &quot;interval&quot;: “20s&quot;,</div><div class="line">            &quot;id&quot;: &quot;app002&quot;,</div><div class="line">              &quot;name&quot;: &quot;Analytics YARN Application 002&quot;,</div><div class="line">            &quot;applicationId&quot;:&quot;app002”,</div><div class="line">        &quot;status&quot;: &quot;passing&quot;,</div><div class="line">            &quot;service_id&quot;:&quot;Analytics_Job_Free_JobID0001&quot;</div><div class="line">        &#125;</div></pre></td></tr></table></figure></p>
+<h4 id="4-注销check"><a href="#4-注销check" class="headerlink" title="4. 注销check"></a>4. 注销check</h4><p><a href="http://{IP}:8500/v1/agent/check/deregister/app002" target="_blank" rel="external">http://{IP}:8500/v1/agent/check/deregister/app002</a></p>
+<h3 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">			&lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">			&lt;artifactId&gt;spring-cloud-starter-consul-discovery&lt;/artifactId&gt;</div><div class="line">			&lt;version&gt;1.1.2.RELEASE&lt;/version&gt;</div><div class="line">		&lt;/dependency</div></pre></td></tr></table></figure>
+<p>application.properties<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">server.port=9955  </div><div class="line"></div><div class="line">spring.application.name=SampleClient</div><div class="line">spring.cloud.consul.host=127.0.0.1</div><div class="line">spring.cloud.consul.port=8500</div><div class="line">spring.cloud.consul.enabled=true</div><div class="line">spring.cloud.consul.discovery.register=false</div><div class="line">spring.cloud.consul.discovery.enabled=true</div><div class="line">spring.cloud.consul.discovery.instanceId=tomcat1</div><div class="line">spring.cloud.consul.discovery.serviceName=tomcat1  </div><div class="line">spring.cloud.consul.discovery.hostname=127.0.0.1</div><div class="line">spring.cloud.consul.discovery.port=$&#123;server.port&#125;</div><div class="line">spring.cloud.consul.discovery.healthCheckUrl=http://127.0.0.1:9955/health  </div><div class="line">spring.cloud.consul.discovery.healthCheckInterval=10s  </div><div class="line">spring.cloud.consul.discovery.tags=dev</div></pre></td></tr></table></figure></p>
+<p>application.yml<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">say-hello:</div><div class="line"> ribbon:</div><div class="line">  okhttp:</div><div class="line">    enabled: true</div><div class="line">```  </div><div class="line">Enable</div></pre></td></tr></table></figure></p>
+<p>@SpringBootApplication<br>@EnableDiscoveryClient<br>@RibbonClient(name = “say-hello”, configuration = SayHelloConfiguration.class)<br>public class Application {<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">Full code</div></pre></td></tr></table></figure></p>
+<p>package hello;</p>
+<p>import org.springframework.beans.factory.annotation.Autowired;<br>import org.springframework.cloud.client.discovery.DiscoveryClient;<br>import org.springframework.cloud.client.loadbalancer.LoadBalanced;<br>import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;<br>import org.springframework.context.annotation.Bean;<br>import org.springframework.web.bind.annotation.RequestMapping;<br>import org.springframework.web.bind.annotation.RestController;<br>import org.springframework.web.client.RestTemplate;</p>
+<p>@RestController<br>public class HelloController {</p>
+<p>  @Autowired<br>  private LoadBalancerClient loadBalancer;<br>  @Autowired<br>  private DiscoveryClient discoveryClient;</p>
+<p>  @LoadBalanced<br>  @Bean<br>  RestTemplate restTemplate() {<br>    return new RestTemplate();<br>  }</p>
+<p>  @Autowired<br>  RestTemplate restTemplate;</p>
+<p>  /**</p>
+<ul>
+<li><p>从所有服务中选择一个服务（轮询）<br>*/<br>@RequestMapping(“/discover”)<br>public Object discover() {<br>// return loadBalancer.choose(“application”).getUri().toString();<br>String greeting = this.restTemplate.getForObject(“<a href="http://application" target="_blank" rel="external">http://application</a>“, String.class);<br>return String.format(“%s!”, greeting);<br>}</p>
+<p>@RequestMapping(“/d”)<br>public Object d() {<br>return loadBalancer.choose(“application”).getUri().toString();</p>
+<p>}</p>
+<p>/**</p>
+</li>
+<li>获取所有服务<br>*/<br>@RequestMapping(“/services”)<br>public Object services() {<br>return discoveryClient.getInstances(“application”).stream().findFirst().get().getUri();<br>}</li>
+</ul>
+<p>}</p>
+<p>```</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/mongo/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/mongo/" itemprop="url">
+                  Mongo
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-01-09T20:46:25+08:00">
+                2017-01-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/mongo/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="mongo/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="1-mongo-docker-image"><a href="#1-mongo-docker-image" class="headerlink" title="1. mongo docker image"></a>1. mongo docker image</h3><p>Start the Database<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run --name mymongo -d mongo:&lt;label&gt; --auth</div></pre></td></tr></table></figure></p>
+<p>Add the Initial Admin User<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">$ docker exec -it mymongo mongo admin</div><div class="line">connecting to: admin</div><div class="line">&gt; db.createUser(&#123; user: &apos;jsmith&apos;, pwd: &apos;some-initial-password&apos;, roles: [ &#123; role: &quot;userAdminAnyDatabase&quot;, db: &quot;admin&quot; &#125; ] &#125;);</div><div class="line">Successfully added user: &#123;</div><div class="line">    &quot;user&quot; : &quot;jsmith&quot;,</div><div class="line">    &quot;roles&quot; : [</div><div class="line">        &#123;</div><div class="line">            &quot;role&quot; : &quot;userAdminAnyDatabase&quot;,</div><div class="line">            &quot;db&quot; : &quot;admin&quot;</div><div class="line">        &#125;</div><div class="line">    ]</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="2-mongo-backup-and-restore"><a href="#2-mongo-backup-and-restore" class="headerlink" title="2. mongo backup and restore"></a>2. mongo backup and restore</h3>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/zipkin/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/zipkin/" itemprop="url">
+                  分布式跟踪系统
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-05-29T20:46:25+08:00">
+                2016-05-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/zipkin/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="zipkin/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="Architecture-Overview"><a href="#Architecture-Overview" class="headerlink" title="Architecture Overview"></a>Architecture Overview</h3><p><img src="http://zipkin.io/public/img/web-screenshot.png" alt="zipkin"></p>
+<p>Tracers live in your applications and record timing and metadata about operations that took place. They often instrument libraries, so that their use is transparent to users. For example, an instrumented web server records when it received a request and when it sent a response. The trace data collected is called a Span.</p>
+<p>Instrumentation is written to be safe in production and have little overhead. For this reason, they only propagate IDs in-band, to tell the receiver there’s a trace in progress. Completed spans are reported to Zipkin out-of-band, similar to how applications report metrics asynchronously.</p>
+<p>For example, when an operation is being traced and it needs to make an outgoing http request, a few headers are added to propagate IDs. Headers are not used to send details such as the operation name.</p>
+<p>The component in an instrumented app that sends data to Zipkin is called a Reporter. Reporters send trace data via one of several transports to Zipkin collectors, which persist trace data to storage. Later, storage is queried by the API to provide data to the UI.</p>
+<p>Here’s a diagram describing this flow:</p>
+<p><img src="http://zipkin.io/public/img/architecture-1.png" alt=""></p>
+<h3 id="Zipkin-architecture"><a href="#Zipkin-architecture" class="headerlink" title="Zipkin architecture"></a>Zipkin architecture</h3><p>To see if an instrumentation library already exists for your platform, see the list of existing instrumentations.</p>
+<h3 id="Example-flow"><a href="#Example-flow" class="headerlink" title="Example flow"></a>Example flow</h3><p>As mentioned in the overview, identifiers are sent in-band and details are sent out-of-band to Zipkin. In both cases, trace instrumentation is responsible for creating valid traces and rendering them properly. For example, a tracer ensures parity between the data it sends in-band (downstream) and out-of-band (async to Zipkin).</p>
+<p>Here’s an example sequence of http tracing where user code calls the resource /foo. This results in a single span, sent asynchronously to Zipkin after user code receives the http response.</p>
+<p>┌─────────────┐ ┌───────────────────────┐  ┌─────────────┐  ┌──────────────────┐<br>│ User Code   │ │ Trace Instrumentation │  │ Http Client │  │ Zipkin Collector │<br>└─────────────┘ └───────────────────────┘  └─────────────┘  └──────────────────┘<br>       │                 │                         │                 │<br>           ┌─────────┐<br>       │ ──┤GET /foo ├─▶ │ ────┐                   │                 │<br>           └─────────┘         │ record tags<br>       │                 │ ◀───┘                   │                 │<br>                           ────┐<br>       │                 │     │ add trace headers │                 │<br>                           ◀───┘<br>       │                 │ ────┐                   │                 │<br>                               │ record timestamp<br>       │                 │ ◀───┘                   │                 │<br>                             ┌─────────────────┐<br>       │                 │ ──┤GET /foo         ├─▶ │                 │<br>                             │X-B3-TraceId: aa │     ────┐<br>       │                 │   │X-B3-SpanId: 6b  │   │     │           │<br>                             └─────────────────┘         │ invoke<br>       │                 │                         │     │ request   │<br>                                                         │<br>       │                 │                         │     │           │<br>                                 ┌────────┐          ◀───┘<br>       │                 │ ◀─────┤200 OK  ├─────── │                 │<br>                           ────┐ └────────┘<br>       │                 │     │ record duration   │                 │<br>            ┌────────┐     ◀───┘<br>       │ ◀──┤200 OK  ├── │                         │                 │<br>            └────────┘       ┌────────────────────────────────┐<br>       │                 │ ──┤ asynchronously report span     ├────▶ │<br>                             │                                │<br>                             │{                               │<br>                             │  “traceId”: “aa”,              │<br>                             │  “id”: “6b”,                   │<br>                             │  “name”: “get”,                │<br>                             │  “timestamp”: 1483945573944000,│<br>                             │  “duration”: 386000,           │<br>                             │  “annotations”: [              │<br>                             │–snip–                        │<br>                             └────────────────────────────────┘<br>Trace instrumentation report spans asynchronously to prevent delays or failures relating to the tracing system from delaying or breaking user code.</p>
+<h3 id="Transport"><a href="#Transport" class="headerlink" title="Transport"></a>Transport</h3><p>Spans sent by the instrumented library must be transported from the services being traced to Zipkin collectors. There are three primary transports: HTTP, Kafka and Scribe. See Span Receivers for more information.</p>
+<p>There are 4 components that make up Zipkin:</p>
+<ul>
+<li>collector</li>
+<li>storage</li>
+<li>search</li>
+<li>web UI</li>
+</ul>
+<h3 id="Zipkin-Collector"><a href="#Zipkin-Collector" class="headerlink" title="Zipkin Collector"></a>Zipkin Collector</h3><p>Once the trace data arrives at the Zipkin collector daemon, it is validated, stored, and indexed for lookups by the Zipkin collector.</p>
+<h3 id="Storage"><a href="#Storage" class="headerlink" title="Storage"></a>Storage</h3><p>Zipkin was initially built to store data on Cassandra since Cassandra is scalable, has a flexible schema, and is heavily used within Twitter. However, we made this component pluggable. In addition to Cassandra, we natively support ElasticSearch and MySQL. Other back-ends might be offered as third party extensions.</p>
+<h3 id="Zipkin-Query-Service"><a href="#Zipkin-Query-Service" class="headerlink" title="Zipkin Query Service"></a>Zipkin Query Service</h3><p>Once the data is stored and indexed, we need a way to extract it. The query daemon provides a simple JSON API for finding and retrieving traces. The primary consumer of this API is the Web UI.</p>
+<h3 id="Web-UI"><a href="#Web-UI" class="headerlink" title="Web UI"></a>Web UI</h3><p>We created a GUI that presents a nice interface for viewing traces. The web UI provides a method for viewing traces based on service, time, and annotations. Note: there is no built-in authentication in the UI!</p>
+<h3 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">			&lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">			&lt;artifactId&gt;spring-cloud-starter-sleuth&lt;/artifactId&gt;</div><div class="line">			&lt;version&gt;1.1.2.RELEASE&lt;/version&gt;</div><div class="line">		&lt;/dependency&gt;</div><div class="line">		&lt;!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-sleuth-zipkin --&gt;</div><div class="line">		&lt;dependency&gt;</div><div class="line">			&lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">			&lt;artifactId&gt;spring-cloud-sleuth-zipkin&lt;/artifactId&gt;</div><div class="line">			&lt;version&gt;1.1.2.RELEASE&lt;/version&gt;</div><div class="line">		&lt;/dependency&gt;</div></pre></td></tr></table></figure>
+<p>属性文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">spring.application.name=ServiceRegistryUsingConsulAndDistributedTrace</div><div class="line">logging.level.org.springframework.web.servlet.DispatcherServlet=INFO</div><div class="line">spring.zipkin.baseUrl=http://localhost:9411/</div><div class="line">spring.sleuth.sampler.percentage=1.0</div><div class="line">sample.zipkin.enabled=true</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">//Use this for debugging (or if there is no Zipkin server running on port 9411)</div><div class="line">  @Bean</div><div class="line">  @ConditionalOnProperty(value = &quot;sample.zipkin.enabled&quot;, havingValue = &quot;false&quot;)</div><div class="line">  public ZipkinSpanReporter spanCollector() &#123;</div><div class="line">      return new ZipkinSpanReporter() &#123;</div><div class="line">          @Override</div><div class="line">          public void report(zipkin.Span span) &#123;</div><div class="line">//              log.info(String.format(&quot;Reporting span [%s]&quot;, span));</div><div class="line">          &#125;</div><div class="line">      &#125;;</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/kafka/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/kafka/" itemprop="url">
+                  Kafka
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-05-09T20:46:25+08:00">
+                2016-05-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/kafka/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="kafka/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><img src="http://kafka.apache.org/images/logo.png" alt=""></p>
+<h3 id="kafka"><a href="#kafka" class="headerlink" title="kafka"></a>kafka</h3><ol>
+<li><p>Kafka Connect</p>
+<ul>
+<li>Overview (<a href="http://kafka.apache.org/documentation/#connect" target="_blank" rel="external">http://kafka.apache.org/documentation/#connect</a>)</li>
+<li>User Guide</li>
+<li>Connector Development Guide</li>
+</ul>
+</li>
+<li><p>Kafka Streams</p>
+<ul>
+<li>Overview</li>
+<li>Core Concepts</li>
+<li>Architecture<br><img src="http://kafka.apache.org/0102/images/streams-architecture-overview.jpg" alt=""></li>
+<li>Developer Guide<ul>
+<li>Low-Level Processor API</li>
+<li>High-Level Streams DSL</li>
+<li>Application Configuration and Execution</li>
+</ul>
+</li>
+<li>Upgrade Guide and API Changes</li>
+</ul>
+</li>
+</ol>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/Hystrix/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/Hystrix/" itemprop="url">
+                  分布式服务弹性框架
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-05-09T20:46:25+08:00">
+                2016-05-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/Hystrix/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="Hystrix/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h3><p>在复杂的分布式 架构 的应用程序有很多的依赖，都会不可避免地在某些时候失败。高并发的依赖失败时如果没有隔离措施，当前应用服务就有被拖垮的风险。<br>Hystrix 是Netflix开源的一个针对分布式系统的延迟和容错库，由Java写成。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">例如:一个依赖30个SOA服务的系统,每个服务99.99%可用。</div><div class="line">99.99%的30次方 ≈ 99.7%</div><div class="line">0.3% 意味着一亿次请求 会有 3,000,00次失败</div><div class="line">换算成时间大约每月有2个小时服务不稳定.</div><div class="line">随着服务依赖数量的变多，服务不稳定的概率会成指数性提高.</div><div class="line">解决问题方案:对依赖做隔离,Hystrix就是处理依赖隔离的框架,同时也是可以帮我们做依赖服务的治理和监控.</div></pre></td></tr></table></figure></p>
+<p>1）Hystrix使用命令模式HystrixCommand(Command)包装依赖调用逻辑，每个命令在单独线程中/信号 授权 下执行</p>
+<p>2）提供熔断器组件,可以自动运行或手动调用,停止当前依赖一段时间(10秒)，熔断器默认 错误 率阈值为50%,超过将自动运行。</p>
+<p>3）可配置依赖调用 超时 时间,超时时间一般设为比99.5%平均时间略高即可.当调用超时时，直接返回或执行fallback逻辑。</p>
+<p>4）为每个依赖提供一个小的线程池（或信号），如果线程池已满调用将被立即拒绝，默认不采用排队.加速失败判定时间。</p>
+<p>5）依赖调用结果分:成功，失败（抛出 异常 ），超时，线程拒绝，短路。 请求失败(异常，拒绝，超时，短路)时执行fallback(降级)逻辑。</p>
+<p><img src="https://github.com/Netflix/Hystrix/wiki/images/soa-4-isolation-640.png" alt="依赖架构"></p>
+<h3 id="设计思想"><a href="#设计思想" class="headerlink" title="设计思想"></a>设计思想</h3><p>HystrixCommand.execute方法实际上是调用了HystrixCommand.queue().get()，而queue方法除了最终调用run之外，还需要为run方法提供超时和异常等保护功能，外部也不能直接调用非安全的run方法.</p>
+<p>1.Hystrix可以为分布式服务提供弹性保护</p>
+<p>2.Hystrix通过命令模式封装调用，来实现弹性保护，继承HystrixCommand并且实现run方法，就完成了最简单的封装。</p>
+<p>3.实现getFallBack方法可以为熔断或者异常提供后备处理方法。</p>
+<p><img src="http://img2.tuicool.com/JrQNFzN.png!web" alt="Command设计模式"><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">public class CommandHelloWorld extends HystrixCommand&lt;String&gt; &#123;</div><div class="line"></div><div class="line">  private final String name;</div><div class="line"></div><div class="line">  public CommandHelloWorld(String name) &#123;</div><div class="line">    super(Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey(&quot;HelloServiceGroup&quot;))</div><div class="line">        .andCommandPropertiesDefaults(HystrixCommandProperties.Setter().withExecutionTimeoutInMilliseconds(500)));</div><div class="line">    this.name = name;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  @Override</div><div class="line">  protected String run() throws InterruptedException &#123;</div><div class="line">    Thread.sleep(600);</div><div class="line"></div><div class="line">    return &quot;Hello &quot; + name + &quot;!&quot;;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  @Override</div><div class="line">  protected String getFallback() &#123;</div><div class="line">    return String.format(&quot;[FallBack]Hello %s!&quot;, name);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>Enable Hystrix in Spring Boot Application<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">@EnableHystrix</div><div class="line">@EnableHystrixDashboard</div><div class="line">public class Application &#123;</div></pre></td></tr></table></figure></p>
+<h3 id="How-It-works"><a href="#How-It-works" class="headerlink" title="How It works"></a>How It works</h3><p><img src="https://github.com/Netflix/Hystrix/wiki/images/hystrix-command-flow-chart.png" alt="9个步骤"></p>
+<p>流程说明:</p>
+<ul>
+<li>1:每次调用创建一个新的HystrixCommand,把依赖调用封装在run()方法中.</li>
+<li>2:执行execute()/queue做同步或异步调用.</li>
+<li>3:判断熔断器(circuit-breaker)是否打开,如果打开跳到步骤8,进行降级策略,如果关闭进入步骤.</li>
+<li>4:判断线程池/队列/信号量是否跑满，如果跑满进入降级步骤8,否则继续后续步骤.</li>
+<li>5:调用HystrixCommand的run方法.运行依赖逻辑<ul>
+<li>5a:依赖逻辑调用超时,进入步骤8.</li>
+</ul>
+</li>
+<li>6:判断逻辑是否调用成功<ul>
+<li>6a:返回成功调用结果</li>
+<li>6b:调用出错，进入步骤8.</li>
+</ul>
+</li>
+<li>7:计算熔断器状态,所有的运行状态(成功, 失败, 拒绝,超时)上报给熔断器，用于统计从而判断熔断器状态.</li>
+<li>8:getFallback()降级逻辑.<br>以下四种情况将触发getFallback调用：<br>(1):run()方法抛出非HystrixBadRequestException异常。<br>(2):run()方法调用超时<br>(3):熔断器开启拦截调用<br>(4):线程池/队列/信号量是否跑满<ul>
+<li>8a:没有实现getFallback的Command将直接抛出异常</li>
+<li>8b:fallback降级逻辑调用成功直接返回</li>
+<li>8c:降级逻辑调用失败抛出异常</li>
+</ul>
+</li>
+<li>9:返回执行成功结果</li>
+</ul>
+<h3 id="Circuit-Breaker-流程架构和统计"><a href="#Circuit-Breaker-流程架构和统计" class="headerlink" title="Circuit Breaker 流程架构和统计"></a>Circuit Breaker 流程架构和统计</h3><p>每个熔断器默认维护10个bucket,每秒一个bucket,每个blucket记录成功,失败,超时,拒绝的状态，<br>默认错误超过50%且10秒内超过20个请求进行中断拦截.</p>
+<p><img src="https://github.com/Netflix/Hystrix/wiki/images/circuit-breaker-640.png" alt=""></p>
+<h3 id="隔离-Isolation-分析"><a href="#隔离-Isolation-分析" class="headerlink" title="隔离(Isolation)分析"></a>隔离(Isolation)分析</h3><h4 id="线程隔离"><a href="#线程隔离" class="headerlink" title="线程隔离"></a>线程隔离</h4><p>把执行依赖代码的线程与请求线程(如:jetty线程)分离，请求线程可以自由控制离开的时间(异步过程)。<br>通过线程池大小可以控制并发量，当线程池饱和时可以提前拒绝服务,防止依赖问题扩散。<br>线上建议线程池不要设置过大，否则大量堵塞线程有可能会拖慢服务器。</p>
+<ul>
+<li><p>线程隔离的优点:</p>
+<ul>
+<li>使用线程可以完全隔离第三方代码,请求线程可以快速放回。当一个失败的依赖再次变成可用时，线程池将清理，并立即恢复可用，而不是一个长时间的恢复。</li>
+<li>可以完全模拟异步调用，方便异步编程。</li>
+</ul>
+</li>
+<li><p>线程隔离的缺点:</p>
+<ul>
+<li>线程池的主要缺点是它增加了cpu，因为每个命令的执行涉及到排队(默认使用SynchronousQueue避免排队)，调度和上下文切换。</li>
+<li><p>对使用ThreadLocal等依赖线程状态的代码增加复杂性，需要手动传递和清理线程状态。</p>
+</li>
+<li><p>NOTE: Netflix公司内部认为线程隔离开销足够小，不会造成重大的成本或性能的影响。</p>
+</li>
+<li>Netflix 内部API 每天100亿的HystrixCommand依赖请求使用线程隔，每个应用大约40多个线程池，每个线程池大约5-20个线程。      </li>
+</ul>
+</li>
+</ul>
+<h4 id="信号隔离"><a href="#信号隔离" class="headerlink" title="信号隔离"></a>信号隔离</h4><p>信号隔离也可以用于限制并发访问，防止阻塞扩散, 与线程隔离最大不同在于执行依赖代码的线程依然是请求线程（该线程需要通过信号申请）.</p>
+<p>如果客户端是可信的且可以快速返回，可以使用信号隔离替换线程隔离,降低开销.<br>信号量的大小可以动态调整, 线程池大小不可以.</p>
+<p>线程隔离与信号隔离区别如下图:</p>
+<p><img src="https://github.com/Netflix/Hystrix/wiki/images/isolation-options-640.png" alt=""></p>
+<h3 id="Monitor-Dashboard"><a href="#Monitor-Dashboard" class="headerlink" title="Monitor Dashboard"></a>Monitor Dashboard</h3><p>Docker Image for this dashboard:</p>
+<p>$ docker run -d -p 7979:7979 kennedyoliveira/hystrix-dashboard hystrix-dashboard</p>
+<p>在Hystrix Dashboard中输入Hystrix Stream: <a href="http://localhost:8080/hystrix.stream" target="_blank" rel="external">http://localhost:8080/hystrix.stream</a></p>
+<h4 id="Hystrix-指标流-Hystrix-Metrics-Stream"><a href="#Hystrix-指标流-Hystrix-Metrics-Stream" class="headerlink" title="Hystrix 指标流(Hystrix Metrics Stream)"></a>Hystrix 指标流(Hystrix Metrics Stream)</h4><p>To enable the Hystrix metrics stream include a dependency on spring-boot-starter-actuator. This will expose the /hystrix.stream as a management endpoint.</p>
+<p>使Hystrix指标流包括依赖于spring-boot-starter-actuator。这将使/hystrix.stream流作为一个管理端点。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure></p>
+<h4 id="断路器-Hystrix-仪表盘-Circuit-Breaker-Hystrix-Dashboard"><a href="#断路器-Hystrix-仪表盘-Circuit-Breaker-Hystrix-Dashboard" class="headerlink" title="断路器: Hystrix 仪表盘(Circuit Breaker: Hystrix Dashboard)"></a>断路器: Hystrix 仪表盘(Circuit Breaker: Hystrix Dashboard)</h4><p>Hystrix的主要作用是会采集每一个HystrixCommand的信息指标,把每一个断路器的信息指标显示的Hystrix仪表盘上。<br>运行Hystrix仪表板需要在spring boot主类上标注@EnableHystrixDashboard。然后访问/hystrix查看仪表盘，在hystrix客户端应用使用/hystrix.stream监控。</p>
+<p><img src="https://github.com/Netflix/Hystrix/wiki/images/dashboard-annoted-circuit-640.png" alt="dashboard"></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/yarn-appdev/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/yarn-appdev/" itemprop="url">
+                  Writing YARN Applications
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-04-09T20:46:25+08:00">
+                2016-04-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/yarn-appdev/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="yarn-appdev/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="Hadoop-Writing-YARN-Applications"><a href="#Hadoop-Writing-YARN-Applications" class="headerlink" title="Hadoop: Writing YARN Applications"></a>Hadoop: Writing YARN Applications</h1><ul>
+<li>原生开发YARN应用<ul>
+<li>参考： <a href="http://hadoop.apache.org/docs/r3.0.0-alpha2/hadoop-yarn/hadoop-yarn-site/WritingYarnApplications.html" target="_blank" rel="external">http://hadoop.apache.org/docs/r3.0.0-alpha2/hadoop-yarn/hadoop-yarn-site/WritingYarnApplications.html</a></li>
+<li>在YARN上编写一个应用程序，你需要开发Client和ApplicationMaster两个模块，并了解涉及到的几个协议的若干API和参数列表，其中ApplicationMaster还要负责资源申请，任务调度、容错等，总之，整个过程非常复杂。</li>
+</ul>
+</li>
+<li>基于Twill开发<ul>
+<li>参考： <a href="http://twill.apache.org/GettingStarted.html" target="_blank" rel="external">http://twill.apache.org/GettingStarted.html</a></li>
+<li>优点： 简化了YARN开发的复杂性；</li>
+<li>缺点： 不容易trouble shooting,封装部分不易detect问题，另外也不能支持最新的Hadoop cluster；文档也太少；</li>
+</ul>
+</li>
+<li>基于Slider开发<ul>
+<li>参考： <a href="http://slider.incubator.apache.org" target="_blank" rel="external">http://slider.incubator.apache.org</a></li>
+<li>优点： 简化了YARN开发的复杂性；</li>
+<li>缺点： 不容易trouble shooting,封装部分不易detect问题，另外也不能支持最新的Hadoop cluster；本身的框架也很复杂，</li>
+</ul>
+</li>
+<li>基于Spring Hadoop开发<ul>
+<li>参考： <a href="https://spring.io/guides/gs/yarn-basic/" target="_blank" rel="external">https://spring.io/guides/gs/yarn-basic/</a></li>
+<li>优点： 简化了YARN开发的复杂性；</li>
+<li>缺点： 不容易trouble shooting,封装部分不易detect问题，另外也不能支持最新的Hadoop cluster；</li>
+</ul>
+</li>
+</ul>
+<h2 id="开发Client和ApplicationMaster"><a href="#开发Client和ApplicationMaster" class="headerlink" title="开发Client和ApplicationMaster"></a>开发Client和ApplicationMaster</h2><p>当用户向YARN中提交一个应用程序后，YARN将分两个阶段运行该应用程序： 第一个阶段是启动ApplicationMaster； 第二个阶段是由ApplicationMaster创建应用程序，为它申请资源，并监控它的整个运行过程，直到运行完成。</p>
+<h3 id="1-开发Client启动AM"><a href="#1-开发Client启动AM" class="headerlink" title="1.开发Client启动AM"></a>1.开发Client启动AM</h3><p>Client部分是用于将应用提交到YARN, 从而可以启动application master.<br>客户端通常只需与ResourceManager交互，期间涉及到多个数据结构和一个RPC协议，具体如下：</p>
+<p><img src="images/yarn-dev1.png" alt=""></p>
+<ul>
+<li><p>客户端通过RPC协议ApplicationClientProtocol向ResourceManager(也称之为ApplicationsManager、ASM)发送应用程序提交请求GetNewApplicationRequest，ResourceManager为其返回应答GetNewApplicationResponse，该数据结构中包含多种信息，包括ApplicationId、可资源使用上限和下限等。初始化并启动一个yarnClient:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">YarnClient yarnClient = YarnClient.createYarnClient();</div><div class="line">yarnClient.init(conf);</div><div class="line">yarnClient.start();</div><div class="line">YarnClientApplication app = yarnClient.createApplication();</div><div class="line">GetNewApplicationResponse appResponse = app.getNewApplicationResponse();</div></pre></td></tr></table></figure>
+</li>
+<li><p>Client部分最关键的是构建一个ApplicationSubmissionContext。启动ApplicationMaster所需的所有信息打包到数据结构ApplicationSubmissionContext中，主要包括以下几种信息：</p>
+<ul>
+<li>(1) application id</li>
+<li>(2) application 名称</li>
+<li>(3) application优先级</li>
+<li>(4) application 所属队列</li>
+<li>(5) application 启动用户名</li>
+<li>(6)  ApplicationMaster对应的Container信息ContainerLaunchContext，包括：启动ApplicationMaster所需各种文件资源、jar包、环境变量、启动命令、运行ApplicationMaster所需的资源（主要指内存）等。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">// set the application name</div><div class="line">ApplicationSubmissionContext appContext = app.getApplicationSubmissionContext();</div><div class="line">ApplicationId appId = appContext.getApplicationId();</div><div class="line"></div><div class="line">appContext.setKeepContainersAcrossApplicationAttempts(keepContainers);</div><div class="line">appContext.setApplicationName(appName);</div><div class="line">// Set up the container launch context for the application master</div><div class="line">ContainerLaunchContext amContainer = ContainerLaunchContext.newInstance(</div><div class="line">  localResources, env, commands, null, null, null);</div><div class="line"></div><div class="line">// Set up resource type requirements</div><div class="line">// For now, both memory and vcores are supported, so we set memory and</div><div class="line">// vcores requirements</div><div class="line">Resource capability = Resource.newInstance(amMemory, amVCores);</div><div class="line">appContext.setResource(capability);</div></pre></td></tr></table></figure>
+</li>
+<li><p>客户端调用ClientRMProtocol#submitApplication(ApplicationSubmissionContext)将ApplicationMaster提交到ResourceManager上。ResourceManager收到请求后，会为ApplicationMaster寻找合适的节点，并在该节点上启动它。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">LOG.info(&quot;Submitting application to ASM&quot;);</div><div class="line">yarnClient.submitApplication(appContext);</div></pre></td></tr></table></figure>
+</li>
+<li><p>客户端可通过多种方式查询应用程序的运行状态，其中一种是调用RPC函数ClientRMProtocol#getApplicationReport获取一个应用程序当前运行状况报告，该报告内容包括应用程序名称、所属用户、所在队列、ApplicationMaster所在节点、一些诊断信息、启动时间等。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">// Get application report for the appId we are interested in</div><div class="line">ApplicationReport report = yarnClient.getApplicationReport(appId);</div><div class="line"></div><div class="line">LOG.info(&quot;Got application report from ASM for&quot;</div><div class="line">    + &quot;, appId=&quot; + appId.getId()</div><div class="line">    + &quot;, clientToAMToken=&quot; + report.getClientToAMToken()</div><div class="line">    + &quot;, appDiagnostics=&quot; + report.getDiagnostics()</div><div class="line">    + &quot;, appMasterHost=&quot; + report.getHost()</div><div class="line">    + &quot;, appQueue=&quot; + report.getQueue()</div><div class="line">    + &quot;, appMasterRpcPort=&quot; + report.getRpcPort()</div><div class="line">    + &quot;, appStartTime=&quot; + report.getStartTime()</div><div class="line">    + &quot;, yarnAppState=&quot; + report.getYarnApplicationState().toString()</div><div class="line">    + &quot;, distributedFinalState=&quot; + report.getFinalApplicationStatus().toString()</div><div class="line">    + &quot;, appTrackingUrl=&quot; + report.getTrackingUrl()</div><div class="line">    + &quot;, appUser=&quot; + report.getUser());</div><div class="line"></div><div class="line">YarnApplicationState state = report.getYarnApplicationState();</div><div class="line">FinalApplicationStatus dsStatus = report.getFinalApplicationStatus();</div></pre></td></tr></table></figure>
+</li>
+<li><p>如果有异常或者其他情况，可以通过yarnClient.killApplication(appId);来kill掉应用；</p>
+</li>
+</ul>
+<h3 id="2-开发ApplicationMaster"><a href="#2-开发ApplicationMaster" class="headerlink" title="2.开发ApplicationMaster"></a>2.开发ApplicationMaster</h3><p>ApplicationMaster需要与ResoureManager和NodeManager交互，以申请资源和启动Container，期间涉及到多个数据结构和两个RPC协议。具体步骤如下：</p>
+<ul>
+<li>ApplicationMaster首先需通过RPC协议AMRMProtocol向ResourceManager发送注册请求RegisterApplicationMasterRequest，该数据结构中包含ApplicationMaster所在节点的host、RPC port和TrackingUrl等信息，而ResourceManager将返回RegisterApplicationMasterResponse，该数据结构中包含多种信息，包括该应用程序的ACL列表、可资源使用上限和下限等。</li>
+</ul>
+<p><img src="images/yarn-dev2.png" alt=""></p>
+<ul>
+<li><p>ApplicationMaster与RM之间的心跳：整个运行过程中，ApplicationMaster需通过心跳与ResourceManager保持联系，这是因为，如果一段时间内（默认是10min），ResourceManager未收到ApplicationMaster信息，则认为它死掉了，会重新调度或者让其失败。通常而言，ApplicationMaster周期性调用RPC函数ApplicationMasterProtocol.allocate向其发送空的AllocateRequest请求即可。</p>
+</li>
+<li><p>构造Container：根据每个任务的资源需求，ApplicationMaster可向ResourceManager申请一系列用于运行任务的Container，ApplicationMaster使用ResourceRequest类描述每个Container（一个container只能运行一个任务）：</p>
+<ul>
+<li>1）Hostname：期望Container所在的节点，如果是*，表示可以为任意节点。</li>
+<li>2）Resource capability：运行该任务所需的资源量，如(memory/disk/cpu)。</li>
+<li>3）Priority：任务优先级。一个应用程序中的任务可能有多种优先级，ResourceManager会优先为高优先级的任务分配资源。</li>
+<li>4）numContainers：符合以上条件的container数目。</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>申请资源分配Container：一旦为任务构造了Container后，ApplicationMaster会使用RPC函数AMRMProtocol#allocate向ResourceManager发送一个AllocateRequest对象，以请求分配这些Container，AllocateRequest中包含以下信息：<ul>
+<li>1）Requested containers：所需的Container列表</li>
+<li>2）Released containers：有些情况下，比如有些任务在某些节点上失败过，则ApplicationMaster不想再在这些节点上运行任务，此时可要求释放这些节点上的Container。</li>
+<li>3）Progress update information：应用程序执行进度</li>
+<li>4）ResponseId：RPC响应ID，每次调用RPC，该值会加1。</li>
+</ul>
+</li>
+<li>ResourceManager会为ApplicationMaster返回一个AllocateResponse对象，该对象中主要信息包含在AMResponse中：<ul>
+<li>1）reboot：ApplicationMaster是否需要重新初始化.当ResourceManager端出现不一致状态时，会要求对应的ApplicationMaster重新初始化。</li>
+<li>2）Allocated Containers：新分配的container列表。</li>
+<li>3）Completed Containers：已运行完成的container列表，该列表中包含运行成功和未成功的Container，ApplicationMaster可能需要重新运行那些未运行成功的Container。</li>
+</ul>
+</li>
+<li>ApplicationMaster会不断追踪已经获取的container，且只有当需求发生变化时，才允许重新为Container申请资源。</li>
+</ul>
+<p><img src="images/yarn-dev3.png" alt=""></p>
+<ul>
+<li>启动Container：当ApplicationMaster（从ResourceManager端）收到新分配的Container列表后，会使用ContainerManagementProtocol#startContainer向对应的NodeManager发送ContainerLaunchContext以启动Container，ContainerLaunchContext包含以下内容：<ul>
+<li>1）ContainerId：Container id</li>
+<li>2）Resource：该Container可使用的资源量（当前仅支持内存）</li>
+<li>3）User：Container所属用户</li>
+<li>4）Security tokens：安全令牌，只有持有该令牌才可启动container</li>
+<li>5）LocalResource：运行Container所需的本地资源，比如jar包、二进制文件、其他外部文件等。</li>
+<li>6）ServiceData：应用程序可能使用其他外部服务，这些服务相关的数据通过该参数指定。</li>
+<li>7）Environment：启动container所需的环境变量</li>
+<li>8）command：启动container的命令</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>监控Container：ApplicationMaster可以通过2种途径监控启动的Container：<ul>
+<li>使用ApplicationMasterProtocol.allocate向ResourceManager发送查询请求；</li>
+<li>使用ContainerManagementProtocol查询指定的ContainerId对应的Container的状态；</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>ApplicationMaster会不断重复前面的步骤，直到所有任务运行成功，此时，它会发送FinishApplicationMasterRequest，以告诉ResourceManage自己运行结束。</li>
+</ul>
+<h2 id="基于Twill开发"><a href="#基于Twill开发" class="headerlink" title="基于Twill开发"></a>基于Twill开发</h2><p>Apache Twill这个项目则是为简化YARN上应用程序开发而成立的项目，该项目把与YARN相关的重复性的工作封装成库，使得用户可以专注于自己的应用程序逻辑。</p>
+<p>下面代码示例是使用Apache Twill开发一个运行在YARN上的helloworld程序：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">public class HelloWorld &#123;</div><div class="line"> static Logger LOG = LoggerFactory.getLogger(HelloWorld.class);</div><div class="line"> static class HelloWorldRunnable extends AbstractTwillRunnable &#123;</div><div class="line"></div><div class="line"> public void run() &#123;</div><div class="line">   OG.info(&quot;Hello World&quot;);</div><div class="line">   &#125;</div><div class="line"> &#125;</div><div class="line"></div><div class="line">public static void main(String[] args) throws Exception &#123;</div><div class="line"> YarnConfiguration conf = new YarnConfiguration();</div><div class="line"> TwillRunnerService runner = new YarnTwillRunnerService(conf, &quot;localhost:2181&quot;);</div><div class="line"> runner.startAndWait();</div><div class="line"></div><div class="line"> HelloWorldRunnable helloworldRunner = new HelloWorldRunnable();</div><div class="line"> TwillController controller = runner.prepare(helloworldRunner).start();</div><div class="line"> Services.getCompletionFuture(controller).get();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="编译Twill"><a href="#编译Twill" class="headerlink" title="编译Twill"></a>编译Twill</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mvn clean install -DskipTests=true</div></pre></td></tr></table></figure>
+<h4 id="启动zookeeper"><a href="#启动zookeeper" class="headerlink" title="启动zookeeper"></a>启动zookeeper</h4><p>Start a Zookeeper server instance<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ docker run --name zk1 --restart always -d -P zookeeper</div></pre></td></tr></table></figure></p>
+<p>This image includes EXPOSE 2181 2888 3888 (the zookeeper client port, follower port, election port respectively), so standard container linking will make it automatically available to the linked containers. Since the Zookeeper “fails fast” it’s better to always restart it.</p>
+<h4 id="Run-Twill-sample"><a href="#Run-Twill-sample" class="headerlink" title="Run Twill sample"></a>Run Twill sample</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ export CP=twill-examples-yarn-0.11.0-SNAPSHOT.jar:`/Users/xiningwang/hadoop/hadoop-2.7.3/bin/hadoop classpath`</div><div class="line"></div><div class="line">$ java -cp $CP org.apache.twill.example.yarn.HelloWorld &#123;zookeeper_host:port&#125;</div></pre></td></tr></table></figure>
+<h4 id="BundledJarExample-Application"><a href="#BundledJarExample-Application" class="headerlink" title="BundledJarExample Application"></a>BundledJarExample Application</h4><p>The BundledJarExample application demonstrates the Twill functionality that allows you to run any Java application in Twill without worrying about library version conflicts between your application and Hadoop. The example calls the main class in a sample application Echo, which simply logs the command line argument(s) passed to it. The Echo application uses a different version of Guava from Twill and Hadoop distributions. BundledJarExample looks for the dependency in a lib folder packaged at the root of the Echo jar.</p>
+<p>You can run the BundleJarExample application from any node of the Hadoop cluster using the below command (be sure to add your ZooKeeper Host and Port):<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">$ export CP=twill-examples-yarn-0.10.0.jar:`hadoop classpath`</div><div class="line"></div><div class="line">$ java -cp $CP org.apache.twill.example.yarn.BundledJarExample &#123;zookeeper_host:port&#125; \</div><div class="line">    twill-examples-echo-0.10.0.jar echo.EchoMain arg1</div></pre></td></tr></table></figure></p>
+<h2 id="Slider"><a href="#Slider" class="headerlink" title="Slider"></a>Slider</h2><p>由SliderAM负责给cluster申请资源，并负责容错（component挂掉之后，SliderAM重新找RM申请资源，并进行相应的分配），每个component的实例运行在YARN container中，一个cluster在YARN中的运行流程大致如下：</p>
+<p><img src="images/slider.png" alt="Slider"></p>
+<h2 id="Spring-Hadoop"><a href="#Spring-Hadoop" class="headerlink" title="Spring Hadoop"></a>Spring Hadoop</h2><p><img src="https://spring.io/guides/gs/yarn-basic/images/rm-ui.png" alt="spring-hadoop"></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/yarn/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/yarn/" itemprop="url">
+                  YARN基本架构
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-03-29T20:46:25+08:00">
+                2016-03-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/yarn/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="yarn/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -477,7 +1667,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/26/hdfs/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/running-spark-on-yarn/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Xi Ning Wang">
@@ -499,8 +1689,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/03/26/hdfs/" itemprop="url">
-                  HDFS
+                <a class="post-title-link" href="/running-spark-on-yarn/" itemprop="url">
+                  Running Spark on YARN
                 </a>
               
             
@@ -516,8 +1706,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-26T21:32:42+08:00">
-                2017-03-26
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-03-09T20:46:25+08:00">
+                2016-03-09
               </time>
             
 
@@ -535,9 +1725,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2017/03/26/hdfs/#comments" itemprop="discussionUrl">
+                <a href="/running-spark-on-yarn/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/03/26/hdfs/" itemprop="commentCount"></span>
+                        data-disqus-identifier="running-spark-on-yarn/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -565,888 +1755,9 @@
       
         
           
-            <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>HDFS（Hadoop Distributed File System ）Hadoop分布式文件系统。是根据google发表的论文翻版的。论文为GFS（Google File System）Google 文件系统（中文，英文）。</p>
-<p>HDFS有很多特点：</p>
-<ul>
-<li>① 保存多个副本，且提供容错机制，副本丢失或宕机自动恢复。默认存3份。</li>
-<li>② 运行在廉价的机器上。</li>
-<li>③ 适合大数据的处理。多大？多小？HDFS默认会将文件分割成block，64M为1个block。然后将block按键值对存储在HDFS上，并将键值对的映射存到内存中。如果小文件太多，那内存的负担会很重。</li>
-</ul>
-<p><img src="images/hdfs1.jpg" alt="hdfs1"><br>如上图所示，HDFS也是按照Master和Slave的结构。分NameNode、SecondaryNameNode、DataNode这几个角色。</p>
-<ul>
-<li>NameNode：是Master节点，是大领导。管理数据块映射；处理客户端的读写请求；配置副本策略；管理HDFS的名称空间；</li>
-<li>SecondaryNameNode：是一个小弟，分担大哥namenode的工作量；是NameNode的冷备份；合并fsimage和fsedits然后再发给namenode。</li>
-<li>DataNode：Slave节点，奴隶，干活的。负责存储client发来的数据块block；执行数据块的读写操作。</li>
-<li>热备份：b是a的热备份，如果a坏掉。那么b马上运行代替a的工作。</li>
-<li>冷备份：b是a的冷备份，如果a坏掉。那么b不能马上代替a工作。但是b上存储a的一些信息，减少a坏掉之后的损失。</li>
-<li>fsimage:元数据镜像文件（文件系统的目录树。）</li>
-<li>edits：元数据的操作日志（针对文件系统做的修改操作记录）</li>
-</ul>
-<p>Namenode内存中存储的是=fsimage+edits。</p>
-<p>SecondaryNameNode负责定时默认1小时，从namenode上，获取fsimage和edits来进行合并，然后再发送给namenode。减少namenode的工作量。</p>
-<h2 id="HDFS写操作"><a href="#HDFS写操作" class="headerlink" title="HDFS写操作"></a>HDFS写操作</h2><p>有一个文件FileA，100M大小。Client将FileA写入到HDFS上。HDFS按默认配置。HDFS分布在三个机架上Rack1，Rack2，Rack3。<br><img src="images/hdfs-write.jpg" alt="hdfs-write"></p>
-<ul>
-<li>a. Client将FileA按64M分块。分成两块，block1和Block2;</li>
-<li>b. Client向nameNode发送写数据请求，如图蓝色虚线①——&gt;。</li>
-<li><p>c. NameNode节点，记录block信息。并返回可用的DataNode，如粉色虚线②———&gt;。</p>
-<p>  Block1: host2,host1,host3</p>
-<p>  Block2: host7,host8,host4</p>
-<p>  原理：</p>
-<pre><code>NameNode具有RackAware机架感知功能，这个可以配置。
-若client为DataNode节点，那存储block时，规则为：副本1，同client的节点上；副本2，不同机架节点上；副本3，同第二个副本机架的另一个节点上；其他副本随机挑选。
-若client不为DataNode节点，那存储block时，规则为：副本1，随机选择一个节点上；副本2，不同副本1，机架上；副本3，同副本2相同的另一个节点上；其他副本随机挑选。
-</code></pre></li>
-<li><p>d. client向DataNode发送block1；发送过程是以流式写入。</p>
-<p>  流式写入过程，</p>
-<pre><code>1&gt;将64M的block1按64k的package划分;
-
-2&gt;然后将第一个package发送给host2;
-
-3&gt;host2接收完后，将第一个package发送给host1，同时client想host2发送第二个package；
-
-4&gt;host1接收完第一个package后，发送给host3，同时接收host2发来的第二个package。
-
-5&gt;以此类推，如图红线实线所示，直到将block1发送完毕。
-
-6&gt;host2,host1,host3向NameNode，host2向Client发送通知，说“消息发送完了”。如图粉红颜色实线所示。
-
-7&gt;client收到host2发来的消息后，向namenode发送消息，说我写完了。这样就真完成了。如图黄色粗实线
-
-8&gt;发送完block1后，再向host7，host8，host4发送block2，如图蓝色实线所示。
-
-9&gt;发送完block2后，host7,host8,host4向NameNode，host7向Client发送通知，如图浅绿色实线所示。
-
-10&gt;client向NameNode发送消息，说我写完了，如图黄色粗实线。。。这样就完毕了。
-</code></pre></li>
-</ul>
-<p>分析，通过写过程，我们可以了解到：</p>
-<pre><code>①写1T文件，我们需要3T的存储，3T的网络流量贷款。
-
-②在执行读或写的过程中，NameNode和DataNode通过HeartBeat进行保存通信，确定DataNode活着。如果发现DataNode死掉了，就将死掉的DataNode上的数据，放到其他节点去。读取时，要读其他节点去。
-
-③挂掉一个节点，没关系，还有其他节点可以备份；甚至，挂掉某一个机架，也没关系；其他机架上，也有备份。
-</code></pre><h2 id="HDFS读操作"><a href="#HDFS读操作" class="headerlink" title="HDFS读操作"></a>HDFS读操作</h2><p><img src="images/hdfs-read.jpg" alt="hdfs-read"></p>
-<p>读操作就简单一些了，如图所示，client要从datanode上，读取FileA。而FileA由block1和block2组成。</p>
-<p>那么，读操作流程为：</p>
-<p>a. client向namenode发送读请求。</p>
-<p>b. namenode查看Metadata信息，返回fileA的block的位置。</p>
-<pre><code>block1:host2,host1,host3
-
-block2:host7,host8,host4
-</code></pre><p>c. block的位置是有先后顺序的，先读block1，再读block2。而且block1去host2上读取；然后block2，去host7上读取；</p>
-<p>上面例子中，client位于机架外，那么如果client位于机架内某个DataNode上，例如,client是host6。那么读取的时候，遵循的规律是：</p>
-<p>优选读取本机架上的数据。</p>
-<h2 id="HDFS中常用到的命令"><a href="#HDFS中常用到的命令" class="headerlink" title="HDFS中常用到的命令"></a>HDFS中常用到的命令</h2><p>1、hadoop fs<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">hadoop fs -ls /</div><div class="line">hadoop fs -lsr</div><div class="line">hadoop fs -mkdir /user/hadoop</div><div class="line">hadoop fs -put a.txt /user/hadoop/</div><div class="line">hadoop fs -get /user/hadoop/a.txt /</div><div class="line">hadoop fs -cp src dst</div><div class="line">hadoop fs -mv src dst</div><div class="line">hadoop fs -cat /user/hadoop/a.txt</div><div class="line">hadoop fs -rm /user/hadoop/a.txt</div><div class="line">hadoop fs -rmr /user/hadoop/a.txt</div><div class="line">hadoop fs -text /user/hadoop/a.txt</div><div class="line">hadoop fs -copyFromLocal localsrc dst 与hadoop fs -put功能类似。</div><div class="line">hadoop fs -moveFromLocal localsrc dst 将本地文件上传到hdfs，同时删除本地文件。</div></pre></td></tr></table></figure></p>
-<p>2、hadoop fsadmin<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">hadoop dfsadmin -report</div><div class="line">hadoop dfsadmin -safemode enter | leave | get | wait</div><div class="line">hadoop dfsadmin -setBalancerBandwidth 1000</div></pre></td></tr></table></figure></p>
-<p>3、hadoop fsck</p>
-<p>4、start-balancer.sh</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/24/mongo/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Xi Ning Wang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Technical Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/03/24/mongo/" itemprop="url">
-                  Mongo
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-24T13:26:48+08:00">
-                2017-03-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/03/24/mongo/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/03/24/mongo/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="1-mongo-docker-image"><a href="#1-mongo-docker-image" class="headerlink" title="1. mongo docker image"></a>1. mongo docker image</h3><p>Start the Database<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run --name mymongo -d mongo:&lt;label&gt; --auth</div></pre></td></tr></table></figure></p>
-<p>Add the Initial Admin User<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">$ docker exec -it mymongo mongo admin</div><div class="line">connecting to: admin</div><div class="line">&gt; db.createUser(&#123; user: &apos;jsmith&apos;, pwd: &apos;some-initial-password&apos;, roles: [ &#123; role: &quot;userAdminAnyDatabase&quot;, db: &quot;admin&quot; &#125; ] &#125;);</div><div class="line">Successfully added user: &#123;</div><div class="line">    &quot;user&quot; : &quot;jsmith&quot;,</div><div class="line">    &quot;roles&quot; : [</div><div class="line">        &#123;</div><div class="line">            &quot;role&quot; : &quot;userAdminAnyDatabase&quot;,</div><div class="line">            &quot;db&quot; : &quot;admin&quot;</div><div class="line">        &#125;</div><div class="line">    ]</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h3 id="2-mongo-backup-and-restore"><a href="#2-mongo-backup-and-restore" class="headerlink" title="2. mongo backup and restore"></a>2. mongo backup and restore</h3>
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/08/consul/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Xi Ning Wang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Technical Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/03/08/consul/" itemprop="url">
-                  Consul
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-08T22:36:51+08:00">
-                2017-03-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/03/08/consul/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/03/08/consul/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="Consul-服务注册管理"><a href="#Consul-服务注册管理" class="headerlink" title="Consul 服务注册管理"></a>Consul 服务注册管理</h3><h4 id="启动Consul-Docker"><a href="#启动Consul-Docker" class="headerlink" title="启动Consul Docker"></a>启动Consul Docker</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run -d -p 8400:8400 -p 8500:8500/tcp -p 8600:53/udp -e &apos;CONSUL_LOCAL_CONFIG=&#123;&quot;acl_datacenter&quot;:&quot;dc1&quot;,&quot;acl_default_policy”:&quot;write&quot;,&quot;acl_down_policy&quot;:&quot;extend-cache&quot;,&quot;acl_master_token&quot;:&quot;the_one_ring&quot;,&quot;bootstrap_expect&quot;:1,&quot;datacenter&quot;:&quot;dc1&quot;,&quot;data_dir&quot;:&quot;/usr/local/bin/consul.d/data&quot;,&quot;server&quot;:true&#125;&apos; consul agent -server -bind=127.0.0.1 -client=0.0.0.0</div></pre></td></tr></table></figure>
-<p>or</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run -d --name myconsul -p 8400:8400 -p 8500:8500/tcp -p 8600:53/udp -e &apos;CONSUL_LOCAL_CONFIG=&#123;&quot;acl_datacenter&quot;:&quot;dc1&quot;,&quot;acl_default_policy&quot;:&quot;allow&quot;,&quot;acl_down_policy&quot;:&quot;extend-cache&quot;,&quot;acl_master_token&quot;:&quot;the_one_ring&quot;,&quot;bootstrap_expect&quot;:1,&quot;datacenter&quot;:&quot;dc1&quot;,&quot;data_dir&quot;:&quot;/usr/local/bin/consul.d/data&quot;,&quot;server&quot;:true&#125;&apos; consul agent -server -bind=127.0.0.1 -client=0.0.0.0 -ui</div></pre></td></tr></table></figure>
-<h4 id="1-注册服务"><a href="#1-注册服务" class="headerlink" title="1. 注册服务:"></a>1. 注册服务:</h4><p><a href="http://{IP}:8500/v1/agent/service/register" target="_blank" rel="external">http://{IP}:8500/v1/agent/service/register</a></p>
-<p>PUT<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    &quot;id&quot;: &quot;Analytics_Job_Free_JobID0001&quot;,</div><div class="line">    &quot;name&quot;: &quot;Analytics_Job_Free_JobID0001&quot;,</div><div class="line">    &quot;tags&quot;: [</div><div class="line">        &quot;RTI&quot;</div><div class="line">    ]</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h4 id="2-注销服务："><a href="#2-注销服务：" class="headerlink" title="2. 注销服务："></a>2. 注销服务：</h4><p><a href="http://{IP}:8500/v1/agent/service/deregister/jetty" target="_blank" rel="external">http://{IP}:8500/v1/agent/service/deregister/jetty</a></p>
-<h4 id="3-注册check"><a href="#3-注册check" class="headerlink" title="3. 注册check"></a>3. 注册check</h4><p><a href="http://{IP}:8500/v1/agent/check/register" target="_blank" rel="external">http://{IP}:8500/v1/agent/check/register</a></p>
-<p>PUT<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">&#123;  </div><div class="line">            &quot;http&quot;: &quot;http://192.168.1.200:8080/health?appId=app001&quot;,  </div><div class="line">            &quot;interval&quot;: “20s&quot;,</div><div class="line">            &quot;id&quot;: &quot;app001&quot;,</div><div class="line">              &quot;name&quot;: &quot;Analytics YARN Application 001&quot;,</div><div class="line">            &quot;applicationId&quot;:&quot;app001&quot;,</div><div class="line">            &quot;service_id&quot;:&quot;Analytics_Job_Free_JobID0001&quot;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">&#123;  </div><div class="line">            &quot;http&quot;: &quot;http://192.168.1.200:8080/health?appId=app002&quot;,  </div><div class="line">            &quot;interval&quot;: “20s&quot;,</div><div class="line">            &quot;id&quot;: &quot;app002&quot;,</div><div class="line">              &quot;name&quot;: &quot;Analytics YARN Application 002&quot;,</div><div class="line">            &quot;applicationId&quot;:&quot;app002”,</div><div class="line">        &quot;status&quot;: &quot;passing&quot;,</div><div class="line">            &quot;service_id&quot;:&quot;Analytics_Job_Free_JobID0001&quot;</div><div class="line">        &#125;</div></pre></td></tr></table></figure></p>
-<h4 id="4-注销check"><a href="#4-注销check" class="headerlink" title="4. 注销check"></a>4. 注销check</h4><p><a href="http://{IP}:8500/v1/agent/check/deregister/app002" target="_blank" rel="external">http://{IP}:8500/v1/agent/check/deregister/app002</a></p>
-<h3 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">			&lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">			&lt;artifactId&gt;spring-cloud-starter-consul-discovery&lt;/artifactId&gt;</div><div class="line">			&lt;version&gt;1.1.2.RELEASE&lt;/version&gt;</div><div class="line">		&lt;/dependency</div></pre></td></tr></table></figure>
-<p>application.properties<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">server.port=9955  </div><div class="line"></div><div class="line">spring.application.name=SampleClient</div><div class="line">spring.cloud.consul.host=127.0.0.1</div><div class="line">spring.cloud.consul.port=8500</div><div class="line">spring.cloud.consul.enabled=true</div><div class="line">spring.cloud.consul.discovery.register=false</div><div class="line">spring.cloud.consul.discovery.enabled=true</div><div class="line">spring.cloud.consul.discovery.instanceId=tomcat1</div><div class="line">spring.cloud.consul.discovery.serviceName=tomcat1  </div><div class="line">spring.cloud.consul.discovery.hostname=127.0.0.1</div><div class="line">spring.cloud.consul.discovery.port=$&#123;server.port&#125;</div><div class="line">spring.cloud.consul.discovery.healthCheckUrl=http://127.0.0.1:9955/health  </div><div class="line">spring.cloud.consul.discovery.healthCheckInterval=10s  </div><div class="line">spring.cloud.consul.discovery.tags=dev</div></pre></td></tr></table></figure></p>
-<p>application.yml<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">say-hello:</div><div class="line"> ribbon:</div><div class="line">  okhttp:</div><div class="line">    enabled: true</div><div class="line">```  </div><div class="line">Enable</div></pre></td></tr></table></figure></p>
-<p>@SpringBootApplication<br>@EnableDiscoveryClient<br>@RibbonClient(name = “say-hello”, configuration = SayHelloConfiguration.class)<br>public class Application {<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">Full code</div></pre></td></tr></table></figure></p>
-<p>package hello;</p>
-<p>import org.springframework.beans.factory.annotation.Autowired;<br>import org.springframework.cloud.client.discovery.DiscoveryClient;<br>import org.springframework.cloud.client.loadbalancer.LoadBalanced;<br>import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;<br>import org.springframework.context.annotation.Bean;<br>import org.springframework.web.bind.annotation.RequestMapping;<br>import org.springframework.web.bind.annotation.RestController;<br>import org.springframework.web.client.RestTemplate;</p>
-<p>@RestController<br>public class HelloController {</p>
-<p>  @Autowired<br>  private LoadBalancerClient loadBalancer;<br>  @Autowired<br>  private DiscoveryClient discoveryClient;</p>
-<p>  @LoadBalanced<br>  @Bean<br>  RestTemplate restTemplate() {<br>    return new RestTemplate();<br>  }</p>
-<p>  @Autowired<br>  RestTemplate restTemplate;</p>
-<p>  /**</p>
-<ul>
-<li><p>从所有服务中选择一个服务（轮询）<br>*/<br>@RequestMapping(“/discover”)<br>public Object discover() {<br>// return loadBalancer.choose(“application”).getUri().toString();<br>String greeting = this.restTemplate.getForObject(“<a href="http://application" target="_blank" rel="external">http://application</a>“, String.class);<br>return String.format(“%s!”, greeting);<br>}</p>
-<p>@RequestMapping(“/d”)<br>public Object d() {<br>return loadBalancer.choose(“application”).getUri().toString();</p>
-<p>}</p>
-<p>/**</p>
-</li>
-<li>获取所有服务<br>*/<br>@RequestMapping(“/services”)<br>public Object services() {<br>return discoveryClient.getInstances(“application”).stream().findFirst().get().getUri();<br>}</li>
-</ul>
-<p>}</p>
-<p>```</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/08/zipkin/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Xi Ning Wang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Technical Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/03/08/zipkin/" itemprop="url">
-                  分布式跟踪系统
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-08T22:26:13+08:00">
-                2017-03-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/03/08/zipkin/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/03/08/zipkin/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="Architecture-Overview"><a href="#Architecture-Overview" class="headerlink" title="Architecture Overview"></a>Architecture Overview</h3><p><img src="http://zipkin.io/public/img/web-screenshot.png" alt="zipkin"></p>
-<p>Tracers live in your applications and record timing and metadata about operations that took place. They often instrument libraries, so that their use is transparent to users. For example, an instrumented web server records when it received a request and when it sent a response. The trace data collected is called a Span.</p>
-<p>Instrumentation is written to be safe in production and have little overhead. For this reason, they only propagate IDs in-band, to tell the receiver there’s a trace in progress. Completed spans are reported to Zipkin out-of-band, similar to how applications report metrics asynchronously.</p>
-<p>For example, when an operation is being traced and it needs to make an outgoing http request, a few headers are added to propagate IDs. Headers are not used to send details such as the operation name.</p>
-<p>The component in an instrumented app that sends data to Zipkin is called a Reporter. Reporters send trace data via one of several transports to Zipkin collectors, which persist trace data to storage. Later, storage is queried by the API to provide data to the UI.</p>
-<p>Here’s a diagram describing this flow:</p>
-<p><img src="http://zipkin.io/public/img/architecture-1.png" alt=""></p>
-<h3 id="Zipkin-architecture"><a href="#Zipkin-architecture" class="headerlink" title="Zipkin architecture"></a>Zipkin architecture</h3><p>To see if an instrumentation library already exists for your platform, see the list of existing instrumentations.</p>
-<h3 id="Example-flow"><a href="#Example-flow" class="headerlink" title="Example flow"></a>Example flow</h3><p>As mentioned in the overview, identifiers are sent in-band and details are sent out-of-band to Zipkin. In both cases, trace instrumentation is responsible for creating valid traces and rendering them properly. For example, a tracer ensures parity between the data it sends in-band (downstream) and out-of-band (async to Zipkin).</p>
-<p>Here’s an example sequence of http tracing where user code calls the resource /foo. This results in a single span, sent asynchronously to Zipkin after user code receives the http response.</p>
-<p>┌─────────────┐ ┌───────────────────────┐  ┌─────────────┐  ┌──────────────────┐<br>│ User Code   │ │ Trace Instrumentation │  │ Http Client │  │ Zipkin Collector │<br>└─────────────┘ └───────────────────────┘  └─────────────┘  └──────────────────┘<br>       │                 │                         │                 │<br>           ┌─────────┐<br>       │ ──┤GET /foo ├─▶ │ ────┐                   │                 │<br>           └─────────┘         │ record tags<br>       │                 │ ◀───┘                   │                 │<br>                           ────┐<br>       │                 │     │ add trace headers │                 │<br>                           ◀───┘<br>       │                 │ ────┐                   │                 │<br>                               │ record timestamp<br>       │                 │ ◀───┘                   │                 │<br>                             ┌─────────────────┐<br>       │                 │ ──┤GET /foo         ├─▶ │                 │<br>                             │X-B3-TraceId: aa │     ────┐<br>       │                 │   │X-B3-SpanId: 6b  │   │     │           │<br>                             └─────────────────┘         │ invoke<br>       │                 │                         │     │ request   │<br>                                                         │<br>       │                 │                         │     │           │<br>                                 ┌────────┐          ◀───┘<br>       │                 │ ◀─────┤200 OK  ├─────── │                 │<br>                           ────┐ └────────┘<br>       │                 │     │ record duration   │                 │<br>            ┌────────┐     ◀───┘<br>       │ ◀──┤200 OK  ├── │                         │                 │<br>            └────────┘       ┌────────────────────────────────┐<br>       │                 │ ──┤ asynchronously report span     ├────▶ │<br>                             │                                │<br>                             │{                               │<br>                             │  “traceId”: “aa”,              │<br>                             │  “id”: “6b”,                   │<br>                             │  “name”: “get”,                │<br>                             │  “timestamp”: 1483945573944000,│<br>                             │  “duration”: 386000,           │<br>                             │  “annotations”: [              │<br>                             │–snip–                        │<br>                             └────────────────────────────────┘<br>Trace instrumentation report spans asynchronously to prevent delays or failures relating to the tracing system from delaying or breaking user code.</p>
-<h3 id="Transport"><a href="#Transport" class="headerlink" title="Transport"></a>Transport</h3><p>Spans sent by the instrumented library must be transported from the services being traced to Zipkin collectors. There are three primary transports: HTTP, Kafka and Scribe. See Span Receivers for more information.</p>
-<p>There are 4 components that make up Zipkin:</p>
-<ul>
-<li>collector</li>
-<li>storage</li>
-<li>search</li>
-<li>web UI</li>
-</ul>
-<h3 id="Zipkin-Collector"><a href="#Zipkin-Collector" class="headerlink" title="Zipkin Collector"></a>Zipkin Collector</h3><p>Once the trace data arrives at the Zipkin collector daemon, it is validated, stored, and indexed for lookups by the Zipkin collector.</p>
-<h3 id="Storage"><a href="#Storage" class="headerlink" title="Storage"></a>Storage</h3><p>Zipkin was initially built to store data on Cassandra since Cassandra is scalable, has a flexible schema, and is heavily used within Twitter. However, we made this component pluggable. In addition to Cassandra, we natively support ElasticSearch and MySQL. Other back-ends might be offered as third party extensions.</p>
-<h3 id="Zipkin-Query-Service"><a href="#Zipkin-Query-Service" class="headerlink" title="Zipkin Query Service"></a>Zipkin Query Service</h3><p>Once the data is stored and indexed, we need a way to extract it. The query daemon provides a simple JSON API for finding and retrieving traces. The primary consumer of this API is the Web UI.</p>
-<h3 id="Web-UI"><a href="#Web-UI" class="headerlink" title="Web UI"></a>Web UI</h3><p>We created a GUI that presents a nice interface for viewing traces. The web UI provides a method for viewing traces based on service, time, and annotations. Note: there is no built-in authentication in the UI!</p>
-<h3 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">			&lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">			&lt;artifactId&gt;spring-cloud-starter-sleuth&lt;/artifactId&gt;</div><div class="line">			&lt;version&gt;1.1.2.RELEASE&lt;/version&gt;</div><div class="line">		&lt;/dependency&gt;</div><div class="line">		&lt;!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-sleuth-zipkin --&gt;</div><div class="line">		&lt;dependency&gt;</div><div class="line">			&lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">			&lt;artifactId&gt;spring-cloud-sleuth-zipkin&lt;/artifactId&gt;</div><div class="line">			&lt;version&gt;1.1.2.RELEASE&lt;/version&gt;</div><div class="line">		&lt;/dependency&gt;</div></pre></td></tr></table></figure>
-<p>属性文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">spring.application.name=ServiceRegistryUsingConsulAndDistributedTrace</div><div class="line">logging.level.org.springframework.web.servlet.DispatcherServlet=INFO</div><div class="line">spring.zipkin.baseUrl=http://localhost:9411/</div><div class="line">spring.sleuth.sampler.percentage=1.0</div><div class="line">sample.zipkin.enabled=true</div></pre></td></tr></table></figure></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">//Use this for debugging (or if there is no Zipkin server running on port 9411)</div><div class="line">  @Bean</div><div class="line">  @ConditionalOnProperty(value = &quot;sample.zipkin.enabled&quot;, havingValue = &quot;false&quot;)</div><div class="line">  public ZipkinSpanReporter spanCollector() &#123;</div><div class="line">      return new ZipkinSpanReporter() &#123;</div><div class="line">          @Override</div><div class="line">          public void report(zipkin.Span span) &#123;</div><div class="line">//              log.info(String.format(&quot;Reporting span [%s]&quot;, span));</div><div class="line">          &#125;</div><div class="line">      &#125;;</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/08/sgg/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Xi Ning Wang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Technical Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/03/08/sgg/" itemprop="url">
-                  StatsD - Graphite - Grafana
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-08T22:16:23+08:00">
-                2017-03-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/03/08/sgg/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/03/08/sgg/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>#1. StatsD - metrics data collecting</p>
-<ul>
-<li>In your application code, use the StatsD client (e.g. Java client library) to collect and send the statistics and aggregation data to StatsD server;</li>
-<li>Not need to pre-define the metrics in anywhere, just place them into your application code;</li>
-<li>By default, stats data are aggregated and sent to Graphite server by every 10 seconds, so think this near-realtime;</li>
-</ul>
-<p>#2. Graphite - metrics data graphing and storage</p>
-<ul>
-<li>Store numeric time-series data: The metric data would be stored into Graphite server (include a Whisper database);</li>
-<li>Render the graph for metrics data per the metrics demand;</li>
-<li>The pre-built UI dashboard is not powerful shown as below, but can easily use it to view the metrics data;</li>
-<li>For production environment, Graphite server should be running as cluster instead of stand-alone server;</li>
-</ul>
-<p>#3. Grafana - powerful dashboard for visualizing the metrics data</p>
-<ul>
-<li>easy to integrate with Graphite to visualize the metrics data;</li>
-<li>input the Graphite HTTP URL to link to Graphite as data source;</li>
-<li>powerful pre-built reporting charts and dashboard;</li>
-</ul>
-<p>#4.  Sample Code:</p>
-<ul>
-<li>easy to feed the data to StatsD -&gt; Graphite -&gt; Grafana<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">private static final StatsDClient statsd = new NonBlockingStatsDClient(&quot;app.api-analytics.sample&quot;, &quot;127.0.0.1&quot;,</div><div class="line">     8125);</div><div class="line">statsd.count(&quot;get.request&quot;, (long)(Math.random()* 10)); // Request count of this API</div></pre></td></tr></table></figure>
-</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/08/Hystrix/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Xi Ning Wang">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Technical Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/03/08/Hystrix/" itemprop="url">
-                  分布式服务弹性框架
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-08T00:20:17+08:00">
-                2017-03-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/03/08/Hystrix/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/03/08/Hystrix/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h3><p>在复杂的分布式 架构 的应用程序有很多的依赖，都会不可避免地在某些时候失败。高并发的依赖失败时如果没有隔离措施，当前应用服务就有被拖垮的风险。<br>Hystrix 是Netflix开源的一个针对分布式系统的延迟和容错库，由Java写成。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">例如:一个依赖30个SOA服务的系统,每个服务99.99%可用。</div><div class="line">99.99%的30次方 ≈ 99.7%</div><div class="line">0.3% 意味着一亿次请求 会有 3,000,00次失败</div><div class="line">换算成时间大约每月有2个小时服务不稳定.</div><div class="line">随着服务依赖数量的变多，服务不稳定的概率会成指数性提高.</div><div class="line">解决问题方案:对依赖做隔离,Hystrix就是处理依赖隔离的框架,同时也是可以帮我们做依赖服务的治理和监控.</div></pre></td></tr></table></figure></p>
-<p>1）Hystrix使用命令模式HystrixCommand(Command)包装依赖调用逻辑，每个命令在单独线程中/信号 授权 下执行</p>
-<p>2）提供熔断器组件,可以自动运行或手动调用,停止当前依赖一段时间(10秒)，熔断器默认 错误 率阈值为50%,超过将自动运行。</p>
-<p>3）可配置依赖调用 超时 时间,超时时间一般设为比99.5%平均时间略高即可.当调用超时时，直接返回或执行fallback逻辑。</p>
-<p>4）为每个依赖提供一个小的线程池（或信号），如果线程池已满调用将被立即拒绝，默认不采用排队.加速失败判定时间。</p>
-<p>5）依赖调用结果分:成功，失败（抛出 异常 ），超时，线程拒绝，短路。 请求失败(异常，拒绝，超时，短路)时执行fallback(降级)逻辑。</p>
-<p><img src="https://github.com/Netflix/Hystrix/wiki/images/soa-4-isolation-640.png" alt="依赖架构"></p>
-<h3 id="设计思想"><a href="#设计思想" class="headerlink" title="设计思想"></a>设计思想</h3><p>HystrixCommand.execute方法实际上是调用了HystrixCommand.queue().get()，而queue方法除了最终调用run之外，还需要为run方法提供超时和异常等保护功能，外部也不能直接调用非安全的run方法.</p>
-<p>1.Hystrix可以为分布式服务提供弹性保护</p>
-<p>2.Hystrix通过命令模式封装调用，来实现弹性保护，继承HystrixCommand并且实现run方法，就完成了最简单的封装。</p>
-<p>3.实现getFallBack方法可以为熔断或者异常提供后备处理方法。</p>
-<p><img src="http://img2.tuicool.com/JrQNFzN.png!web" alt="Command设计模式"><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">public class CommandHelloWorld extends HystrixCommand&lt;String&gt; &#123;</div><div class="line"></div><div class="line">  private final String name;</div><div class="line"></div><div class="line">  public CommandHelloWorld(String name) &#123;</div><div class="line">    super(Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey(&quot;HelloServiceGroup&quot;))</div><div class="line">        .andCommandPropertiesDefaults(HystrixCommandProperties.Setter().withExecutionTimeoutInMilliseconds(500)));</div><div class="line">    this.name = name;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  @Override</div><div class="line">  protected String run() throws InterruptedException &#123;</div><div class="line">    Thread.sleep(600);</div><div class="line"></div><div class="line">    return &quot;Hello &quot; + name + &quot;!&quot;;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  @Override</div><div class="line">  protected String getFallback() &#123;</div><div class="line">    return String.format(&quot;[FallBack]Hello %s!&quot;, name);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>Enable Hystrix in Spring Boot Application<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">@EnableHystrix</div><div class="line">@EnableHystrixDashboard</div><div class="line">public class Application &#123;</div></pre></td></tr></table></figure></p>
-<h3 id="How-It-works"><a href="#How-It-works" class="headerlink" title="How It works"></a>How It works</h3><p><img src="https://github.com/Netflix/Hystrix/wiki/images/hystrix-command-flow-chart.png" alt="9个步骤"></p>
-<p>流程说明:</p>
-<ul>
-<li>1:每次调用创建一个新的HystrixCommand,把依赖调用封装在run()方法中.</li>
-<li>2:执行execute()/queue做同步或异步调用.</li>
-<li>3:判断熔断器(circuit-breaker)是否打开,如果打开跳到步骤8,进行降级策略,如果关闭进入步骤.</li>
-<li>4:判断线程池/队列/信号量是否跑满，如果跑满进入降级步骤8,否则继续后续步骤.</li>
-<li>5:调用HystrixCommand的run方法.运行依赖逻辑<ul>
-<li>5a:依赖逻辑调用超时,进入步骤8.</li>
-</ul>
-</li>
-<li>6:判断逻辑是否调用成功<ul>
-<li>6a:返回成功调用结果</li>
-<li>6b:调用出错，进入步骤8.</li>
-</ul>
-</li>
-<li>7:计算熔断器状态,所有的运行状态(成功, 失败, 拒绝,超时)上报给熔断器，用于统计从而判断熔断器状态.</li>
-<li>8:getFallback()降级逻辑.<br>以下四种情况将触发getFallback调用：<br>(1):run()方法抛出非HystrixBadRequestException异常。<br>(2):run()方法调用超时<br>(3):熔断器开启拦截调用<br>(4):线程池/队列/信号量是否跑满<ul>
-<li>8a:没有实现getFallback的Command将直接抛出异常</li>
-<li>8b:fallback降级逻辑调用成功直接返回</li>
-<li>8c:降级逻辑调用失败抛出异常</li>
-</ul>
-</li>
-<li>9:返回执行成功结果</li>
-</ul>
-<h3 id="Circuit-Breaker-流程架构和统计"><a href="#Circuit-Breaker-流程架构和统计" class="headerlink" title="Circuit Breaker 流程架构和统计"></a>Circuit Breaker 流程架构和统计</h3><p>每个熔断器默认维护10个bucket,每秒一个bucket,每个blucket记录成功,失败,超时,拒绝的状态，<br>默认错误超过50%且10秒内超过20个请求进行中断拦截.</p>
-<p><img src="https://github.com/Netflix/Hystrix/wiki/images/circuit-breaker-640.png" alt=""></p>
-<h3 id="隔离-Isolation-分析"><a href="#隔离-Isolation-分析" class="headerlink" title="隔离(Isolation)分析"></a>隔离(Isolation)分析</h3><h4 id="线程隔离"><a href="#线程隔离" class="headerlink" title="线程隔离"></a>线程隔离</h4><p>把执行依赖代码的线程与请求线程(如:jetty线程)分离，请求线程可以自由控制离开的时间(异步过程)。<br>通过线程池大小可以控制并发量，当线程池饱和时可以提前拒绝服务,防止依赖问题扩散。<br>线上建议线程池不要设置过大，否则大量堵塞线程有可能会拖慢服务器。</p>
-<ul>
-<li><p>线程隔离的优点:</p>
-<ul>
-<li>使用线程可以完全隔离第三方代码,请求线程可以快速放回。当一个失败的依赖再次变成可用时，线程池将清理，并立即恢复可用，而不是一个长时间的恢复。</li>
-<li>可以完全模拟异步调用，方便异步编程。</li>
-</ul>
-</li>
-<li><p>线程隔离的缺点:</p>
-<ul>
-<li>线程池的主要缺点是它增加了cpu，因为每个命令的执行涉及到排队(默认使用SynchronousQueue避免排队)，调度和上下文切换。</li>
-<li><p>对使用ThreadLocal等依赖线程状态的代码增加复杂性，需要手动传递和清理线程状态。</p>
-</li>
-<li><p>NOTE: Netflix公司内部认为线程隔离开销足够小，不会造成重大的成本或性能的影响。</p>
-</li>
-<li>Netflix 内部API 每天100亿的HystrixCommand依赖请求使用线程隔，每个应用大约40多个线程池，每个线程池大约5-20个线程。      </li>
-</ul>
-</li>
-</ul>
-<h4 id="信号隔离"><a href="#信号隔离" class="headerlink" title="信号隔离"></a>信号隔离</h4><p>信号隔离也可以用于限制并发访问，防止阻塞扩散, 与线程隔离最大不同在于执行依赖代码的线程依然是请求线程（该线程需要通过信号申请）.</p>
-<p>如果客户端是可信的且可以快速返回，可以使用信号隔离替换线程隔离,降低开销.<br>信号量的大小可以动态调整, 线程池大小不可以.</p>
-<p>线程隔离与信号隔离区别如下图:</p>
-<p><img src="https://github.com/Netflix/Hystrix/wiki/images/isolation-options-640.png" alt=""></p>
-<h3 id="Monitor-Dashboard"><a href="#Monitor-Dashboard" class="headerlink" title="Monitor Dashboard"></a>Monitor Dashboard</h3><p>Docker Image for this dashboard:</p>
-<p>$ docker run -d -p 7979:7979 kennedyoliveira/hystrix-dashboard hystrix-dashboard</p>
-<p>在Hystrix Dashboard中输入Hystrix Stream: <a href="http://localhost:8080/hystrix.stream" target="_blank" rel="external">http://localhost:8080/hystrix.stream</a></p>
-<h4 id="Hystrix-指标流-Hystrix-Metrics-Stream"><a href="#Hystrix-指标流-Hystrix-Metrics-Stream" class="headerlink" title="Hystrix 指标流(Hystrix Metrics Stream)"></a>Hystrix 指标流(Hystrix Metrics Stream)</h4><p>To enable the Hystrix metrics stream include a dependency on spring-boot-starter-actuator. This will expose the /hystrix.stream as a management endpoint.</p>
-<p>使Hystrix指标流包括依赖于spring-boot-starter-actuator。这将使/hystrix.stream流作为一个管理端点。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure></p>
-<h4 id="断路器-Hystrix-仪表盘-Circuit-Breaker-Hystrix-Dashboard"><a href="#断路器-Hystrix-仪表盘-Circuit-Breaker-Hystrix-Dashboard" class="headerlink" title="断路器: Hystrix 仪表盘(Circuit Breaker: Hystrix Dashboard)"></a>断路器: Hystrix 仪表盘(Circuit Breaker: Hystrix Dashboard)</h4><p>Hystrix的主要作用是会采集每一个HystrixCommand的信息指标,把每一个断路器的信息指标显示的Hystrix仪表盘上。<br>运行Hystrix仪表板需要在spring boot主类上标注@EnableHystrixDashboard。然后访问/hystrix查看仪表盘，在hystrix客户端应用使用/hystrix.stream监控。</p>
-<p><img src="https://github.com/Netflix/Hystrix/wiki/images/dashboard-annoted-circuit-640.png" alt="dashboard"></p>
+            <h3 id="To-launch-a-Spark-application-in-cluster-yarn-mode"><a href="#To-launch-a-Spark-application-in-cluster-yarn-mode" class="headerlink" title="To launch a Spark application in cluster/yarn mode:"></a>To launch a Spark application in cluster/yarn mode:</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ ./bin/spark-submit --class path.to.your.Class --master yarn --deploy-mode cluster [options] &lt;app jar&gt; [app options]</div></pre></td></tr></table></figure>
+<p>For example:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">$ ./bin/spark-submit --class org.apache.spark.examples.SparkPi \</div><div class="line">    --master yarn \</div><div class="line">    --deploy-mode cluster \</div><div class="line">    --driver-memory 4g \</div><div class="line">    --executor-memory 2g \</div><div class="line">    --executor-cores 1 \</div><div class="line">    --queue thequeue \</div><div class="line">    lib/spark-examples*.jar \</div><div class="line">    10</div></pre></td></tr></table></figure></p>
+<p>See the detail from:<br><a href="http://spark.apache.org/docs/latest/running-on-yarn.html" target="_blank" rel="external">http://spark.apache.org/docs/latest/running-on-yarn.html</a></p>
 
           
         
@@ -1530,7 +1841,7 @@ block2:host7,host8,host4
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-count">19</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1552,7 +1863,7 @@ block2:host7,host8,host4
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-count">11</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

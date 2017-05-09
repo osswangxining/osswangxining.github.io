@@ -1,5 +1,6 @@
 ---
 title: Kubernetes Secrets
+date: 2017-3-10 20:46:25
 categories:
   - 分布式&云计算
   - Kubernetes

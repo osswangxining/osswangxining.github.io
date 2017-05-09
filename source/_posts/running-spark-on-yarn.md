@@ -1,5 +1,6 @@
 ---
 title: Running Spark on YARN
+date: 2016-3-9 20:46:25
 ---
 ### To launch a Spark application in cluster/yarn mode:
 ```

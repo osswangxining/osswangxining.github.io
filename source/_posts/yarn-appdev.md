@@ -1,5 +1,6 @@
 ---
 title: Writing YARN Applications
+date: 2016-4-9 20:46:25
 ---
 
 # Hadoop: Writing YARN Applications

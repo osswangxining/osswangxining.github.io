@@ -1,5 +1,6 @@
 ---
 title: Kubernetes
+date: 2017-2-12 20:46:25
 categories:
   - 分布式&云计算
   - Kubernetes
