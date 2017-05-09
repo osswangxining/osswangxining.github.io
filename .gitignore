@@ -1,3 +1,7 @@
-#public
-#node_modules
-#scaffolds
+public
+node_modules
+scaffolds
+
+.DS_Store
+
+*.html

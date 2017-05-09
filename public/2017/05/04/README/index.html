@@ -87,17 +87,17 @@
 
 
 
-<meta name="description" content="1. 分布式配置管理 Consul Archaius Kubernetes ConfigMap &amp;amp; Secrets  配置的集中管理：采用consul的KV，将所有微服务的application.properties中的配置内容存入consul。 配置的动态管理：采用archaius，将consul上的配置信息读到spring的PropertySource和archaius的PollRes">
+<meta name="description" content="分布式配置管理 Consul Archaius Kubernetes ConfigMap &amp;amp; Secrets  配置的集中管理：采用consul的KV，将所有微服务的application.properties中的配置内容存入consul。 配置的动态管理：采用archaius，将consul上的配置信息读到spring的PropertySource和archaius的PollResult">
 <meta name="keywords" content="分布式,架构设计">
 <meta property="og:type" content="article">
 <meta property="og:title" content="分布式架构">
 <meta property="og:url" content="http://yoursite.com/2017/05/04/README/index.html">
 <meta property="og:site_name" content="Technical Blog">
-<meta property="og:description" content="1. 分布式配置管理 Consul Archaius Kubernetes ConfigMap &amp;amp; Secrets  配置的集中管理：采用consul的KV，将所有微服务的application.properties中的配置内容存入consul。 配置的动态管理：采用archaius，将consul上的配置信息读到spring的PropertySource和archaius的PollRes">
-<meta property="og:updated_time" content="2017-05-08T14:09:20.000Z">
+<meta property="og:description" content="分布式配置管理 Consul Archaius Kubernetes ConfigMap &amp;amp; Secrets  配置的集中管理：采用consul的KV，将所有微服务的application.properties中的配置内容存入consul。 配置的动态管理：采用archaius，将consul上的配置信息读到spring的PropertySource和archaius的PollResult">
+<meta property="og:updated_time" content="2017-05-09T06:07:01.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="分布式架构">
-<meta name="twitter:description" content="1. 分布式配置管理 Consul Archaius Kubernetes ConfigMap &amp;amp; Secrets  配置的集中管理：采用consul的KV，将所有微服务的application.properties中的配置内容存入consul。 配置的动态管理：采用archaius，将consul上的配置信息读到spring的PropertySource和archaius的PollRes">
+<meta name="twitter:description" content="分布式配置管理 Consul Archaius Kubernetes ConfigMap &amp;amp; Secrets  配置的集中管理：采用consul的KV，将所有微服务的application.properties中的配置内容存入consul。 配置的动态管理：采用archaius，将consul上的配置信息读到spring的PropertySource和archaius的PollResult">
 
 
 
@@ -172,7 +172,7 @@
       </a>
     </div>
       
-        <p class="site-subtitle"></p>
+        <p class="site-subtitle">Welcome to my world!</p>
       
   </div>
 
@@ -375,31 +375,31 @@
       
 
       
-        <h3 id="1-分布式配置管理"><a href="#1-分布式配置管理" class="headerlink" title="1. 分布式配置管理"></a>1. 分布式配置管理</h3><ul>
+        <h2 id="分布式配置管理"><a href="#分布式配置管理" class="headerlink" title="分布式配置管理"></a>分布式配置管理</h2><ul>
 <li>Consul</li>
 <li>Archaius</li>
 <li>Kubernetes ConfigMap &amp; Secrets</li>
 </ul>
 <p>配置的集中管理：采用consul的KV，将所有微服务的application.properties中的配置内容存入consul。</p>
 <p>配置的动态管理：采用archaius，将consul上的配置信息读到spring的PropertySource和archaius的PollResult中，当修改了配置信息后，经常改变的值通过DynamicFactory来获取，不经常改变的值可以通过其他方式获取. 大部分情况下，修改了consul上的配置信息后，相应的项目不需要重启，也会读到最新的值。</p>
-<h3 id="2-服务注册与发现"><a href="#2-服务注册与发现" class="headerlink" title="2. 服务注册与发现"></a>2. 服务注册与发现</h3><ul>
+<h2 id="2-服务注册与发现"><a href="#2-服务注册与发现" class="headerlink" title="2. 服务注册与发现"></a>2. 服务注册与发现</h2><ul>
 <li><a href="/2017/03/08/consul/">Consul</a></li>
 <li>Eureka</li>
 <li><a href="kubernetes.md#service">Kubernetes Service</a> &amp; Ingress Resource</li>
 </ul>
-<h3 id="3-负载平衡"><a href="#3-负载平衡" class="headerlink" title="3. 负载平衡"></a>3. 负载平衡</h3><ul>
+<h2 id="3-负载平衡"><a href="#3-负载平衡" class="headerlink" title="3. 负载平衡"></a>3. 负载平衡</h2><ul>
 <li>Netflix Ribbon（Spring Cloud）</li>
 <li><p><a href="kubernetes.md#service">Kubernetes Service</a></p>
 <p><a href="consul.md">Client Side Load Balancing</a></p>
 </li>
 </ul>
-<h3 id="4-API网关与智能路由"><a href="#4-API网关与智能路由" class="headerlink" title="4. API网关与智能路由"></a>4. API网关与智能路由</h3><ul>
+<h2 id="4-API网关与智能路由"><a href="#4-API网关与智能路由" class="headerlink" title="4. API网关与智能路由"></a>4. API网关与智能路由</h2><ul>
 <li>Netflix Zuul（SpringCloud）</li>
 <li><p><a href="kubernetes.md#service">Kubernetes Service</a> &amp;Ingress Resource</p>
 <p><a href="gateway.md">Gateway</a></p>
 </li>
 </ul>
-<h3 id="5-分布式服务弹性与容错"><a href="#5-分布式服务弹性与容错" class="headerlink" title="5. 分布式服务弹性与容错"></a>5. 分布式服务弹性与容错</h3><ul>
+<h2 id="5-分布式服务弹性与容错"><a href="#5-分布式服务弹性与容错" class="headerlink" title="5. 分布式服务弹性与容错"></a>5. 分布式服务弹性与容错</h2><ul>
 <li>弹性服务</li>
 <li>服务降级</li>
 <li>线程池/信号隔离</li>
@@ -407,44 +407,44 @@
 <p><a href="Hystrix.md">Hystrix架构设计</a></p>
 </li>
 </ul>
-<h3 id="6-日志管理"><a href="#6-日志管理" class="headerlink" title="6. 日志管理"></a>6. 日志管理</h3><ul>
+<h2 id="6-日志管理"><a href="#6-日志管理" class="headerlink" title="6. 日志管理"></a>6. 日志管理</h2><ul>
 <li>ELK Stack（LogStash -&gt; ES -&gt; Kibana）</li>
 </ul>
-<h3 id="7-分布式跟踪"><a href="#7-分布式跟踪" class="headerlink" title="7. 分布式跟踪"></a>7. 分布式跟踪</h3><ul>
+<h2 id="7-分布式跟踪"><a href="#7-分布式跟踪" class="headerlink" title="7. 分布式跟踪"></a>7. 分布式跟踪</h2><ul>
 <li>Zipkin</li>
 <li><p>SpringCloud Sleuth</p>
 <p><a href="zipkin">Zipkin</a> is a distributed tracing system. It helps gather timing data needed to troubleshoot latency problems in microservice architectures. It manages both the collection and lookup of this data. Zipkin’s design is based on the Google Dapper paper.</p>
 <p>Applications are instrumented to report timing data to Zipkin. The Zipkin UI also presents a Dependency diagram showing how many traced requests went through each application. If you are troubleshooting latency problems or errors, you can filter or sort all traces based on the application, length of trace, annotation, or timestamp. Once you select a trace, you can see the percentage of the total trace time each span takes which allows you to identify the problem application.</p>
 </li>
 </ul>
-<h3 id="8-监控与度量"><a href="#8-监控与度量" class="headerlink" title="8. 监控与度量"></a>8. 监控与度量</h3><ul>
+<h2 id="8-监控与度量"><a href="#8-监控与度量" class="headerlink" title="8. 监控与度量"></a>8. 监控与度量</h2><ul>
 <li><p>Application/Infrastructure monitoring using StatsD + Graphite + Grafana</p>
 <p><a href="sgg.md">StatsD + Graphite + Grafana</a></p>
 </li>
 </ul>
-<h3 id="9-服务安全"><a href="#9-服务安全" class="headerlink" title="9. 服务安全"></a>9. 服务安全</h3><ul>
+<h2 id="9-服务安全"><a href="#9-服务安全" class="headerlink" title="9. 服务安全"></a>9. 服务安全</h2><ul>
 <li>SpringCloud Security</li>
 </ul>
-<h3 id="10-Auto-Scaling"><a href="#10-Auto-Scaling" class="headerlink" title="10. Auto Scaling"></a>10. Auto Scaling</h3><ul>
+<h2 id="10-Auto-Scaling"><a href="#10-Auto-Scaling" class="headerlink" title="10. Auto Scaling"></a>10. Auto Scaling</h2><ul>
 <li>Kubernetes Health Check、SelfHealing、Autoscaling</li>
 </ul>
-<h3 id="11-打包部署和调度部署"><a href="#11-打包部署和调度部署" class="headerlink" title="11. 打包部署和调度部署"></a>11. 打包部署和调度部署</h3><ul>
+<h2 id="11-打包部署和调度部署"><a href="#11-打包部署和调度部署" class="headerlink" title="11. 打包部署和调度部署"></a>11. 打包部署和调度部署</h2><ul>
 <li>Spring Boot；</li>
 <li>Docker／Rkt、Kubernetes Scheduler&amp;Deployment</li>
 </ul>
-<h3 id="12-任务工作管理"><a href="#12-任务工作管理" class="headerlink" title="12. 任务工作管理"></a>12. 任务工作管理</h3><ul>
+<h2 id="12-任务工作管理"><a href="#12-任务工作管理" class="headerlink" title="12. 任务工作管理"></a>12. 任务工作管理</h2><ul>
 <li>Spring Batch</li>
 <li>Kubernetes Jobs&amp;Scheduled Jobs</li>
 </ul>
-<h2 id="分布式存储"><a href="#分布式存储" class="headerlink" title="分布式存储"></a>分布式存储</h2><h4 id="1-持久化-分布式文件系统"><a href="#1-持久化-分布式文件系统" class="headerlink" title="1.持久化 - 分布式文件系统"></a>1.持久化 - 分布式文件系统</h4><ul>
+<h2 id="分布式存储"><a href="#分布式存储" class="headerlink" title="分布式存储"></a>分布式存储</h2><h2 id="1-持久化-分布式文件系统"><a href="#1-持久化-分布式文件系统" class="headerlink" title="1.持久化 - 分布式文件系统"></a>1.持久化 - 分布式文件系统</h2><ul>
 <li><a href="hdfs.md">HDFS分布式文件系统</a></li>
 </ul>
-<h4 id="2-持久化-分布式数据库"><a href="#2-持久化-分布式数据库" class="headerlink" title="2.持久化 - 分布式数据库"></a>2.持久化 - 分布式数据库</h4><ul>
+<h2 id="2-持久化-分布式数据库"><a href="#2-持久化-分布式数据库" class="headerlink" title="2.持久化 - 分布式数据库"></a>2.持久化 - 分布式数据库</h2><ul>
 <li>[传统关系型数据库集群,如MySQL Cluster]</li>
 <li><a href="mongo.md">Mongo</a></li>
 <li><a href="hbase.md">Cassandra,HBase</a></li>
 </ul>
-<h4 id="3-非持久化-分布式缓存-消息系统"><a href="#3-非持久化-分布式缓存-消息系统" class="headerlink" title="3.非持久化 - 分布式缓存/消息系统"></a>3.非持久化 - 分布式缓存/消息系统</h4><ul>
+<h2 id="3-非持久化-分布式缓存-消息系统"><a href="#3-非持久化-分布式缓存-消息系统" class="headerlink" title="3.非持久化 - 分布式缓存/消息系统"></a>3.非持久化 - 分布式缓存/消息系统</h2><ul>
 <li><a href="kafka.md">Kafka</a></li>
 <li>[Redis]</li>
 </ul>
@@ -453,7 +453,7 @@
 <li><a href="yarn-appdev.md">YARN应用开发的几种方式</a></li>
 <li><a href="running-spark-on-yarn.md">Running Spark on YARN</a></li>
 </ul>
-<h3 id="Spark-Big-Data-Analytics"><a href="#Spark-Big-Data-Analytics" class="headerlink" title="Spark Big Data Analytics"></a>Spark Big Data Analytics</h3><ul>
+<h2 id="Spark-Big-Data-Analytics"><a href="#Spark-Big-Data-Analytics" class="headerlink" title="Spark Big Data Analytics"></a>Spark Big Data Analytics</h2><ul>
 <li><a href="spark.md">Spark</a></li>
 </ul>
 
@@ -591,7 +591,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -602,7 +602,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-count">2</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -613,7 +613,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-count">8</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -648,7 +648,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-分布式配置管理"><span class="nav-number">1.</span> <span class="nav-text">1. 分布式配置管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-服务注册与发现"><span class="nav-number">2.</span> <span class="nav-text">2. 服务注册与发现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-负载平衡"><span class="nav-number">3.</span> <span class="nav-text">3. 负载平衡</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-API网关与智能路由"><span class="nav-number">4.</span> <span class="nav-text">4. API网关与智能路由</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-分布式服务弹性与容错"><span class="nav-number">5.</span> <span class="nav-text">5. 分布式服务弹性与容错</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-日志管理"><span class="nav-number">6.</span> <span class="nav-text">6. 日志管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-分布式跟踪"><span class="nav-number">7.</span> <span class="nav-text">7. 分布式跟踪</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-监控与度量"><span class="nav-number">8.</span> <span class="nav-text">8. 监控与度量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-服务安全"><span class="nav-number">9.</span> <span class="nav-text">9. 服务安全</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-Auto-Scaling"><span class="nav-number">10.</span> <span class="nav-text">10. Auto Scaling</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#11-打包部署和调度部署"><span class="nav-number">11.</span> <span class="nav-text">11. 打包部署和调度部署</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#12-任务工作管理"><span class="nav-number">12.</span> <span class="nav-text">12. 任务工作管理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式存储"><span class="nav-number"></span> <span class="nav-text">分布式存储</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-持久化-分布式文件系统"><span class="nav-number">0.1.</span> <span class="nav-text">1.持久化 - 分布式文件系统</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-持久化-分布式数据库"><span class="nav-number">0.2.</span> <span class="nav-text">2.持久化 - 分布式数据库</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-非持久化-分布式缓存-消息系统"><span class="nav-number">0.3.</span> <span class="nav-text">3.非持久化 - 分布式缓存/消息系统</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式计算框架"><span class="nav-number"></span> <span class="nav-text">分布式计算框架</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Spark-Big-Data-Analytics"><span class="nav-number">1.</span> <span class="nav-text">Spark Big Data Analytics</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式配置管理"><span class="nav-number">1.</span> <span class="nav-text">分布式配置管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-服务注册与发现"><span class="nav-number">2.</span> <span class="nav-text">2. 服务注册与发现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-负载平衡"><span class="nav-number">3.</span> <span class="nav-text">3. 负载平衡</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-API网关与智能路由"><span class="nav-number">4.</span> <span class="nav-text">4. API网关与智能路由</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-分布式服务弹性与容错"><span class="nav-number">5.</span> <span class="nav-text">5. 分布式服务弹性与容错</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-日志管理"><span class="nav-number">6.</span> <span class="nav-text">6. 日志管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-分布式跟踪"><span class="nav-number">7.</span> <span class="nav-text">7. 分布式跟踪</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-监控与度量"><span class="nav-number">8.</span> <span class="nav-text">8. 监控与度量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-服务安全"><span class="nav-number">9.</span> <span class="nav-text">9. 服务安全</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-Auto-Scaling"><span class="nav-number">10.</span> <span class="nav-text">10. Auto Scaling</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11-打包部署和调度部署"><span class="nav-number">11.</span> <span class="nav-text">11. 打包部署和调度部署</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#12-任务工作管理"><span class="nav-number">12.</span> <span class="nav-text">12. 任务工作管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式存储"><span class="nav-number">13.</span> <span class="nav-text">分布式存储</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-持久化-分布式文件系统"><span class="nav-number">14.</span> <span class="nav-text">1.持久化 - 分布式文件系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-持久化-分布式数据库"><span class="nav-number">15.</span> <span class="nav-text">2.持久化 - 分布式数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-非持久化-分布式缓存-消息系统"><span class="nav-number">16.</span> <span class="nav-text">3.非持久化 - 分布式缓存/消息系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式计算框架"><span class="nav-number">17.</span> <span class="nav-text">分布式计算框架</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spark-Big-Data-Analytics"><span class="nav-number">18.</span> <span class="nav-text">Spark Big Data Analytics</span></a></li></ol></div>
             
 
           </div>

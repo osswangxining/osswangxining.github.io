@@ -1,5 +1,13 @@
 ---
 title: Kubernetes
+categories:
+  - 分布式&云计算
+tags:
+  - 分布式
+  - Kubernetes
+  - container
+  - 容器
+  - PaaS
 ---
 
 ## MiniKube
@@ -255,6 +263,7 @@ If a Deployment is exposed publicly, the Service will load-balance the traffic o
 ![rollingupdate](https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_06_rollingupdates3.svg)
 ![rollingupdate](https://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_06_rollingupdates4.svg)
 
+### set image
 在原来程序的基础上，多输出一个v2作为新版本，使用set image命令指定新版本镜像.
 ```
 xis-macbook-pro:~ xiningwang$ kubectl set image deployments/helloworld helloworld=registry.hnaresearch.com/public/hello-world:v2.0
@@ -282,7 +291,7 @@ helloworld-2889228138-bj38m   1/1       Running   0          10m
 helloworld-2889228138-dv3ch   1/1       Running   0          10m
 helloworld-2889228138-q68vx   1/1       Running   0          10m
 ```
-
+### rollout undo
 使用kubectl rollout undo命令回滚到之前的版本：
 ```
 xis-macbook-pro:~ xiningwang$ kubectl rollout undo deployment/helloworld
