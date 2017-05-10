@@ -5,10 +5,10 @@
 # Site
 title: Technical Blog
 subtitle: Welcome to my world!
-description: [专注于分布式技术架构、大数据分析及机器学习]
+description: [专注于分布式技术架构、IoT云计算平台及大数据分析]
 author: Xi Ning Wang
-language: zh-Hans
-timezone:
+language: zh-CN
+timezone: Asia/Shanghai
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
