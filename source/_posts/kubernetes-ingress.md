@@ -19,6 +19,13 @@ tags:
 - 集群网络：一组逻辑或物理链接，可根据Kubernetes 网络模型 实现群集内的通信。 集群网络的实现包括Overlay模型的 flannel 和基于SDN的 OVS 。
 - 服务：使用标签选择器标识一组pod成为的Kubernetes 服务 。 除非另有说明，否则服务假定在集群网络内仅可通过虚拟IP访问。
 
+毋庸置疑,容器是未来的最为重要的配置编排格式之一, 打包应用程序也将会变得更加容易。虽然像Docker这样的工具提供真实的容器，但是也需要其他工具来处理如replication，failover以及API来自动化部署到多个机器。
+
+Service在部署之前存在一个IP地址，但是这个地址只存在于Kubernetes集群之内。这也就意味着service对于网络来说根本不可用！当运行在谷歌GCE上的时候（像我们一样），Kubernetes能够自动配置一个负载均衡器来访问应用程序。如果你不是在谷歌GCE上面的话，你就需要做些额外的工作来使负载均衡运行起来。
+
+将service直接暴露到一个主机端口也可以，这就是经常使用的方式，但这会令很多Kubernetes的优势无法充分发挥。如果依赖主机上的端口，那么当部署多个应用程序的时候，就会陷入端口冲突,这也使得调度集群或者替代主机变得更加困难。
+
+
 ## 什么是Ingress
 通常情况下，service和pod仅可在集群内部网络中通过IP地址访问。所有到达边界路由器的流量或被丢弃或被转发到其他地方。从概念上讲，可能像下面这样：
 ```
@@ -151,6 +158,13 @@ spec:
           serviceName: s2
           servicePort: 80
 ```
+## 使用Nginx设置负载均衡
+在任意情况下，当创建新的Kubernetes services的时候，需要一个机制来动态地重新部署负载均衡器.
+
+通过使用confd来检测配置在etcd内的修改，并基于一个模版生成一个新的nginx配置文件.
+
+![ingress-nginx](/images/ingress-nginx.png)
+
 ## 替代方案
 可以通过很多种方式暴露service而不必直接使用ingress：
 - 使用 Service.Type=LoadBalancer
