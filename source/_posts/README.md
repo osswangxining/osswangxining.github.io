@@ -1,7 +1,9 @@
 ---
-title: 分布式架构
-date: 2017-6-9 20:46:25
-categories: 分布式&云计算
+title: 分布式系统架构设计
+date: 2017-5-9 20:46:25
+categories:
+- 分布式&云计算
+- 分布式技术架构
 tags:
   - 分布式
   - 架构设计
@@ -21,6 +23,9 @@ tags:
   - [Consul](/consul/)
   - Eureka
   - [Kubernetes Service](/kubernetes/#service)
+
+## 分布式锁
+  - [分布式锁](/distributed-lock/)
 
 ## 负载平衡
   - Netflix Ribbon（Spring Cloud）
@@ -91,4 +96,4 @@ tags:
   - [YARN分布式计算框架](/yarn/)
   - [YARN应用开发的几种方式](/yarn-appdev/)
   - [Running Spark on YARN](/running-spark-on-yarn/)
-  - [Spark Big Data Analytics](spark.md)
+  - [Spark Big Data Analytics](/spark/)
