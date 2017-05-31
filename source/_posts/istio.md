@@ -52,4 +52,12 @@ Mixer负责执行访问控制与使用的策略,并从Envoy收集数据.提供�
 ![](images/ManagerAdapters.png)
 
 ### Istio-Auth
-提供服务间以及用户之间的认证.
+提供服务间以及用户之间的认证,确保不需要修改服务code的前提下增强服务之间的安全性. 主要包括以下3个组件:
+- 身份识别
+  - 当Istio运行在Kubernetes时,Auth会使用Kubernetes提供的服务账号来识别运行服务的主体是谁.
+- key管理
+  - Auth提供了一个CA自动化生成和管理key和证书.
+- 通讯安全
+  - 服务间的通讯通过Envoy在客户端和服务端提供tunnel来保证服务调用的安全.
+
+![](images/Istio_Auth.png)
