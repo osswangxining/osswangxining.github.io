@@ -71,11 +71,10 @@ data:
   username: YWRtaW4=
   password: MWYyZDFlMmU2N2Rm
 ```
+
 使用yaml文件创建Secrets:
-```
-xis-macbook-pro:~ xiningwang$ kubectl create -f ./mysecrect.yaml
+> xis-macbook-pro:~ xiningwang$ kubectl create -f ./mysecrect.yaml
 secret "mysecret" created
-```   
 
 ## 查看Secrets
 使用如下命令获取创建的Secrets内容:
