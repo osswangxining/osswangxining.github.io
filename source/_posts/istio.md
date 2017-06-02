@@ -337,10 +337,7 @@ rules:
 
 执行如下命令可以使rating服务拒绝来自reviews v3服务的任何请求.
 
-```
-istioctl mixer rule create global ratings.default.svc.cluster.local 
-      -f samples/apps/bookinfo/mixer-rule-ratings-denial.yaml
-```  
+istioctl mixer rule create global ratings.default.svc.cluster.local -f samples/apps/bookinfo/mixer-rule-ratings-denial.yaml
 
 ### 使用黑白名单
 使用黑白名单之前需要先定义一个adapter,如下:
