@@ -26,7 +26,7 @@ date: 2016-4-9 20:46:25
 Client部分是用于将应用提交到YARN, 从而可以启动application master.
 客户端通常只需与ResourceManager交互，期间涉及到多个数据结构和一个RPC协议，具体如下：
 
-![](images/yarn-dev1.png)
+![](/images/yarn-dev1.png)
 - 客户端通过RPC协议ApplicationClientProtocol向ResourceManager(也称之为ApplicationsManager、ASM)发送应用程序提交请求GetNewApplicationRequest，ResourceManager为其返回应答GetNewApplicationResponse，该数据结构中包含多种信息，包括ApplicationId、可资源使用上限和下限等。初始化并启动一个yarnClient:
 ```
 YarnClient yarnClient = YarnClient.createYarnClient();
@@ -94,7 +94,7 @@ GetNewApplicationResponse appResponse = app.getNewApplicationResponse();
 ApplicationMaster需要与ResoureManager和NodeManager交互，以申请资源和启动Container，期间涉及到多个数据结构和两个RPC协议。具体步骤如下：
 - ApplicationMaster首先需通过RPC协议AMRMProtocol向ResourceManager发送注册请求RegisterApplicationMasterRequest，该数据结构中包含ApplicationMaster所在节点的host、RPC port和TrackingUrl等信息，而ResourceManager将返回RegisterApplicationMasterResponse，该数据结构中包含多种信息，包括该应用程序的ACL列表、可资源使用上限和下限等。
 
-![](images/yarn-dev2.png)
+![](/images/yarn-dev2.png)
 
 - ApplicationMaster与RM之间的心跳：整个运行过程中，ApplicationMaster需通过心跳与ResourceManager保持联系，这是因为，如果一段时间内（默认是10min），ResourceManager未收到ApplicationMaster信息，则认为它死掉了，会重新调度或者让其失败。通常而言，ApplicationMaster周期性调用RPC函数ApplicationMasterProtocol.allocate向其发送空的AllocateRequest请求即可。
 
@@ -116,7 +116,7 @@ ApplicationMaster需要与ResoureManager和NodeManager交互，以申请资源�
   - 3）Completed Containers：已运行完成的container列表，该列表中包含运行成功和未成功的Container，ApplicationMaster可能需要重新运行那些未运行成功的Container。
 - ApplicationMaster会不断追踪已经获取的container，且只有当需求发生变化时，才允许重新为Container申请资源。
 
-![](images/yarn-dev3.png)
+![](/images/yarn-dev3.png)
 
 - 启动Container：当ApplicationMaster（从ResourceManager端）收到新分配的Container列表后，会使用ContainerManagementProtocol#startContainer向对应的NodeManager发送ContainerLaunchContext以启动Container，ContainerLaunchContext包含以下内容：
   - 1）ContainerId：Container id
@@ -194,7 +194,7 @@ $ java -cp $CP org.apache.twill.example.yarn.BundledJarExample {zookeeper_host:p
 ## Slider
 由SliderAM负责给cluster申请资源，并负责容错（component挂掉之后，SliderAM重新找RM申请资源，并进行相应的分配），每个component的实例运行在YARN container中，一个cluster在YARN中的运行流程大致如下：
 
-![Slider](images/slider.png)
+![Slider](/images/slider.png)
 
 ## Spring Hadoop
 

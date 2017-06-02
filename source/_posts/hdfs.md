@@ -11,7 +11,7 @@ HDFS有很多特点：
 -    ② 运行在廉价的机器上。
 -    ③ 适合大数据的处理。多大？多小？HDFS默认会将文件分割成block，64M为1个block。然后将block按键值对存储在HDFS上，并将键值对的映射存到内存中。如果小文件太多，那内存的负担会很重。
 
-![hdfs1](images/hdfs1.jpg)
+![hdfs1](/images/hdfs1.jpg)
 如上图所示，HDFS也是按照Master和Slave的结构。分NameNode、SecondaryNameNode、DataNode这几个角色。
 
 - NameNode：是Master节点，是大领导。管理数据块映射；处理客户端的读写请求；配置副本策略；管理HDFS的名称空间；
@@ -28,7 +28,7 @@ SecondaryNameNode负责定时默认1小时，从namenode上，获取fsimage和ed
 
 ## HDFS写操作
 有一个文件FileA，100M大小。Client将FileA写入到HDFS上。HDFS按默认配置。HDFS分布在三个机架上Rack1，Rack2，Rack3。
-![hdfs-write](images/hdfs-write.jpg)
+![hdfs-write](/images/hdfs-write.jpg)
 - a. Client将FileA按64M分块。分成两块，block1和Block2;
 - b. Client向nameNode发送写数据请求，如图蓝色虚线①------>。
 - c. NameNode节点，记录block信息。并返回可用的DataNode，如粉色虚线②--------->。
@@ -76,7 +76,7 @@ SecondaryNameNode负责定时默认1小时，从namenode上，获取fsimage和ed
     ③挂掉一个节点，没关系，还有其他节点可以备份；甚至，挂掉某一个机架，也没关系；其他机架上，也有备份。
 
 ## HDFS读操作
-![hdfs-read](images/hdfs-read.jpg)
+![hdfs-read](/images/hdfs-read.jpg)
 
 读操作就简单一些了，如图所示，client要从datanode上，读取FileA。而FileA由block1和block2组成。
 
