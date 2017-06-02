@@ -339,8 +339,10 @@ rules:
 ```
 istioctl mixer rule create global ratings.default.svc.cluster.local -f samples/apps/bookinfo/mixer-rule-ratings-denial.yaml
 ```  
+
 ### 使用黑白名单
 使用黑白名单之前需要先定义一个adapter,如下:
+
 ```
 - name: versionList
   impl: genericListChecker
