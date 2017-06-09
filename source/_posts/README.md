@@ -1,6 +1,6 @@
 ---
 title: 分布式系统架构设计
-date: 2017-5-9 20:46:25
+date: 2017-5-1 20:46:25
 categories:
 - 分布式&云计算
 - 分布式技术架构
@@ -11,7 +11,7 @@ tags:
 
 ## 分布式配置管理
   - [Consul](/consul) | etcd
-  - Archaius动态管理
+  - [Archaius动态管理](/archaius)
   - [Kubernetes ConfigMap](/kubernetes-configmap/)
   - [Kubernetes Secrets](/kubernetes-secrets/)
 
