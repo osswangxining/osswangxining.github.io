@@ -21,7 +21,7 @@ tags:
 
 ## 服务注册与发现
   - [Consul](/consul/)
-  - Eureka
+  - Eureka | Zookeeper | etcd [对比](/servicediscovery)
   - [Kubernetes Service](/kubernetes/#service)
 
 ## 分布式锁
