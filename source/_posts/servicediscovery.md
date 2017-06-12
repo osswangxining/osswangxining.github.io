@@ -9,4 +9,4 @@ tags:
   - 架构设计
 ---
 
-![servicediscovery](/images/servicediscovery)
+![servicediscovery](/images/servicediscovery.png)
