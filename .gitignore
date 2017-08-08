@@ -7,3 +7,7 @@ scaffolds
 *.html
 
 db.json
+
+.DS_Store
+
+.DS_Store
