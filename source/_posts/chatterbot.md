@@ -182,7 +182,7 @@ Serving on port 8000...
 
 ### API服务调用
 
-![](images/chatbot-api-chrome.png)
+![](/images/chatbot-api-chrome.png)
 
 
 ## 接入微信
@@ -225,5 +225,3 @@ if __name__ == '__main__':
 开始运行(使用python2)：python wechat_bot.py
 
 之后扫码登录即可
-
-    
