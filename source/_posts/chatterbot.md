@@ -42,3 +42,188 @@ python3 -m chatterbot --version
 0.7.6
 ```
 我用的是当前最新的版本0.7.6。
+
+## 快速入门
+开发第一个入门的机器人例子。
+
+myfirstchatbot.py
+
+```
+# -*- coding: utf-8 -*-
+from chatterbot import ChatBot
+from chatterbot.trainers import ChatterBotCorpusTrainer
+
+chatbot = ChatBot("ChineseChatbot1")
+chatbot.set_trainer(ChatterBotCorpusTrainer)
+chatbot.train("chatterbot.corpus.chinese")
+
+question = '早上好'
+response = chatbot.get_response(question)
+print(question)
+print(response)
+print("###########################################")
+question = "很高兴认识你"
+print(question)
+print(chatbot.get_response(question))
+print("###########################################")
+question = "嗨，最近如何?"
+print(question)
+print(chatbot.get_response(question))
+print("###########################################")
+question = "复杂优于晦涩"
+print(question)
+print(chatbot.get_response(question))
+print("###########################################")
+question = "面对模棱两可，拒绝猜测的诱惑."
+print(question)
+print(chatbot.get_response(question))
+print("###########################################")
+question = "生命、宇宙以及世间万物的终极答案是什么?"
+print(question)
+print(chatbot.get_response(question))
+print("###########################################")
+```
+
+运行 python3 myfirstchatbot.py, 结果如下：
+
+```
+conversations.yml Training: [####################] 100%
+greetings.yml Training: [####################] 100%
+trivia.yml Training: [####################] 100%
+早上好
+很高兴认识你
+###########################################
+很高兴认识你
+谢谢你。你也一样.
+###########################################
+嗨，最近如何?
+挺好
+###########################################
+复杂优于晦涩
+简单优于复杂.
+###########################################
+面对模棱两可，拒绝猜测的诱惑.
+你似乎很熟悉Python之禅
+###########################################
+生命、宇宙以及世间万物的终极答案是什么?
+你想了解哪方面?
+###########################################
+```
+
+需要注意的是：
+1. 中文支持需要使用Python3，中文语料库使用chatterbot.corpus.chinese。
+2. Chatterbot默认情况下会学习每一次输入，可以通过chatbot = ChatBot("...", read_only=True)设置成只读模式。
+
+## API接口
+把聊天机器人封装为api服务，这样它的使用场合就不受限制了，能服务于任何http client。
+
+另一个原因是，微信接入脚本是python2的，而中文聊天机器人脚本基于python3。
+### 创建API服务
+使用hug作为API服务的框架，
+```
+安装依赖：pip3 install hug
+```
+
+创建bot_api.py:
+```
+#!/usr/bin/env python
+# coding: utf-8
+
+from chatterbot import ChatBot
+from chatterbot.trainers import ChatterBotCorpusTrainer
+import hug
+
+
+weixinchatbot = ChatBot("weixinchatbot")
+weixinchatbot.set_trainer(ChatterBotCorpusTrainer)
+# 使用中文语料库训练它
+weixinchatbot.train("chatterbot.corpus.chinese")  # 语料库
+
+
+@hug.get()
+def get_response(user_input):
+    response = weixinchatbot.get_response(user_input).text
+    return {"response":response}
+```
+### 启动API服务
+运行hug -f bot_api.py：
+```
+
+xiningwang@ubuntu:~/ChatterBot/examples$ hug -f bot_api.py
+conversations.yml Training: [####################] 100%
+greetings.yml Training: [####################] 100%
+trivia.yml Training: [####################] 100%
+
+/#######################################################################\
+          `.----``..-------..``.----.
+         :/:::::--:---------:--::::://.
+        .+::::----##/-/oo+:-##----:::://
+        `//::-------/oosoo-------::://.       ##    ##  ##    ##    #####
+          .-:------./++o/o-.------::-`   ```  ##    ##  ##    ##  ##
+             `----.-./+o+:..----.     `.:///. ########  ##    ## ##
+   ```        `----.-::::::------  `.-:::://. ##    ##  ##    ## ##   ####
+  ://::--.``` -:``...-----...` `:--::::::-.`  ##    ##  ##   ##   ##    ##
+  :/:::::::::-:-     `````      .:::::-.`     ##    ##    ####     ######
+   ``.--:::::::.                .:::.`
+         ``..::.                .::         EMBRACE THE APIs OF THE FUTURE
+             ::-                .:-
+             -::`               ::-                   VERSION 2.3.1
+             `::-              -::`
+              -::-`           -::-
+\########################################################################/
+
+ Copyright (C) 2016 Timothy Edmund Crosley
+ Under the MIT License
+
+
+Serving on port 8000...
+
+```
+
+### API服务调用
+
+![](images/chatbot-api-chrome.png)
+
+
+## 接入微信
+基于wxBot项目，使得用代码与微信交互，这样一来使聊天过程（input/output）可编程，可以让聊天机器人接管我们的聊天。
+
+wxBot脚本到本地：
+```
+wget https://raw.githubusercontent.com/liuwons/wxBot/master/wxbot.py
+```
+创建wechat_bot.py:
+```
+#!/usr/bin/env python
+# coding: utf-8
+
+from wxbot import WXBot
+import requests
+bot_api="http://127.0.0.1:8000/get_response"
+
+class MyWXBot(WXBot):
+    def handle_msg_all(self, msg):
+        if msg['msg_type_id'] == 4 and msg['content']['type'] == 0:
+            user_input = msg["content"]["data"]
+            payload={"user_input":user_input}
+            response = requests.get(bot_api,params=payload).json()["response"]
+            #print(type(response)) # unicode
+            self.send_msg_by_uid(response, msg['user']['id'])
+
+def main():
+    bot = MyWXBot()
+    bot.DEBUG = True
+    bot.conf['qr'] = 'png'
+    bot.run()
+
+if __name__ == '__main__':
+    main()
+```
+
+安装依赖：pip install requests pyqrcode pypng Pillow
+
+开始运行(使用python2)：python wechat_bot.py
+
+之后扫码登录即可
+
+    
