@@ -20,7 +20,7 @@ after_script:
 
 branches:
   only:
-    - hexo  #只监测hexo分支，hexo是我的分支的名称，可根据自己情况设置
+    - gh-pages  #只监测gh-pages分支，gh-pages是我的分支的名称，可根据自己情况设置
 env:
  global:
    - GH_REF: github.com/osswangxining/osswangxining.github.io.git 
