@@ -87,7 +87,8 @@ def SVM(X,y,XX):
 
     predicted = model.predict(XX)
     return predicted
-```    
+
+```
 
 
 ### SVM Classifier using cross validation
