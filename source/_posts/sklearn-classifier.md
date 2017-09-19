@@ -89,6 +89,7 @@ def SVM(X,y,XX):
     return predicted
 ```    
 
+
 ### SVM Classifier using cross validation
 ```
 def svm_cross_validation(train_x, train_y):    
@@ -106,6 +107,7 @@ def svm_cross_validation(train_x, train_y):
     return model  
 ```
 
+
 ### LR
 ```
 from sklearn.linear_model import LogisticRegression
@@ -119,6 +121,7 @@ def LR(X,y，XX):
     return predicted
 ```
 
+
 ### 决策树（CART）
 ```
 from sklearn.tree import DecisionTreeClassifier
@@ -130,6 +133,7 @@ def CTRA(X,y,XX):
     predicted = model.predict(XX)
     return predicted
 ```
+
 
 ### 随机森林
 ```
