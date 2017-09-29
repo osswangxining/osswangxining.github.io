@@ -12,4 +12,4 @@ tags:
 
 ## Applying Chatbots to the Internet of Things
 
-![](/files/applying-chatbots-into-iot.pdf)
+[Applying Chatbots to the Internet of Things](/files/applying-chatbots-into-iot.pdf)
