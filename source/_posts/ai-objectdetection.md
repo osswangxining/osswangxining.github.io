@@ -556,6 +556,134 @@ def _load_pascal_annotation(self, index):
 
 将训练得到的**py-faster-rcnn/output/faster-rcnn-alt-opt/voc_2007_trainval/ZF_faster_rcnn_final.caffemodel**模型拷贝到**py-faster-rcnn/data/faster/rcnn_model**
 
+修改py-faster-rcnn/tools/demo.py或者新建demo-test.py，具体代码如下所示：
+```
+#!/usr/bin/env python
+# --------------------------------------------------------
+# Faster R-CNN
+# Copyright (c) 2015 Microsoft
+# Licensed under The MIT License [see LICENSE for details]
+# Written by Ross Girshick
+# --------------------------------------------------------
+"""
+Demo script showing detections in sample images.
+See README.md for installation instructions before running.
+"""
+import _init_paths
+from fast_rcnn.config import cfg
+from fast_rcnn.test import im_detect
+from fast_rcnn.nms_wrapper import nms
+from utils.timer import Timer
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy.io as sio
+import caffe, os, sys, cv2
+import argparse
+import shutil
+CLASSES = ('__background__',
+           '你的标签1', '你的标')
+NETS = {'vgg16': ('VGG16',
+                  'VGG16_faster_rcnn_final.caffemodel'),
+        'zf': ('ZF',
+                  '你的模型名称')}
+def save_det(im, class_name, dets, thresh=0.5):
+    """Save results with bounding boxes."""
+    inds = np.where(dets[:, -1] >= thresh)[0]
+    if len(inds) == 0:
+        print "ERROR: none bounding box!"
+        return im
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    for i in inds:
+        bbox = dets[i, :4]
+        rect_start = (bbox[0], bbox[1])
+        rect_end = (bbox[2], bbox[3])
+        color = (0, 255, 0)
+        cv2.rectangle(im, rect_start, rect_end, color, 1, 0)
+        cv2.putText(im, class_name, (bbox[0], bbox[1]), font, 1, (255,0,0), 2, cv2.CV_AA)
+    #cv2.imwrite("out.jpg", im)
+    return im
+def test(net, input_images, output_images):
+    """Save test images with bounding boxes"""
+    for (input_image, output_image) in zip(input_images, output_images):
+        if not os.path.exists(input_image):
+            print "ERROR: file is not existed!\n"
+            exit(-1)
+        print "input_image = " + input_image
+        im = cv2.imread(input_image)
+        # Detect all object classes and regress object bounds
+        scores,boxes = im_detect(net, im)
+        # Save detections for each class
+        CONF_THRESH = 0.8
+        NMS_THRESH = 0.3
+        for cls_ind, cls in enumerate(CLASSES[1:]):
+        cls_ind += 1 # because we skipped background
+        cls_boxes = boxes[:, 4*cls_ind : 4*(cls_ind + 1)]
+        cls_scores = scores[:, cls_ind]
+        dets = np.hstack((cls_boxes, cls_scores[:, np.newaxis])).astype(np.float32)
+        keep = nms(dets, NMS_THRESH)
+        dets = dets[keep, :]
+        im = save_det(im, cls, dets, thresh=CONF_THRESH)
+        cv2.imwrite(output_image, im)
+        print "output_image = " + output_image
+def gen_test_image_list(list_file, input_root, output_root):
+    """Generate test image lists"""
+    open_file = open(list_file, 'r')
+    input_images = []
+    output_images = []
+    for image_prefix in open_file.readlines():
+        image_prefix = image_prefix.strip()
+        input_image = os.path.join(input_root, image_prefix + ".jpg")
+    output_image = os.path.join(output_root, "result_" + image_prefix + ".jpg")
+    input_images.append(input_image)
+    output_images.append(output_image)
+    return (input_images, output_images)
+def parse_args():
+    """Parse input arguments."""
+    parser = argparse.ArgumentParser(description='Faster R-CNN demo')
+    parser.add_argument('--gpu', dest='gpu_id', help='GPU device id to use [0]',
+                        default=0, type=int)
+    parser.add_argument('--cpu', dest='cpu_mode',
+                        help='Use CPU mode (overrides --gpu)',
+                        action='store_true')
+    parser.add_argument('--net', dest='demo_net', help='Network to use [vgg16]',
+                        choices=NETS.keys(), default='vgg16')
+    args = parser.parse_args()
+    return args
+if __name__ == '__main__':
+    cfg.TEST.HAS_RPN = True  # Use RPN for proposals
+    args = parse_args()
+    prototxt = os.path.join(cfg.MODELS_DIR, NETS[args.demo_net][0],
+                            'faster_rcnn_alt_opt', 'faster_rcnn_test.pt')
+    caffemodel = os.path.join(cfg.DATA_DIR, 'faster_rcnn_models',
+                              NETS[args.demo_net][1])
+    if not os.path.isfile(caffemodel):
+        raise IOError(('{:s} not found.\nDid you run ./data/script/'
+                       'fetch_faster_rcnn_models.sh?').format(caffemodel))
+    if args.cpu_mode:
+        caffe.set_mode_cpu()
+    else:
+        caffe.set_mode_gpu()
+        caffe.set_device(args.gpu_id)
+        cfg.GPU_ID = args.gpu_id
+    net = caffe.Net(prototxt, caffemodel, caffe.TEST)
+    print '\n\nLoaded network {:s}'.format(caffemodel)
+    VOC_ROOT = os.path.join(cfg.DATA_DIR, "VOCdevkit2007", "VOC2007")
+    list_file = os.path.join(VOC_ROOT, "ImageSets", "Main", "test.txt")
+    input_root = os.path.join(VOC_ROOT, "JPEGImages")
+    output_root = os.path.join(VOC_ROOT, "TestResults")
+    if os.path.exists(output_root):
+        shutil.rmtree(output_root)
+    os.mkdir(output_root)
+    input_images, output_images = gen_test_image_list(list_file, input_root, output_root)
+    test(net, input_images, output_images)
+```
+
+输入测试命令：
+```
+    ./tools/demo-test.py --net zf
+```
+测试的结果保存到**py-faster-rcnn/data/VOCdevkit2007/VOC2007/TestResults**.
+
 ## Trouble Shooting
 ### 'max_overlaps' issue
 使用自己数据集训练Faster-RCNN模型时，如果出现'max_overlaps' issue， 极有可能是因为之前训练时出现错误，但pkl文件仍在cache中。所以解决的方法是删除在py-faster-rcnn/data/cache目录下的pkl文件。
