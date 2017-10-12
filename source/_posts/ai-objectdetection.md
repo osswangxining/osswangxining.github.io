@@ -32,6 +32,35 @@ RCNN的算法：
 
 fast RCNN在RCNN的基础之上，将分类和位置精修统一到了一个深度网络之内。faster RCNN可以简单地看做“区域生成网络+fast RCNN“的系统，用区域生成网络代替fast RCNN中的Selective Search方法。
 
+## Faster-RCNN的配置与编译
+### 配置Caffe环境
+下载有关Caffe的所有的依赖项，可以查看安装Caffe的教程
+### 配置Faster-RCNN环境
+安装cython,python-opencv,easydict:
+```
+sudo apt-get install python-numpy
+sudo apt-get install python-scipy
+pip install cython
+pip install easydict
+pip install shutil
+pip install cPickle
+pip install uuid
+pip install multiprocessing
+pip install xml
+```
+  下载py-faster-rcnn
+```
+# Make sure to clone with --recursive  
+git clone --recursive https://github.com/rbgirshick/py-faster-rcnn.git
+```
+
+  进入py-faster-rcnn/lib，执行
+```
+make
+```
+
+  进入py-faster-rcnn/caffe-faster-rcnn，将我改好的Makefile.config复制该路径下:
+
 ## 处理思路
 使用自己定制的数据集训练Faster-RCNN模型，一般有两种思路：其一，修改Faster-RCNN代码,适合自己的数据集；其二，将自己的数据集格式改为VOC2007形式的数据集。从工作量上看，无疑后者更加容易一些（下面的例子采取第二种方法）。
 
