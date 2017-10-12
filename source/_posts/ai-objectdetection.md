@@ -1,5 +1,5 @@
 ---
-title: 人工智能 - 目标检测
+title: 使用自己数据集训练Faster-RCNN模型
 date: 2017-10-10 20:46:25
 categories:
   - Machine Learning
@@ -13,7 +13,7 @@ tags:
 
 ---
 
-## 目标检测
+## 基本概念介绍
 
 目标检测的四个基本步骤：
 - 候选区域生成
@@ -31,3 +31,7 @@ RCNN的算法：
 ![](/images/rcnn-fast-faster.png)
 
 fast RCNN在RCNN的基础之上，将分类和位置精修统一到了一个深度网络之内。faster RCNN可以简单地看做“区域生成网络+fast RCNN“的系统，用区域生成网络代替fast RCNN中的Selective Search方法。
+
+## Trouble Shooting
+### 'max_overlaps' issue
+使用自己数据集训练Faster-RCNN模型时，如果出现'max_overlaps' issue， 极有可能是因为之前训练时出现错误，但pkl文件仍在cache中。所以解决的方法是删除在py-faster-rcnn/data/cache目录下的pkl文件。
