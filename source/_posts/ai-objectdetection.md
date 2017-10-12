@@ -445,6 +445,107 @@ layer {
 }  
 ```
 
+### 修改faster_rcnn_test.pt
+第5步：py-faster-rcnn/models/pascal_voc/ZF/faster_rcnn_alt_opt/faster_rcnn_test.pt修改:
+```
+layer {  
+  name: "cls_score"  
+  type: "InnerProduct"  
+  bottom: "fc7"  
+  top: "cls_score"  
+  inner_product_param {  
+    num_output: 3 #按训练集类别改，该值为类别数+1  
+  }  
+}  
+```
+
+```
+layer {  
+  name: "bbox_pred"  
+  type: "InnerProduct"  
+  bottom: "fc7"  
+  top: "bbox_pred"  
+  inner_product_param {  
+    num_output: 12 #按训练集类别改，该值为（类别数+1）*4  
+  }  
+}  
+```
+
+### 修改pascal_voc.py
+  第6步：py-faster-rcnn/lib/datasets/pascal_voc.py修改:
+```
+class pascal_voc(imdb):  
+def __init__(self, image_set, year, devkit_path=None):  
+    imdb.__init__(self, 'voc_' + year + '_' + image_set)  
+    self._year = year  
+    self._image_set = image_set  
+    self._devkit_path = self._get_default_path() if devkit_path is None \  
+                        else devkit_path  
+    self._data_path = os.path.join(self._devkit_path, 'VOC' + self._year)  
+    self._classes = ('__background__', # always index 0  
+                     '你的标签1','你的标签2')  
+```
+
+### 修改pascal_voc.py
+第7步：修改lib/datasets/pascal_voc.py的_load_pascal_annotation()函数:
+```
+def _load_pascal_annotation(self, index):
+    """
+    Load image and bounding boxes info from XML file in the PASCAL VOC
+    format.
+    """
+    filename = os.path.join(self._data_path, 'Annotations', index + '.xml')
+    tree = ET.parse(filename)
+    objs = tree.findall('object')
+    if not self.config['use_diff']:
+        # Exclude the samples labeled as difficult
+        non_diff_objs = [
+            obj for obj in objs if int(obj.find('difficult').text) == 0]
+        # if len(non_diff_objs) != len(objs):
+        #     print 'Removed {} difficult objects'.format(
+        #         len(objs) - len(non_diff_objs))
+        objs = non_diff_objs
+    num_objs = len(objs)
+    boxes = np.zeros((num_objs, 4), dtype=np.uint16)
+    gt_classes = np.zeros((num_objs), dtype=np.int32)
+    overlaps = np.zeros((num_objs, self.num_classes), dtype=np.float32)
+    # "Seg" area for pascal is just the box area
+    seg_areas = np.zeros((num_objs), dtype=np.float32)
+    # Load object bounding boxes into a data frame.
+    for ix, obj in enumerate(objs):
+        bbox = obj.find('bndbox')
+        # Make pixel indexes 0-based
+        # x1 = float(bbox.find('xmin').text) - 1
+        # y1 = float(bbox.find('ymin').text) - 1
+        # x2 = float(bbox.find('xmax').text) - 1
+        # y2 = float(bbox.find('ymax').text) - 1
+        ### 因为标注过程中，可能存在标注的目标框太靠近边缘或者自己没注意，导致标注的数据在训练时产生了异常
+        x1 = float(bbox.find('xmin').text)
+        y1 = float(bbox.find('ymin').text)
+        x2 = float(bbox.find('xmax').text)
+        y2 = float(bbox.find('ymax').text)
+        cls = self._class_to_ind[obj.find('name').text.lower().strip()]
+        boxes[ix, :] = [x1, y1, x2, y2]
+        gt_classes[ix] = cls
+        overlaps[ix, cls] = 1.0
+        seg_areas[ix] = (x2 - x1 + 1) * (y2 - y1 + 1)
+    overlaps = scipy.sparse.csr_matrix(overlaps)
+    return {'boxes' : boxes,
+            'gt_classes': gt_classes,
+            'gt_overlaps' : overlaps,
+            'flipped' : False,
+            'seg_areas' : seg_areas}
+```
+
+### 修改学习率
+第8步：学习率可以在py-faster-rcnn/models/pascal_voc/ZF/faster_rcnn_alt_opt中的solve文件设置；
+
+### 修改迭代次数
+第9步：迭代次数可以在py-faster-rcnn/tools的train_faster_rcnn_alt_opt.py中修改。
+```
+    max_iters = [80000, 40000, 80000, 40000]
+```
+分别为4个阶段（rpn第1阶段，fast-rcnn第1阶段，rpn第2阶段，fast-rcnn第2阶段）的迭代次数。可改成你希望的迭代次数。
 
 ## 训练模型
 我们采用ZF模型进行训练，输入如下命令：
