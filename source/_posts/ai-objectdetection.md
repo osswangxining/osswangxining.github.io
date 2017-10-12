@@ -282,7 +282,179 @@ JPEGImages中存放的是.jpg图片，如下所示：
 
 到此为止，你可以用自己定制的数据集的Annotations,ImageSets和JPEGImages替换py-faster-rcnn/data/VOCdevkit2007/VOC2007中对应的文件夹。
 
-##
+## 修改Faster-RCNN的训练参数
+### 修改stage1_fast_rcnn_train.pt
+第1步：py-faster-rcnn/models/pascal_voc/ZF/faster_rcnn_alt_opt/stage1_fast_rcnn_train.pt修改如下：
+```
+layer {  
+  name: 'data'  
+  type: 'Python'  
+  top: 'data'  
+  top: 'rois'  
+  top: 'labels'  
+  top: 'bbox_targets'  
+  top: 'bbox_inside_weights'  
+  top: 'bbox_outside_weights'  
+  python_param {  
+    module: 'roi_data_layer.layer'  
+    layer: 'RoIDataLayer'  
+    param_str: "'num_classes': 3" #按训练集类别改，该值为类别数+1  
+  }  
+}  
+```
+
+```
+layer {  
+  name: "cls_score"  
+  type: "InnerProduct"  
+  bottom: "fc7"  
+  top: "cls_score"  
+  param { lr_mult: 1.0 }  
+  param { lr_mult: 2.0 }  
+  inner_product_param {  
+    num_output: 3 #按训练集类别改，该值为类别数+1  
+    weight_filler {  
+      type: "gaussian"  
+      std: 0.01  
+    }  
+    bias_filler {  
+      type: "constant"  
+      value: 0  
+    }  
+  }  
+}
+```
+
+```
+layer {  
+  name: "bbox_pred"  
+  type: "InnerProduct"  
+  bottom: "fc7"  
+  top: "bbox_pred"  
+  param { lr_mult: 1.0 }  
+  param { lr_mult: 2.0 }  
+  inner_product_param {  
+    num_output: 12 #按训练集类别改，该值为（类别数+1）*4  
+    weight_filler {  
+      type: "gaussian"  
+      std: 0.001  
+    }  
+    bias_filler {  
+      type: "constant"  
+      value: 0  
+    }  
+  }  
+}
+```
+
+### 修改stage1_rpn_train.pt
+第2步：py-faster-rcnn/models/pascal_voc/ZF/faster_rcnn_alt_opt/stage1_rpn_train.pt修改如下：
+```
+layer {  
+    name: 'input-data'  
+    type: 'Python'  
+    top: 'data'  
+    top: 'im_info'  
+    top: 'gt_boxes'  
+    python_param {  
+        module: 'roi_data_layer.layer'  
+        layer: 'RoIDataLayer'  
+        param_str: "'num_classes': 3" #按训练集类别改，该值为类别数+1  
+    }  
+}  
+```
+
+### 修改stage2_fast_rcnn_train.pt
+第3步：py-faster-rcnn/models/pascal_voc/ZF/faster_rcnn_alt_opt/stage2_fast_rcnn_train.pt修改如下：
+```
+layer {  
+  name: 'data'  
+  type: 'Python'  
+  top: 'data'  
+  top: 'rois'  
+  top: 'labels'  
+  top: 'bbox_targets'  
+  top: 'bbox_inside_weights'  
+  top: 'bbox_outside_weights'  
+  python_param {  
+    module: 'roi_data_layer.layer'  
+    layer: 'RoIDataLayer'  
+    param_str: "'num_classes': 3" #按训练集类别改，该值为类别数+1  
+  }  
+}
+```
+
+```
+layer {  
+  name: "cls_score"  
+  type: "InnerProduct"  
+  bottom: "fc7"  
+  top: "cls_score"  
+  param { lr_mult: 1.0 }  
+  param { lr_mult: 2.0 }  
+  inner_product_param {  
+    num_output: 3 #按训练集类别改，该值为类别数+1  
+    weight_filler {  
+      type: "gaussian"  
+      std: 0.01  
+    }  
+    bias_filler {  
+      type: "constant"  
+      value: 0  
+    }  
+  }  
+}  
+```
+
+```
+layer {  
+  name: "bbox_pred"  
+  type: "InnerProduct"  
+  bottom: "fc7"  
+  top: "bbox_pred"  
+  param { lr_mult: 1.0 }  
+  param { lr_mult: 2.0 }  
+  inner_product_param {  
+    num_output: 12 #按训练集类别改，该值为（类别数+1）*4  
+    weight_filler {  
+      type: "gaussian"  
+      std: 0.001  
+    }  
+    bias_filler {  
+      type: "constant"  
+      value: 0  
+    }  
+  }  
+}
+```
+
+### 修改stage2_rpn_train.pt
+第4步：py-faster-rcnn/models/pascal_voc/ZF/faster_rcnn_alt_opt/stage2_rpn_train.pt修改:
+```
+layer {  
+  name: 'input-data'  
+  type: 'Python'  
+  top: 'data'  
+  top: 'im_info'  
+  top: 'gt_boxes'  
+  python_param {  
+    module: 'roi_data_layer.layer'  
+    layer: 'RoIDataLayer'  
+    param_str: "'num_classes': 3" #按训练集类别改，该值为类别数+1  
+  }  
+}  
+```
+
+
+## 训练模型
+我们采用ZF模型进行训练，输入如下命令：
+```
+    ./experiments/scripts/faster_rcnn_alt_opt.sh 0 ZF pascal_voc  
+```
+## 测试模型
+
+将训练得到的**py-faster-rcnn/output/faster-rcnn-alt-opt/voc_2007_trainval/ZF_faster_rcnn_final.caffemodel**模型拷贝到**py-faster-rcnn/data/faster/rcnn_model**
+
 ## Trouble Shooting
 ### 'max_overlaps' issue
 使用自己数据集训练Faster-RCNN模型时，如果出现'max_overlaps' issue， 极有可能是因为之前训练时出现错误，但pkl文件仍在cache中。所以解决的方法是删除在py-faster-rcnn/data/cache目录下的pkl文件。
