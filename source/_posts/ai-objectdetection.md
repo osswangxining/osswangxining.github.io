@@ -42,6 +42,70 @@ fast RCNN在RCNN的基础之上，将分类和位置精修统一到了一个深�
 Annotations中存在的是.xml文件，文件中记录描述每张图的ground truth信息,如下所示：
 ![](/images/annotations-sample-xml.png)
 
+每个xml文件的内容具体如下：
+```
+<annotation>
+	<folder>shoe</folder>
+	<filename>shoe-001.jpg</filename>
+	<path>/home/xiningwang/Downloads/shoe/shoe-001.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1000</width>
+		<height>1000</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>shoe</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>44</xmin>
+			<ymin>150</ymin>
+			<xmax>975</xmax>
+			<ymax>842</ymax>
+		</bndbox>
+	</object>
+</annotation>
+```
+
+ImageSets/Main存放的是test.txt、trainval.txt、train.txt、val.txt。 其中，test.txt是测试集，大概占整个数据集的20%；trainval.txt是训练集和验证集的组合，也就是整个数据集剩下的80%；train.txt是训练集，是trainval.txt的90%；val.txt是验证集，是trainval.txt的10%。
+
+每个TXT文件的内容都是相应图片的前缀（去掉后缀.jpg），如下所示：
+```
+handbag-001
+handbag-002
+handbag-003
+handbag-004
+handbag-005
+handbag-006
+handbag-007
+handbag-008
+handbag-009
+handbag-010
+handbag-011
+handbag-012
+shoe-001
+shoe-002
+shoe-003
+shoe-004
+shoe-005
+shoe-006
+shoe-007
+shoe-008
+shoe-009
+shoe-010
+shoe-011
+shoe-012
+```
+
+JPEGImages中存放的是.jpg图片，如下所示：
+![](/images/jpegimages-sample.png)
+
+
 ##
 ## Trouble Shooting
 ### 'max_overlaps' issue
