@@ -280,6 +280,7 @@ shoe-012
 JPEGImages中存放的是.jpg图片，如下所示：
 ![](/images/jpegimages-sample.png)
 
+到此为止，你可以用自己定制的数据集的Annotations,ImageSets和JPEGImages替换py-faster-rcnn/data/VOCdevkit2007/VOC2007中对应的文件夹。
 
 ##
 ## Trouble Shooting
