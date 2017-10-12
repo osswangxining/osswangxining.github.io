@@ -706,5 +706,41 @@ if __name__ == '__main__':
 测试的结果保存到**py-faster-rcnn/data/VOCdevkit2007/VOC2007/TestResults**.
 
 ## Trouble Shooting
-### 'max_overlaps' issue
+1. 'assert（boxes[:,2]>=boxes[:,0]）.all() issue
+出现问题：训练faster rcnn时出现如下报错：
+```
+File "/py-faster-rcnn/tools/../lib/datasets/imdb.py", line 108, in append_flipped_images
+    assert (boxes[:, 2] >= boxes[:, 0]).all()
+AssertionError
+```
+
+检查自己数据发现，左上角坐标（x,y）可能为0，或标定区域溢出图片.
+而faster rcnn会对Xmin,Ymin,Xmax,Ymax进行减一操作, 如果Xmin为0，减一后变为65535
+```
+# Make pixel indexes 0-based
+        # x1 = float(bbox.find('xmin').text) - 1
+        # y1 = float(bbox.find('ymin').text) - 1
+        # x2 = float(bbox.find('xmax').text) - 1
+        # y2 = float(bbox.find('ymax').text) - 1
+```
+
+问题解决:
+1、修改lib/datasets/imdb.py，append_flipped_images()函数
+数据整理，在一行代码为 boxes[:, 2] = widths[i] - oldx1 - 1下加入代码：
+```
+for b in range(len(boxes)):
+  if boxes[b][2]< boxes[b][0]:
+    boxes[b][0] = 0
+```
+2、修改lib/datasets/pascal_voc.py, load_pascal_annotation(,)函数将对Xmin,Ymin,Xmax,Ymax减一去掉.
+
+3、（可选，如果1和2可以解决问题，就没必要用3）修改lib/fast_rcnn/config.py，不使图片实现翻转，如下改为：
+```
+# Use horizontally-flipped images during training?
+__C.TRAIN.USE_FLIPPED = False
+```
+
+
+
+2. 'max_overlaps' issue
 使用自己数据集训练Faster-RCNN模型时，如果出现'max_overlaps' issue， 极有可能是因为之前训练时出现错误，但pkl文件仍在cache中。所以解决的方法是删除在py-faster-rcnn/data/cache目录下的pkl文件。
