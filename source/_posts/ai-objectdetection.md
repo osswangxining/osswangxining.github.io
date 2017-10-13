@@ -567,51 +567,127 @@ def _load_pascal_annotation(self, index):
     max_iters = [80000, 40000, 80000, 40000]
 ```
 分别为4个阶段（rpn第1阶段，fast-rcnn第1阶段，rpn第2阶段，fast-rcnn第2阶段）的迭代次数。可改成你希望的迭代次数。
+如果改了这些数值，最好把py-faster-rcnn/models/pascal_voc/ZF/faster_rcnn_alt_opt里对应的solver文件（有4个）也修改，stepsize小于上面修改的数值。
 
 ## 训练模型
 我们采用ZF模型进行训练，输入如下命令：
 ```
     ./experiments/scripts/faster_rcnn_alt_opt.sh 0 ZF pascal_voc  
 ```
+
+**！！！为防止与之前的模型搞混,训练前把output文件夹删除（或改个其他名），还要把py-faster-rcnn/data/cache中的文件和py-faster-rcnn/data/VOCdevkit2007/annotations_cache中的文件删除（如果有的话）**
+
 ## 测试模型
 
-将训练得到的**py-faster-rcnn/output/faster-rcnn-alt-opt/voc_2007_trainval/ZF_faster_rcnn_final.caffemodel**模型拷贝到**py-faster-rcnn/data/faster/rcnn_model**
+将训练得到的**py-faster-rcnn/output/faster-rcnn-alt-opt/voc_2007_trainval/ZF_faster_rcnn_final.caffemodel**模型拷贝到**py-faster-rcnn/data/faster_rcnn_model**
 
-修改py-faster-rcnn/tools/demo.py或者新建demo-test.py，具体代码如下所示：
+修改py-faster-rcnn/tools/demo.py或者新建demo-wangxn.py，具体代码如下所示：
 ```
 #!/usr/bin/env python
+
 # --------------------------------------------------------
 # Faster R-CNN
 # Copyright (c) 2015 Microsoft
 # Licensed under The MIT License [see LICENSE for details]
 # Written by Ross Girshick
 # --------------------------------------------------------
+
 """
 Demo script showing detections in sample images.
+
 See README.md for installation instructions before running.
 """
+
 import _init_paths
 from fast_rcnn.config import cfg
 from fast_rcnn.test import im_detect
 from fast_rcnn.nms_wrapper import nms
 from utils.timer import Timer
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
 import numpy as np
 import scipy.io as sio
 import caffe, os, sys, cv2
 import argparse
 import shutil
+
 CLASSES = ('__background__',
-           '你的标签1', '你的标')
+           'handbag', 'shoe')
+
 NETS = {'vgg16': ('VGG16',
                   'VGG16_faster_rcnn_final.caffemodel'),
         'zf': ('ZF',
-                  '你的模型名称')}
+                  'ZF_faster_rcnn_final_wangxn.caffemodel')}
+
+
+def vis_detections(im, class_name, dets, image_name, thresh=0.5):
+    """Draw detected bounding boxes."""
+    inds = np.where(dets[:, -1] >= thresh)[0]
+    if len(inds) == 0:
+        return
+
+    im = im[:, :, (2, 1, 0)]
+    fig, ax = plt.subplots(figsize=(12, 12))
+    ax.imshow(im, aspect='equal')
+    for i in inds:
+        bbox = dets[i, :4]
+        score = dets[i, -1]
+
+        ax.add_patch(
+            plt.Rectangle((bbox[0], bbox[1]),
+                          bbox[2] - bbox[0],
+                          bbox[3] - bbox[1], fill=False,
+                          edgecolor='red', linewidth=3.5)
+            )
+        ax.text(bbox[0], bbox[1] - 2,
+                '{:s} {:.3f}'.format(class_name, score),
+                bbox=dict(facecolor='blue', alpha=0.5),
+                fontsize=14, color='white')
+
+    ax.set_title(('{} detections with '
+                  'p({} | box) >= {:.1f}').format(class_name, class_name,
+                                                  thresh),
+                  fontsize=14)
+    plt.axis('off')
+    plt.tight_layout()
+    plt.draw()
+    im_file = os.path.join('/home/wangxn', 'test100', 'new-{}'.format(image_name))
+    plt.savefig(im_file)
+
+def demo(net, image_name):
+    """Detect object classes in an image using pre-computed object proposals."""
+
+    # Load the demo image
+    im_file = os.path.join(cfg.DATA_DIR, 'demo', image_name)
+    im = cv2.imread(im_file)
+
+    # Detect all object classes and regress object bounds
+    timer = Timer()
+    timer.tic()
+    scores, boxes = im_detect(net, im)
+    timer.toc()
+    print ('Detection took {:.3f}s for '
+           '{:d} object proposals').format(timer.total_time, boxes.shape[0])
+
+    # Visualize detections for each class
+    CONF_THRESH = 0.8
+    NMS_THRESH = 0.3
+    for cls_ind, cls in enumerate(CLASSES[1:]):
+        cls_ind += 1 # because we skipped background
+        cls_boxes = boxes[:, 4*cls_ind:4*(cls_ind + 1)]
+        cls_scores = scores[:, cls_ind]
+        dets = np.hstack((cls_boxes,
+                          cls_scores[:, np.newaxis])).astype(np.float32)
+        keep = nms(dets, NMS_THRESH)
+        dets = dets[keep, :]
+        vis_detections(im, cls, dets, image_name,  thresh=CONF_THRESH)
+
 def save_det(im, class_name, dets, thresh=0.5):
     """Save results with bounding boxes."""
     inds = np.where(dets[:, -1] >= thresh)[0]
     if len(inds) == 0:
-        print "ERROR: none bounding box!"
+        print "WARNING: none bounding box!"
         return im
     font = cv2.FONT_HERSHEY_SIMPLEX
     for i in inds:
@@ -623,8 +699,10 @@ def save_det(im, class_name, dets, thresh=0.5):
         cv2.putText(im, class_name, (bbox[0], bbox[1]), font, 1, (255,0,0), 2, cv2.CV_AA)
     #cv2.imwrite("out.jpg", im)
     return im
+
 def test(net, input_images, output_images):
     """Save test images with bounding boxes"""
+    print input_images
     for (input_image, output_image) in zip(input_images, output_images):
         if not os.path.exists(input_image):
             print "ERROR: file is not existed!\n"
@@ -637,15 +715,16 @@ def test(net, input_images, output_images):
         CONF_THRESH = 0.8
         NMS_THRESH = 0.3
         for cls_ind, cls in enumerate(CLASSES[1:]):
-        cls_ind += 1 # because we skipped background
-        cls_boxes = boxes[:, 4*cls_ind : 4*(cls_ind + 1)]
-        cls_scores = scores[:, cls_ind]
-        dets = np.hstack((cls_boxes, cls_scores[:, np.newaxis])).astype(np.float32)
-        keep = nms(dets, NMS_THRESH)
-        dets = dets[keep, :]
-        im = save_det(im, cls, dets, thresh=CONF_THRESH)
+            cls_ind += 1 # because we skipped background
+            cls_boxes = boxes[:, 4*cls_ind : 4*(cls_ind + 1)]
+            cls_scores = scores[:, cls_ind]
+            dets = np.hstack((cls_boxes, cls_scores[:, np.newaxis])).astype(np.float32)
+            keep = nms(dets, NMS_THRESH)
+            dets = dets[keep, :]
+            im = save_det(im, cls, dets, thresh=CONF_THRESH)
         cv2.imwrite(output_image, im)
         print "output_image = " + output_image
+
 def gen_test_image_list(list_file, input_root, output_root):
     """Generate test image lists"""
     open_file = open(list_file, 'r')
@@ -654,10 +733,11 @@ def gen_test_image_list(list_file, input_root, output_root):
     for image_prefix in open_file.readlines():
         image_prefix = image_prefix.strip()
         input_image = os.path.join(input_root, image_prefix + ".jpg")
-    output_image = os.path.join(output_root, "result_" + image_prefix + ".jpg")
-    input_images.append(input_image)
-    output_images.append(output_image)
+        output_image = os.path.join(output_root, "result_" + image_prefix + ".jpg")
+        input_images.append(input_image)
+        output_images.append(output_image)
     return (input_images, output_images)
+
 def parse_args():
     """Parse input arguments."""
     parser = argparse.ArgumentParser(description='Faster R-CNN demo')
@@ -668,18 +748,26 @@ def parse_args():
                         action='store_true')
     parser.add_argument('--net', dest='demo_net', help='Network to use [vgg16]',
                         choices=NETS.keys(), default='vgg16')
+
     args = parser.parse_args()
+
     return args
+
 if __name__ == '__main__':
     cfg.TEST.HAS_RPN = True  # Use RPN for proposals
+
     args = parse_args()
+
     prototxt = os.path.join(cfg.MODELS_DIR, NETS[args.demo_net][0],
                             'faster_rcnn_alt_opt', 'faster_rcnn_test.pt')
     caffemodel = os.path.join(cfg.DATA_DIR, 'faster_rcnn_models',
                               NETS[args.demo_net][1])
+
+    print args
     if not os.path.isfile(caffemodel):
         raise IOError(('{:s} not found.\nDid you run ./data/script/'
                        'fetch_faster_rcnn_models.sh?').format(caffemodel))
+
     if args.cpu_mode:
         caffe.set_mode_cpu()
     else:
@@ -687,7 +775,9 @@ if __name__ == '__main__':
         caffe.set_device(args.gpu_id)
         cfg.GPU_ID = args.gpu_id
     net = caffe.Net(prototxt, caffemodel, caffe.TEST)
+
     print '\n\nLoaded network {:s}'.format(caffemodel)
+
     VOC_ROOT = os.path.join(cfg.DATA_DIR, "VOCdevkit2007", "VOC2007")
     list_file = os.path.join(VOC_ROOT, "ImageSets", "Main", "test.txt")
     input_root = os.path.join(VOC_ROOT, "JPEGImages")
@@ -697,16 +787,22 @@ if __name__ == '__main__':
     os.mkdir(output_root)
     input_images, output_images = gen_test_image_list(list_file, input_root, output_root)
     test(net, input_images, output_images)
+
 ```
 
 输入测试命令：
 ```
-    ./tools/demo-test.py --net zf
+    ./tools/demo-wangxn.py --net zf
+```
+或者将默认的模型改为zf：
+```
+parser.add_argument('--net', dest='demo_net', help='Network to use [vgg16]',  
+                        choices=NETS.keys(), default='zf')  
 ```
 测试的结果保存到**py-faster-rcnn/data/VOCdevkit2007/VOC2007/TestResults**.
 
 ## Trouble Shooting
-1. 'assert（boxes[:,2]>=boxes[:,0]）.all() issue
+### 'assert（boxes[:,2]>=boxes[:,0]）.all() issue
 出现问题：训练faster rcnn时出现如下报错：
 ```
 File "/py-faster-rcnn/tools/../lib/datasets/imdb.py", line 108, in append_flipped_images
@@ -742,5 +838,70 @@ __C.TRAIN.USE_FLIPPED = False
 
 
 
-2. 'max_overlaps' issue
+### 'max_overlaps' issue
 使用自己数据集训练Faster-RCNN模型时，如果出现'max_overlaps' issue， 极有可能是因为之前训练时出现错误，但pkl文件仍在cache中。所以解决的方法是删除在py-faster-rcnn/data/cache目录下的pkl文件。
+
+### 中文显示
+以py-faster-rcnn的demo.py代码为基础，在demo.py中的修改如下：
+1. 指定默认编码：
+```
+import caffe, os, sys, cv2  
+reload(sys)  
+sys.setdefaultencoding('utf-8')  
+```
+
+2. 设置中文字体：
+```
+def vis_detections(im, class_name, dets, thresh=0.5):  
+    """Draw detected bounding boxes."""  
+    inds = np.where(dets[:, -1] >= thresh)[0]  
+    if len(inds) == 0:  
+        return  
+
+    im = im[:, :, (2, 1, 0)]  
+    zhfont = matplotlib.font_manager.FontProperties(fname="/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf") #字体  
+
+    fig, ax = plt.subplots(figsize=(12, 12))  
+    ax.imshow(im, aspect='equal')  
+```
+上面的zhfont就是设置的中文字体，由于系统的原因，这个路径不一定相同，所以，用下面的命令确定你的中文字体路径：
+```
+$ fc-match -v "AR PL UKai CN"
+Pattern has 37 elts (size 48)
+       	family: "DejaVu Sans"(s)
+       	familylang: "en"(s)
+       	style: "Book"(s)
+       	stylelang: "en"(s)
+       	fullname: "DejaVu Sans"(s)
+       	fullnamelang: "en"(s)
+       	slant: 0(i)(s)
+       	weight: 80(i)(s)
+       	width: 100(i)(s)
+       	size: 12(f)(s)
+       	pixelsize: 12.5(f)(s)
+       	foundry: "PfEd"(w)
+       	antialias: True(w)
+       	hintstyle: 1(i)(w)
+       	hinting: True(w)
+       	verticallayout: False(s)
+       	autohint: False(s)
+       	globaladvance: True(s)
+       	file: "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"(w)
+       	index: 0(i)(w)
+       	outline: True(w)
+       	scalable: True(w)
+       	dpi: 75(f)(s)
+```
+
+3. 添加参数
+
+还是vis_detections()这个函数，修改：
+```
+ax.text(bbox[0], bbox[1] - 2,  
+                '{:s}'.format(s),  
+                bbox=dict(facecolor='blue', alpha=0.5),  
+                fontsize=14, color='white', fontproperties = zhfont)
+```
+那个s就是识别的结果（有中文），color后面添加fontproperties = zhfont
+
+这样，就可以在图像上显示中文了.
