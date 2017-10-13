@@ -577,6 +577,19 @@ def _load_pascal_annotation(self, index):
 
 **！！！为防止与之前的模型搞混,训练前把output文件夹删除（或改个其他名），还要把py-faster-rcnn/data/cache中的文件和py-faster-rcnn/data/VOCdevkit2007/annotations_cache中的文件删除（如果有的话）**
 
+训练过程如下图所示：
+![](/images/training-1.png)
+
+![](/images/training-2.png)
+
+![](/images/training-3.png)
+
+![](/images/training-4.png)
+
+![](/images/training-5.png)
+
+![](/images/training-6.png)
+
 ## 测试模型
 
 将训练得到的**py-faster-rcnn/output/faster-rcnn-alt-opt/voc_2007_trainval/ZF_faster_rcnn_final.caffemodel**模型拷贝到**py-faster-rcnn/data/faster_rcnn_model**
