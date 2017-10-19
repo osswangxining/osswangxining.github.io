@@ -167,3 +167,189 @@ TLSv1.2 - Supports RFC 5246: TLS version 1.2 ; may support other versions
   - 显式调用startHandshake方法
   - 在socket对象上进行read或write操作
   - 在socket对象上调用getSession方法
+
+代码如下：
+```
+package ssl;
+
+import java.io.BufferedReader;  
+import java.io.FileInputStream;  
+import java.io.IOException;  
+import java.io.InputStreamReader;  
+import java.io.PrintWriter;  
+import java.net.Socket;  
+import java.security.KeyStore;  
+import java.security.cert.X509Certificate;  
+
+import javax.net.ssl.HandshakeCompletedEvent;  
+import javax.net.ssl.HandshakeCompletedListener;  
+import javax.net.ssl.KeyManagerFactory;  
+import javax.net.ssl.SSLContext;  
+import javax.net.ssl.SSLPeerUnverifiedException;  
+import javax.net.ssl.SSLServerSocket;  
+import javax.net.ssl.SSLServerSocketFactory;  
+import javax.net.ssl.SSLSocket;  
+import javax.net.ssl.TrustManagerFactory;  
+
+public class MySSLServer implements Runnable, HandshakeCompletedListener {  
+
+    public static final int SERVER_PORT = 11123;  
+
+    private final Socket _s;  
+    private String peerCerName;  
+
+    public MySSLServer(Socket s) {  
+        _s = s;  
+    }  
+
+    public static void main(String[] args) throws Exception {  
+        String serverKeyStoreFile = "/Users/xiningwang/temp20151019/tempkey";  
+        String serverKeyStorePwd = "123456";  
+        String myServerKeyPwd = "myserver";  
+        String serverTrustKeyStoreFile = "/Users/xiningwang/temp20151019/myservertrust.keystore";  
+        String serverTrustKeyStorePwd = "12345678";  
+
+        KeyStore serverKeyStore = KeyStore.getInstance("JKS");  
+        serverKeyStore.load(new FileInputStream(serverKeyStoreFile), serverKeyStorePwd.toCharArray());  
+
+        KeyStore serverTrustKeyStore = KeyStore.getInstance("JKS");  
+        serverTrustKeyStore.load(new FileInputStream(serverTrustKeyStoreFile), serverTrustKeyStorePwd.toCharArray());  
+
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());  
+        kmf.init(serverKeyStore, myServerKeyPwd.toCharArray());  
+
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());  
+        tmf.init(serverTrustKeyStore);  
+
+        SSLContext sslContext = SSLContext.getInstance("TLSv1");  
+        sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);  
+
+        SSLServerSocketFactory sslServerSocketFactory = sslContext.getServerSocketFactory();  
+        SSLServerSocket sslServerSocket = (SSLServerSocket) sslServerSocketFactory.createServerSocket(SERVER_PORT);  
+        sslServerSocket.setNeedClientAuth(true);  
+
+        while (true) {  
+            SSLSocket s = (SSLSocket)sslServerSocket.accept();  
+            MySSLServer cs = new MySSLServer(s);  
+            s.addHandshakeCompletedListener(cs);  
+            new Thread(cs).start();  
+        }  
+    }  
+
+    @Override  
+    public void run() {  
+        try {  
+            BufferedReader reader = new BufferedReader(new InputStreamReader(_s.getInputStream()));  
+            PrintWriter writer = new PrintWriter(_s.getOutputStream(), true);  
+
+            writer.println("Welcome~, enter exit to leave.");  
+            String s;  
+            while ((s = reader.readLine()) != null && !s.trim().equalsIgnoreCase("exit")) {  
+                writer.println("Echo: " + s);  
+            }  
+            writer.println("Bye~, " + peerCerName);  
+        } catch (Exception e) {  
+            e.printStackTrace();  
+        } finally {  
+            try {  
+                _s.close();  
+            } catch (IOException e) {  
+                e.printStackTrace();  
+            }  
+        }  
+    }  
+
+    @Override  
+    public void handshakeCompleted(HandshakeCompletedEvent event) {  
+        try {  
+            X509Certificate cert = (X509Certificate) event.getPeerCertificates()[0];  
+            peerCerName = cert.getSubjectX500Principal().getName();  
+        } catch (SSLPeerUnverifiedException ex) {  
+            ex.printStackTrace();  
+        }  
+    }  
+
+}
+```
+
+## client端处理流程和代码
+- 1）加载client的keystore文件。
+
+- 2）加载client的truststore文件。
+
+- 3) 创建KeyManagerFactory对象并初始化。
+
+- 4) 创建TrustManagerFactory对象并初始化。truststore中存的是server的公钥，不需要keypass也可以访问。
+
+- 5）创建SSLContext并用3）和4）中创建的KeyManagerFactory和TrustManagerFactory对象来初始化。
+
+- 6）创建SSLSocketFactory，在指定的网络地址和端口上创建SSLSocket。
+
+- 7）在这个SSLSocket对象的输入输出流上进行读写。
+
+代码如下：
+```
+package ssl;
+
+import java.io.BufferedReader;  
+import java.io.FileInputStream;  
+import java.io.IOException;  
+import java.io.InputStreamReader;  
+import java.io.PrintWriter;  
+import java.net.Socket;  
+import java.security.KeyStore;  
+
+import javax.net.ssl.KeyManagerFactory;  
+import javax.net.ssl.SSLContext;  
+import javax.net.ssl.SSLSocketFactory;  
+import javax.net.ssl.TrustManagerFactory;  
+
+public class MySSLClient {  
+    public static void main(String[] args) throws Exception {  
+        String clientKeyStoreFile = "/Users/xiningwang/temp20151019/tempkey4client";  
+        String clientKeyStorePwd = "123456";  
+        String myclientKeyPwd = "myclient";  
+        String clientTrustKeyStoreFile = "/Users/xiningwang/temp20151019/myclienttrust.keystore";  
+        String clientTrustKeyStorePwd = "12345678";  
+
+        KeyStore clientKeyStore = KeyStore.getInstance("JKS");  
+        clientKeyStore.load(new FileInputStream(clientKeyStoreFile), clientKeyStorePwd.toCharArray());  
+
+        KeyStore clientTrustKeyStore = KeyStore.getInstance("JKS");  
+        clientTrustKeyStore.load(new FileInputStream(clientTrustKeyStoreFile), clientTrustKeyStorePwd.toCharArray());  
+
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());  
+        kmf.init(clientKeyStore, myclientKeyPwd.toCharArray());  
+
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());  
+        tmf.init(clientTrustKeyStore);  
+
+        SSLContext sslContext = SSLContext.getInstance("TLSv1");  
+        sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);  
+
+        SSLSocketFactory socketFactory = sslContext.getSocketFactory();  
+        Socket socket = socketFactory.createSocket("localhost", MySSLServer.SERVER_PORT);  
+
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);  
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));  
+
+        send("hello", out);  
+        Thread.sleep(5000);
+        send("exit", out);  
+        receive(in);  
+        socket.close();  
+    }  
+
+    public static void send(String s, PrintWriter out) throws IOException {  
+        System.out.println("Sending: " + s);       
+        out.println(s);  
+    }  
+
+    public static void receive(BufferedReader in) throws IOException {  
+        String s;  
+        while ((s = in.readLine()) != null) {  
+            System.out.println("Reveived: " + s);  
+        }  
+    }  
+}
+```
