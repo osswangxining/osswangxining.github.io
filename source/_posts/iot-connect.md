@@ -8,11 +8,21 @@ tags:
 
 ---
 
-## LPWAN is for IoT
+## 基本知识
 
-One technology cannot serve all of the projected applications and volumes for IoT.
-- WiFi and BTLE are widely adopted standards and serve the applications related to communicating personal devices quite well.
-- Cellular technology is a great fit for applications that need high data throughput and have a power source.
-- LPWAN offers multi-year battery lifetime and is designed for sensors and applications that need to send small amounts of data over long distances a few times per hour from varying environments.
-
+物联网应用中的无线技术有多种，可组成局域网或广域网。组成局域网的无线技术主要有2.4GHz的WiFi，蓝牙、Zigbee等，组成广域网的无线技术主要有2G/3G/4G等。这些无线技术，优缺点非常明显，如下图所示：
 ![](/images/iot-connect-protocol.png)
+
+在低功耗广域网（Low Power Wide Area Network, LPWAN）产生之前，似乎远距离和低功耗两者之间只能二选一。当采用LPWAN技术之后，设计人员可做到两者都兼顾，最大程度地实现更长距离通信与更低功耗，同时还可节省额外的中继器成本。
+
+LoRa 是LPWAN通信技术中的一种，是美国Semtech公司采用和推广的一种基于扩频技术的超远距离无线传输方案。这一方案改变了以往关于传输距离与功耗的折衷考虑方式，为用户提供一种简单的能实现远距离、长电池寿命、大容量的系统，进而扩展传感网络。目前，LoRa 主要在全球免费频段运行，包括433、868、915 MHz等。
+
+LoRa技术具有远距离、低功耗（电池寿命长）、多节点、低成本的特性。LoRa网络主要由终端（可内置LoRa模块）、网关、Server和云四部分组成。应用数据可双向传输。如下所示：
+
+![](/images/iot-connect-protocol-2.png)
+
+LoRaWAN网络根据实际应用的不同，把终端设备划分成A/B/C三类：
+- Class A：双向通信终端设备。这一类的终端设备允许双向通信，每一个终端设备上行传输会伴随着两个下行接收窗口。终端设备的传输槽是基于其自身通信需求，其微调是基于一个随机的时间基准（ALOHA协议）。Class  A所属的终端设备在应用时功耗最低，终端发送一个上行传输信号后，服务器能很迅速地进行下行通信，任何时候，服务器的下行通信都只能在上行通信之后。
+- Class B：具有预设接收槽的双向通信终端设备。这一类的终端设备会在预设时间中开放多余的接收窗口，为了达到这一目的，终端设备会同步从网关接收一个Beacon，通过Beacon将基站与模块的时间进行同步。这种方式能使服务器知晓终端设备正在接收数据。
+Class C：具有最大接收槽的双向通信终端设备。这一类的终端设备持续开放接收窗口，只在传输时关闭。
+![](/images/iot-connect-class.png)
