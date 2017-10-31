@@ -3,7 +3,6 @@ title: 构建自己的聊天机器人（及如何接入微信）
 date: 2017-9-3 10:46:25
 categories:
   - AI
-  - IOT
 tags:
   - 人工智能
   - IoT

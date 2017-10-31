@@ -3,7 +3,6 @@ title: Applying Chatbots to the Internet of Things
 date: 2017-9-30 10:46:25
 categories:
   - AI
-  - IOT
 tags:
   - 人工智能
   - IoT

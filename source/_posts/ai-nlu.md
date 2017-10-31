@@ -3,10 +3,10 @@ title: IoT - 人工智能
 date: 2017-8-19 20:46:25
 categories:
   - AI
-  - IOT
 tags:
   - AI
   - NLU
+  - IoT
 
 ---
 

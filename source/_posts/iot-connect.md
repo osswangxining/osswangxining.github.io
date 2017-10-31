@@ -1,5 +1,5 @@
 ---
-title: 使用定制数据集训练Faster-RCNN模型
+title: 使用LoRa在Edge端组网并接入IoT云平台
 date: 2017-10-30 20:46:25
 categories:
   - IoT
