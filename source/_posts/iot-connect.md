@@ -43,7 +43,7 @@ LoRa联盟于2015年上半年由思科（Cisco）、IBM和升特（Semtech）等
 ### 行业生态
 结合行业生态再来看下上面提到的网络架构，大家可以各自想想自己的位置。
 
-![](/images/lorawan-ecosystem.png)
+![](/images/lorawan_ecosystem.png)
 
 ### 终端设备分类
 LoRaWAN网络根据实际应用的不同，把终端设备划分成A/B/C三类：
