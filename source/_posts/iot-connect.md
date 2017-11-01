@@ -100,6 +100,11 @@ LoRaWAN网络根据实际应用的不同，把终端设备划分成A/B/C三类�
 
 ![](/images/lora-device-gateway-cloud.png)
 
+### 开源实现
+A LoRa Server architecture constists out of multiple components:
+
+![](https://docs.loraserver.io/img/architecture.png)
+
 ### LoRa数据包转发
 A LoRa packet forwarder is a program running on the host of a LoRa gateway that forwards RF packets receive by the concentrator to a server through a IP/UDP link, and emits RF packets that are sent by the server.
 
