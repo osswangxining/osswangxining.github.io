@@ -14,10 +14,12 @@ tags:
 - 三个词：质量、速度、创新。
 - 三句话：系统思考、加速反馈循环、持续改进
 
-![Docker and the Three Ways of DevOps](/files/docker-mta/WP_Docker and the 3 ways devops.pdf)
+[Docker and the Three Ways of DevOps](/files/docker-mta/WP_Docker and the 3 ways devops.pdf)
 
-![Modernize Traditional Apps](/files/docker-mta/ROI_Infographic_9-13-17.pdf)
+[Modernize Traditional Apps](/files/docker-mta/ROI_Infographic_9-13-17.pdf)
 
-![Solution Brief: Modernize Traditional Apps](/files/docker-mta/SB_MTA_04.14.2017.pdf)
+[Solution Brief: Modernize Traditional Apps](/files/docker-mta/SB_MTA_04.14.2017.pdf)
 
-![Docker or VM](/files/docker-mta/Docker-for-Virtualization-Admin-eBook.pdf)
+[Docker or VM](/files/docker-mta/Docker-for-Virtualization-Admin-eBook.pdf)
+
+TO BE CONTINUED
