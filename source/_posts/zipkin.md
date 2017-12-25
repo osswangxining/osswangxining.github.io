@@ -100,8 +100,9 @@ Trace instrumentation report spans asynchronously to prevent delays or failures 
 Spans sent by the instrumented library must be transported from the services being traced to Zipkin collectors. There are three primary transports: HTTP, Kafka and Scribe. See Span Receivers for more information.
 
 
-# ZipkinServer
-ZipkinServer是SpringBoot启动类，该类上使用了@EnableZipkinServer注解，加载了相关的Bean，而且在启动方法中添加了监听器RegisterZipkinHealthIndicators类，来初始化健康检查的相关bean。
+### ZipkinServer
+ZipkinServer本身是一个SpringBoot应用程序，可以作为一个jar启动。类ZipkinServer上使用了@EnableZipkinServer注解，加载了相关的Bean，而且在启动方法中添加了监听器RegisterZipkinHealthIndicators类，来初始化健康检查的相关bean。
+Span的存储和收集可以根据实际情况进行配置，默认情况下，存储使用了内存方式，收集则是使用了http post (/api/v1/spans)方式。监听端口默认为9411.
 
 ```
 package zipkin.server;
@@ -120,6 +121,61 @@ public class ZipkinServer {
   }
 }
 
+```
+
+运行mvn package之后可以得到zipkin-server-{version}-exec.jar，运行java -jar zipkin-server-{version}-exec.jar。
+运行结果如下：
+```
+xis-macbook-pro:node_modules xiningwang$ java -jar /Users/xiningwang/localgit/zipkin/zipkin-server/target/zipkin-server-2.4.3-SNAPSHOT-exec.jar
+                                    ********
+                                  **        **
+                                 *            *
+                                **            **
+                                **            **
+                                 **          **
+                                  **        **
+                                    ********
+                                      ****
+                                      ****
+        ****                          ****
+     ******                           ****                                 ***
+  ****************************************************************************
+    *******                           ****                                 ***
+        ****                          ****
+                                       **
+                                       **
+
+
+             *****      **     *****     ** **       **     **   **
+               **       **     **  *     ***         **     **** **
+              **        **     *****     ****        **     **  ***
+             ******     **     **        **  **      **     **   **
+
+:: Powered by Spring Boot ::         (v1.5.8.RELEASE)
+.......
+2017-12-25 14:39:26.410  INFO 94492 --- [           main] o.s.b.a.e.mvc.EndpointHandlerMapping     : Mapped "{[/auditevents || /auditevents.json],methods=[GET],produces=[application/vnd.spring-boot.actuator.v1+json || application/json]}" onto public org.springframework.http.ResponseEntity<?> org.springframework.boot.actuate.endpoint.mvc.AuditEventsMvcEndpoint.findByPrincipalAndAfterAndType(java.lang.String,java.util.Date,java.lang.String)
+2017-12-25 14:39:27.061  INFO 94492 --- [           main] o.s.j.e.a.AnnotationMBeanExporter        : Registering beans for JMX exposure on startup
+2017-12-25 14:39:27.071  INFO 94492 --- [           main] o.s.c.support.DefaultLifecycleProcessor  : Starting beans in phase 0
+2017-12-25 14:39:27.243  INFO 94492 --- [           main] b.c.e.u.UndertowEmbeddedServletContainer : Undertow started on port(s) 9411 (http)
+2017-12-25 14:39:27.252  INFO 94492 --- [           main] zipkin.server.ZipkinServer               : Started ZipkinServer in 9.434 seconds (JVM running for 10.054)
+
+```
+### 数据存储
+以mysql为例。
+启动mysql及zipkin：
+```
+docker run --name mysql57 -e MYSQL_ROOT_PASSWORD=passw0rd -d mysql:5.7.20
+
+STORAGE_TYPE=mysql MYSQL_USER=root MYSQL_PASS=passw0rd java -jar /Users/xiningwang/localgit/zipkin/zipkin-server/target/zipkin-server-2.4.3-SNAPSHOT-exec.jar
+```
+默认情况下，以下属性使用如下默认值:
+```
+* `MYSQL_DB`: The database to use. Defaults to "zipkin".
+* `MYSQL_USER` and `MYSQL_PASS`: MySQL authentication, which defaults to empty string.
+* `MYSQL_HOST`: Defaults to localhost
+* `MYSQL_TCP_PORT`: Defaults to 3306
+* `MYSQL_MAX_CONNECTIONS`: Maximum concurrent connections, defaults to 10
+* `MYSQL_USE_SSL`: Requires `javax.net.ssl.trustStore` and `javax.net.ssl.trustStorePassword`, defaults to false.
 ```
 
 ### 例子
