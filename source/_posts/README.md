@@ -34,6 +34,59 @@ Spring Cloud Config主要是为了分布式系统的外部配置提供了服务�
 Spring Cloud Bus提供了批量刷新配置的机制，它使用轻量级的消息代理（例如RabbitMQ、Kafka等）连接分布式系统的节点，这样就可以通过Spring Cloud Bus广播配置的变化或者其他的管理指令。
 ![](/images/spring-config-server-client-bus.png)
 
+具体操作如下：
+1. git clone spring-cloud-config, 我们使用了1.4.1.BUILD-SNAPSHOT；
+```
+cd spring-cloud-config
+./mvnw install
+```
+2. 启动config server
+```
+cd spring-cloud-config-server/
+../mvnw spring-boot:run
+```
+查看运行结果：
+```
+curl localhost:8888/foo/development |  python -m json.tool
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   708    0   708    0     0   1114      0 --:--:-- --:--:-- --:--:--  1114
+{
+    "label": null,
+    "name": "foo",
+    "profiles": [
+        "development"
+    ],
+    "propertySources": [
+        {
+            "name": "https://github.com/spring-cloud-samples/config-repo/foo-development.properties",
+            "source": {
+                "bar": "spam",
+                "foo": "from foo development"
+            }
+        },
+        {
+            "name": "https://github.com/spring-cloud-samples/config-repo/foo.properties",
+            "source": {
+                "democonfigclient.message": "hello spring io",
+                "foo": "from foo props"
+            }
+        },
+        {
+            "name": "https://github.com/spring-cloud-samples/config-repo/application.yml",
+            "source": {
+                "eureka.client.serviceUrl.defaultZone": "http://localhost:8761/eureka/",
+                "foo": "baz",
+                "info.description": "Spring Cloud Samples",
+                "info.url": "https://github.com/spring-cloud-samples"
+            }
+        }
+    ],
+    "state": null,
+    "version": "a611374438e75aa1b9808908c57833480944e1a8"
+}
+```
+
 启动RabiitMQ:
 ```
 docker run -d -p 5671:5671 -p 5672:5672 -p 4369:4369 -p 25672:25672  --hostname my-rabbit --name myrabbit rabbitmq
