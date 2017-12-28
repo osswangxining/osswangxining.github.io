@@ -166,7 +166,7 @@ management:
   - SpringCloud Sleuth
 
   ![](/images/distributed-tracing.png)
-  
+
   [Zipkin](/zipkin/) is a distributed tracing system. It helps gather timing data needed to troubleshoot latency problems in microservice architectures. It manages both the collection and lookup of this data. Zipkin’s design is based on the Google Dapper paper.
 
   Applications are instrumented to report timing data to Zipkin. The Zipkin UI also presents a Dependency diagram showing how many traced requests went through each application. If you are troubleshooting latency problems or errors, you can filter or sort all traces based on the application, length of trace, annotation, or timestamp. Once you select a trace, you can see the percentage of the total trace time each span takes which allows you to identify the problem application.
@@ -175,12 +175,13 @@ management:
 
 ### 日志管理
   - ELK Stack（LogStash -> ES -> Kibana）
+ ![](/images/elk.png)
 
 ### 监控与度量
   - Application/Infrastructure monitoring using StatsD + Graphite + Grafana
 
   [StatsD + Graphite + Grafana](/sgg/)
-
+   ![](/images/statsd-graphite-grafana.png)
 
 ## 弹性服务与容错处理
  - 弹性服务
@@ -188,13 +189,21 @@ management:
  - 线程池/信号隔离
  - 快速解决依赖隔离
 
+ ![](/images/service-resillence.png)
  [Hystrix架构设计](/Hystrix/)
+
+### 流量控制
+![](/images/rate-limiter.png)
+
 
 ## 分布式事务、分布式锁
 ### 分布式事务
+ ![](/images/distributed-transaction-1.png)
+ ![](/images/distributed-transaction-2.png)
 
 ### 分布式锁
   - [分布式锁](/distributed-lock/)
+  ![](/images/distributed-lock.png)
 
 ## 分布式存储与计算
 
