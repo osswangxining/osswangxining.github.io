@@ -10,6 +10,11 @@ tags:
 ---
 基于之前的[版本](/README)更新.
 
+## 如何有效设计分布式系统
+结合实例分享分布式系统架构设计的经验
+
+![](/images/distributed-arch-design.png)
+
 ## 分布式配置管理
   - [Consul](/consul) | etcd
   - [Archaius动态管理](/archaius)
@@ -34,6 +39,8 @@ Spring Cloud Config主要是为了分布式系统的外部配置提供了服务�
 尽管使用/refresh 端点手动刷新配置，但是如果所有微服务节点的配置都需要手动去刷新的话，那必然是一个繁琐的工作，并且随着系统的不断扩张，会变得越来越难以维护。因此，实现配置的自动刷新是很有必要的，本节我们讨论使用Spring Cloud Bus实现配置的自动刷新。
 Spring Cloud Bus提供了批量刷新配置的机制，它使用轻量级的消息代理（例如RabbitMQ、Kafka等）连接分布式系统的节点，这样就可以通过Spring Cloud Bus广播配置的变化或者其他的管理指令。
 ![](/images/spring-config-server-client-bus.png)
+
+代码可以参考： https://github.com/osswangxining/spring-cloud-config/tree/1.4.x
 
 具体操作如下：
 #### 启动RabiitMQ (作为Spring Cloud Bus，也可以选择Kafka):
