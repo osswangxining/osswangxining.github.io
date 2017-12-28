@@ -35,6 +35,11 @@ Spring Cloud Bus提供了批量刷新配置的机制，它使用轻量级的消�
 ![](/images/spring-config-server-client-bus.png)
 
 具体操作如下：
+0. 启动RabiitMQ:
+```
+docker run -d -p 5671:5671 -p 5672:5672 -p 4369:4369 -p 25672:25672  --hostname my-rabbit --name myrabbit rabbitmq
+
+```
 1. git clone spring-cloud-config, 我们使用了1.4.1.BUILD-SNAPSHOT；
 ```
 cd spring-cloud-config
@@ -86,12 +91,43 @@ curl localhost:8888/foo/development |  python -m json.tool
     "version": "a611374438e75aa1b9808908c57833480944e1a8"
 }
 ```
-
-启动RabiitMQ:
+3. 运行spring-cloud-config-sample
 ```
-docker run -d -p 5671:5671 -p 5672:5672 -p 4369:4369 -p 25672:25672  --hostname my-rabbit --name myrabbit rabbitmq
-
+cd spring-cloud-config-sample
+../mvnw spring-boot:run
 ```
+ 查看运行结果：
+```
+curl localhost:8080/configprops
+```
+
+如果出现如下信息，则是需要修改security配置。
+```
+{
+    "timestamp": 1514452991317,
+    "status": 401,
+    "error": "Unauthorized",
+    "message": "Full authentication is required to access this resource.",
+    "path": "/bus/refresh"
+}
+```
+
+在config client/server的yml文件添加：
+```
+management:
+  context_path: /admin
+  security:
+    enabled: false
+```
+4. curl -X POST localhost:8888/admin/bus/refresh
+一旦/bus/refresh被触发，config server会执行如下逻辑:
+```
+17:39:18.101  INFO 48866 --- [nio-8888-exec-9] s.c.a.AnnotationConfigApplicationContext : Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@5e4125d3: startup date [Thu Dec 28 17:39:18 CST 2017]; root of context hierarchy
+17:39:18.108  INFO 48866 --- [nio-8888-exec-9] o.s.c.c.s.e.NativeEnvironmentRepository  : Adding property source: file:/var/folders/zp/kmj0tf897hndh27m457zkzv40000gn/T/config-repo-4824252633476331455/bar.properties
+17:39:18.108  INFO 48866 --- [nio-8888-exec-9] o.s.c.c.s.e.NativeEnvironmentRepository  : Adding property source: file:/var/folders/zp/kmj0tf897hndh27m457zkzv40000gn/T/config-repo-4824252633476331455/application.yml
+17:39:18.108  INFO 48866 --- [nio-8888-exec-9] s.c.a.AnnotationConfigApplicationContext : Closing org.springframework.context.annotation.AnnotationConfigApplicationContext@5e4125d3: startup date [Thu Dec 28 17:39:18 CST 2017]; root of context hierarchy
+```
+
 
 ## 服务注册与发现
   - [Consul](/consul/)
