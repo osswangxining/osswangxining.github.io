@@ -154,6 +154,7 @@ management:
   - [Kubernetes Service](/kubernetes/#service)
 
   [Client Side Load Balancing](/consul/)
+
 ### API网关与智能路由
   - Netflix Zuul（SpringCloud）
   - [Kubernetes Service](/kubernetes/#service)
@@ -175,12 +176,14 @@ management:
 
 ### 日志管理
   - ELK Stack（LogStash -> ES -> Kibana）
+
  ![](/images/elk.png)
 
 ### 监控与度量
   - Application/Infrastructure monitoring using StatsD + Graphite + Grafana
 
   [StatsD + Graphite + Grafana](/sgg/)
+  
    ![](/images/statsd-graphite-grafana.png)
 
 ## 弹性服务与容错处理

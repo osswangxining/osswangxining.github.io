@@ -4,8 +4,8 @@
 
 # Site
 title: Technical Blog
-subtitle: Welcome to my world!
-description: [专注于分布式高性能技术架构、IoT云平台、机器/深度学习, 有问题请mailto: osswangxining@163.com]
+subtitle: Welcome to my world! 有问题请osswangxining（at）163.com
+description: [专注于分布式高性能技术架构、IoT云平台、机器/深度学习]
 author: Xi Ning Wang
 language: zh-Hans
 timezone: Asia/Shanghai
