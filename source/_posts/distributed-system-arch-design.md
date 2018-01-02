@@ -183,7 +183,7 @@ management:
   - Application/Infrastructure monitoring using StatsD + Graphite + Grafana
 
   [StatsD + Graphite + Grafana](/sgg/)
-  
+
    ![](/images/statsd-graphite-grafana.png)
 
 ## 弹性服务与容错处理
@@ -197,6 +197,25 @@ management:
 
 ### 流量控制
 ![](/images/rate-limiter.png)
+
+#### 使用令牌捅算法进行限流
+guava库里的RateLimiter类内部采用令牌捅算法实现.
+```
+<!--核心代码片段-->
+private RateLimiter rateLimiter = RateLimiter.create(400);//400表示每秒允许处理的量是400
+ if(rateLimiter.tryAcquire()) {
+   //逻辑在此处
+ }
+```
+本人实现了一个基于Guava的Spring Boot Starter，参见[ratelimiter-spring-boot-starter](https://github.com/osswangxining/ratelimiter-spring-boot-starter)
+
+显然，该方式是最快捷且有效的，单节点模式下，使用RateLimiter进行限流一点问题都没有。但分布式系统总请求就是节点数x400/s，限流效果失效。
+
+#### 使用redis进行限流
+使用redis进行限流，其很好地解决了分布式环境下多实例所导致的并发问题。因为使用redis设置的计时器和计数器均是全局唯一的，不管多少个节点，它们使用的都是同样的计时器和计数器，因此可以做到非常精准的流控。
+
+另外，可以使用Redis+Lua或者Nginx+Lua来实现。因为Redis是单线程模型，能确保限流服务是线程安全的。
+
 
 
 ## 分布式事务、分布式锁
