@@ -187,13 +187,81 @@ management:
    ![](/images/statsd-graphite-grafana.png)
 
 ## 弹性服务与容错处理
- - 弹性服务
- - 服务降级
- - 线程池/信号隔离
- - 快速解决依赖隔离
+### Hystrix架构设计
+  - 弹性服务
+    - Hystrix可以为分布式服务提供弹性保护，通过命令模式封装调用，来实现弹性保护，继承HystrixCommand并且实现run方法，就完成了最简单的封装。
+    - 实现getFallBack方法可以为熔断或者异常提供后备处理方法。
+  - 服务降级
+    - 提供熔断器组件,可以自动运行或手动调用,停止当前依赖一段时间(10秒)，熔断器默认 错误 率阈值为50%,超过将自动运行。
+  - 线程池/信号隔离
+    - 为每个依赖提供一个小的线程池（或信号），如果线程池已满调用将被立即拒绝，默认不采用排队.加速失败判定时间。
+  - 快速解决依赖隔离
+    - 可配置依赖调用 超时 时间,超时时间一般设为比99.5%平均时间略高即可.当调用超时时，直接返回或执行fallback逻辑。
+
+
+弹性服务与容错处理的本质就是指使用命令模式（如HystrixCommand）包装依赖调用逻辑，每个命令在单独线程中/信号授权下执行。
 
  ![](/images/service-resillence.png)
  [Hystrix架构设计](/Hystrix/)
+### 单个应用的熔断监控
+
+代码参见： https://github.com/osswangxining/resilience-dependencyisolation-spring-boot
+
+在使用Spring Boot添加依赖时，需要注意spring-boot-starter-actuator，否则就不能访问hystrix的一些endpoint，如：
+- 提供hystrix 监控界面的http://{ip}:{port}/hystrix
+- 以及返回流式数据的API： http://{ip}:{port}/hystrix.stream 等。
+
+```
+<dependency>
+	<groupId>org.springframework.cloud</groupId>
+	<artifactId>spring-cloud-starter-hystrix</artifactId>
+</dependency>
+<dependency>
+	<groupId>org.springframework.cloud</groupId>
+	<artifactId>spring-cloud-starter-hystrix-dashboard</artifactId>
+</dependency>
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+```
+
+#### Turbine
+在复杂的分布式系统中，相同服务的节点经常需要部署上百甚至上千个，很多时候，运维人员希望能够把相同服务的节点状态以一个整体集群的形式展现出来，这样可以更好的把握整个系统的状态。 为此，Netflix提供了一个开源项目（Turbine）来提供把多个hystrix.stream的内容聚合为一个数据源供Dashboard展示。
+
+- 添加依赖, 包括2个trubine相关的依赖：
+```
+<dependency>
+		<groupId>org.springframework.cloud</groupId>
+		<artifactId>spring-cloud-starter-turbine</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>org.springframework.cloud</groupId>
+		<artifactId>spring-cloud-netflix-turbine</artifactId>
+	</dependency>
+```
+
+代码参见： https://github.com/osswangxining/resilience-dependencyisolation-spring-boot
+
+- 配置文件
+```
+spring.application.name=hystrix-dashboard-turbine
+server.port=6688
+turbine.appConfig=node01,node02
+turbine.aggregator.clusterConfig= default
+turbine.clusterNameExpression= new String("default")
+turbine.combine-host-port=true
+```
+
+  - turbine.appConfig ：配置Eureka中的serviceId列表，表明监控哪些服务
+  - turbine.aggregator.clusterConfig ：指定聚合哪些集群，多个使用”,”分割，默认为default。可使用http://.../turbine.stream?cluster={clusterConfig之一}访问
+  - turbine.clusterNameExpression ：参数指定了集群名称为default，当我们服务数量非常多的时候，可以启动多个Turbine服务来构建不同的聚合集群，而该参数可以用来区分这些不同的聚合集群，同时该参数值可以在Hystrix仪表盘中用来定位不同的聚合集群，只需要在Hystrix Stream的URL中通过cluster参数来指定；
+  - turbine.combine-host-port参数设置为true，可以让同一主机上的服务通过主机名与端口号的组合来进行区分，默认情况下会以host来区分不同的服务，这会使得在本地调试的时候，本机上的不同服务聚合成一个服务来统计。
+
+- 默认情况下是通过HTTP收集聚合
+
+- 此外可以通过消息代理收集聚合
+  - 可以将所有需要收集的监控信息都输出到消息代理中，然后Turbine服务再从消息代理中异步的获取这些监控信息，最后将这些监控信息聚合并输出到Hystrix Dashboard中。
 
 ### 流量控制
 ![](/images/rate-limiter.png)
