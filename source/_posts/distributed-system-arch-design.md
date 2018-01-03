@@ -288,11 +288,15 @@ private RateLimiter rateLimiter = RateLimiter.create(400);//400表示每秒允�
 
 ## 分布式事务、分布式锁
 ### 分布式事务
+分布式事务本质上是依赖于可靠的分布式消息系统，以及本地的数据库事务共同完成的。
+
  ![](/images/distributed-transaction-1.png)
+
  ![](/images/distributed-transaction-2.png)
 
 ### 分布式锁
   - [分布式锁](/distributed-lock/)
+
   ![](/images/distributed-lock.png)
 
 ## 分布式存储与计算
