@@ -175,7 +175,7 @@ management:
   - Zipkin
   - SpringCloud Sleuth
 
-  ![](/images/distributed-tracing.png)
+  ![分布式链路追踪](/images/distributed-tracing.png)
 
   [Zipkin](/zipkin/) is a distributed tracing system. It helps gather timing data needed to troubleshoot latency problems in microservice architectures. It manages both the collection and lookup of this data. Zipkin’s design is based on the Google Dapper paper.
 
