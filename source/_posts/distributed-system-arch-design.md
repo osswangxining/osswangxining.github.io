@@ -153,14 +153,23 @@ management:
   - Netflix Ribbon（Spring Cloud）
   - [Kubernetes Service](/kubernetes/#service)
 
-  [Client Side Load Balancing](/consul/)
+  客户端负载均衡的常用算法如下：
+    - 1.Round Robbin（轮询）
+      - 最古老的算法最可信的算法，缺点是有状态，必须在并发之下记住上一次到谁了。
+    - 2.Random（随机）
+      - 最简单的，无状态的算法。
+    - 3.Least Load（最小负载）
+      - 可以实现某种程度上的智能调节。具体的实现包括最少在途请求数（发出去了还没收到应答的请求），最少并发连接数，最小平均响应时间等等。
+    - 4.Hash （参数哈希）
+      - 根据参数进行哈希，一来有分区的效果（参见单元化架构，可改善数据库连接，缓存热度等），二来可以Stick Session（可本机进行防刷运算等）
 
 ### API网关与智能路由
   - Netflix Zuul（SpringCloud）
   - [Kubernetes Service](/kubernetes/#service)
   - [Kubernetes Ingress](/kubernetes-ingress/)
 
-  [Gateway](/gateway/)
+  [Gateway]
+  ![zuul](/images/gateway-filters.png)
 
 ## 分布式系统链路追踪
   - Zipkin
