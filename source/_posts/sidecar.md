@@ -56,14 +56,15 @@ Zuul代理会自动为每个在Eureka注册中心上的服务添加路由到 /se
 如果你用的不是Eureka，譬如使用了consul, 实现有所不同。
 
 ## Spring Cloud Consul Sidecar
-官方并没有提供spring cloud consul Sidecar, 下面会讲述一下如何定制实现该功能。
+官方并没有提供spring cloud consul Sidecar, **是因为在大多数情况下，是通过本地代理的方式来连接Consul的，这个本地代理本身就是一个sidecar。这与netflix Eureka是不同的。**
+下面会讲述一下假如仍然基于consul去打造一个类似于eureka的sidecar，如何定制实现该功能。
 直接上代码先。
 
 ![](/images/spring-cloud-consul-sidecar-project.png)
 
-代码地址：https://github.com/osswangxining/spring-cloud-consul/spring-cloud-consul-sidecar
+代码地址：https://github.com/osswangxining/spring-cloud-consul-sidecar/tree/master/spring-cloud-consul-sidecar
 
-使用该Sidecar的例子： https://github.com/osswangxining/spring-cloud-consul/spring-cloud-consul-sample
+使用该Sidecar的例子： https://github.com/osswangxining/spring-cloud-consul-sidecar/tree/master/spring-cloud-consul-sample
 
 下面不打算写太多文字了，直接看代码吧。
 
