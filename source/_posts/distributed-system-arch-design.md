@@ -36,7 +36,33 @@ Spring Cloud Config主要是为了分布式系统的外部配置提供了服务�
 - Config Server: 是一个看横向扩展的，集中式的配置服务器，它用于集中管理应用程序各个环境下配置，默认使用Git存储配置内容。
 - Config Client: 是一个Config Server的客户端，用于操作存储在Config Server上的配置属性，所有微服务都指向Config Server,启动的时候会请求它获取所需要的配置属性，然后缓存这些属性以提高性能。
 
-尽管使用/refresh 端点手动刷新配置，但是如果所有微服务节点的配置都需要手动去刷新的话，那必然是一个繁琐的工作，并且随着系统的不断扩张，会变得越来越难以维护。因此，实现配置的自动刷新是很有必要的，本节我们讨论使用Spring Cloud Bus实现配置的自动刷新。
+尽管使用/refresh 端点手动刷新配置，但是如果所有微服务节点的配置都需要手动去刷新的话，那必然是一个繁琐的工作，并且随着系统的不断扩张，会变得越来越难以维护。因此，实现配置的自动刷新是很有必要的，Spring Cloud Bus实现配置的自动刷新机制是一旦接收到RefreshEvent，就会启动ContextRefresher.refresh。
+#### RefreshEventListener
+```
+public class RefreshEventListener {
+	private static Log log = LogFactory.getLog(RefreshEventListener.class);
+	private ContextRefresher refresh;
+	private AtomicBoolean ready = new AtomicBoolean(false);
+
+	public RefreshEventListener(ContextRefresher refresh) {
+		this.refresh = refresh;
+	}
+
+	@EventListener
+	public void handle(ApplicationReadyEvent event) {
+		this.ready.compareAndSet(false, true);
+	}
+
+	@EventListener
+	public void handle(RefreshEvent event) {
+		if (this.ready.get()) { // don't handle events before app is ready
+			log.debug("Event received " + event.getEventDesc());
+			Set<String> keys = this.refresh.refresh();
+			log.info("Refresh keys changed: " + keys);
+		}
+	}
+}
+```
 Spring Cloud Bus提供了批量刷新配置的机制，它使用轻量级的消息代理（例如RabbitMQ、Kafka等）连接分布式系统的节点，这样就可以通过Spring Cloud Bus广播配置的变化或者其他的管理指令。
 ![](/images/spring-config-server-client-bus.png)
 
