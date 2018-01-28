@@ -84,7 +84,7 @@ Mixer的配置有几个中心职责：
 - **适配器** 封装了Mixer和特定基础设施后端之间的接口。
 - **模板** 定义了从特定请求的属性到适配器输入的映射关系。一个适配器可以支持任意数量的模板。
 
-![operator, adapter and template devs](/images/operator%20template%20adapter%20dev.svg)
+![operator, adapter and template devs](/images/operator-template-adapter-dev.svg)
 
 ### Pilot (原Istio-Manager)
 Pilot负责收集和验证配置并将其传播到各种Istio组件。它从Mixer和Envoy中抽取环境特定的实现细节，为他们提供用户服务的抽象表示，独立于底层平台。此外，流量管理规则（即通用4层规则和7层HTTP/gRPC路由规则）可以在运行时通过Pilot进行编程。
