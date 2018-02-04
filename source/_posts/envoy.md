@@ -214,7 +214,7 @@ frontproxy_service2_1      /bin/sh -c /usr/local/bin/ ...   Up      80/tcp
 ```
 
 ## 路由规则解析
-### front-envoy.yaml文件
+### envoy配置文件
 front-envoy.yaml文件如下定义：
 ```
 static_resources:
@@ -275,6 +275,51 @@ admin:
 
 ```
 
+service-envoy.yaml文件如下定义：
+```
+static_resources:
+  listeners:
+  - address:
+      socket_address:
+        address: 0.0.0.0
+        port_value: 80
+    filter_chains:
+    - filters:
+      - name: envoy.http_connection_manager
+        config:
+          codec_type: auto
+          stat_prefix: ingress_http
+          route_config:
+            name: local_route
+            virtual_hosts:
+            - name: service
+              domains:
+              - "*"
+              routes:
+              - match:
+                  prefix: "/service"
+                route:
+                  cluster: local_service
+          http_filters:
+          - name: envoy.router
+            config: {}
+  clusters:
+  - name: local_service
+    connect_timeout: 0.25s
+    type: strict_dns
+    lb_policy: round_robin
+    hosts:
+    - socket_address:
+        address: 127.0.0.1
+        port_value: 8080
+admin:
+  access_log_path: "/dev/null"
+  address:
+    socket_address:
+      address: 0.0.0.0
+      port_value: 8081
+
+```
 ### 测试Envoy的路由能力
 
 测试service1：
@@ -332,5 +377,106 @@ Hello from behind Envoy (service 2)! hostname: 6abdb62aa858 resolvedhostname: 17
 >    prefix: "/service/2"
 >  route:
 >    cluster: service2
+
+```
+
+
+### 测试Envoy的负载均衡能力
+针对service1进行扩容，增加到3个container：
+```
+$ docker-compose up --scale service1=3
+$ docker-compose ps
+          Name                        Command               State                      Ports
+----------------------------------------------------------------------------------------------------------------
+frontproxy_front-envoy_1   /bin/sh -c /usr/local/bin/ ...   Up      0.0.0.0:8000->80/tcp, 0.0.0.0:8001->8001/tcp
+frontproxy_service1_1      /bin/sh -c /usr/local/bin/ ...   Up      80/tcp
+frontproxy_service1_2      /bin/sh -c /usr/local/bin/ ...   Up      80/tcp
+frontproxy_service1_3      /bin/sh -c /usr/local/bin/ ...   Up      80/tcp
+frontproxy_service2_1      /bin/sh -c /usr/local/bin/ ...   Up      80/tcp
+
+
+$ docker ps
+CONTAINER ID        IMAGE                    COMMAND                  CREATED              STATUS              PORTS                                          NAMES
+06f3c0d14b1a        frontproxy_service1      "/bin/sh -c /usr/loc…"   About a minute ago   Up About a minute   80/tcp                                         frontproxy_service1_2
+658f44d72f00        frontproxy_service1      "/bin/sh -c /usr/loc…"   About a minute ago   Up About a minute   80/tcp                                         frontproxy_service1_3
+326cdcbf4dcf        frontproxy_service1      "/bin/sh -c /usr/loc…"   3 hours ago          Up 3 hours          80/tcp                                         frontproxy_service1_1
+b8bbdc349469        frontproxy_front-envoy   "/bin/sh -c '/usr/lo…"   3 hours ago          Up 3 hours          0.0.0.0:8001->8001/tcp, 0.0.0.0:8000->80/tcp   frontproxy_front-envoy_1
+6abdb62aa858        frontproxy_service2      "/bin/sh -c /usr/loc…"   3 hours ago          Up 3 hours          80/tcp                                         frontproxy_service2_1
+
+```
+
+连续访问多次service1，会看到3个不同的容器会被轮询调用：
+```
+Xis-MacBook-Pro:front-proxy xiningwang$ curl -v $(docker-machine ip default):8000/service/1
+*   Trying 192.168.99.101...
+* TCP_NODELAY set
+* Connected to 192.168.99.101 (192.168.99.101) port 8000 (#0)
+> GET /service/1 HTTP/1.1
+> Host: 192.168.99.101:8000
+> User-Agent: curl/7.54.0
+> Accept: */*
+>
+< HTTP/1.1 200 OK
+< content-type: text/html; charset=utf-8
+< content-length: 89
+< server: envoy
+< date: Sun, 04 Feb 2018 10:05:18 GMT
+< x-envoy-upstream-service-time: 4
+<
+Hello from behind Envoy (service 1)! hostname: 658f44d72f00 resolvedhostname: 172.18.0.5
+* Connection #0 to host 192.168.99.101 left intact
+Xis-MacBook-Pro:front-proxy xiningwang$ curl -v $(docker-machine ip default):8000/service/1
+*   Trying 192.168.99.101...
+* TCP_NODELAY set
+* Connected to 192.168.99.101 (192.168.99.101) port 8000 (#0)
+> GET /service/1 HTTP/1.1
+> Host: 192.168.99.101:8000
+> User-Agent: curl/7.54.0
+> Accept: */*
+>
+< HTTP/1.1 200 OK
+< content-type: text/html; charset=utf-8
+< content-length: 89
+< server: envoy
+< date: Sun, 04 Feb 2018 10:05:22 GMT
+< x-envoy-upstream-service-time: 3
+<
+Hello from behind Envoy (service 1)! hostname: 06f3c0d14b1a resolvedhostname: 172.18.0.6
+* Connection #0 to host 192.168.99.101 left intact
+Xis-MacBook-Pro:front-proxy xiningwang$
+Xis-MacBook-Pro:front-proxy xiningwang$ curl -v $(docker-machine ip default):8000/service/1
+*   Trying 192.168.99.101...
+* TCP_NODELAY set
+* Connected to 192.168.99.101 (192.168.99.101) port 8000 (#0)
+> GET /service/1 HTTP/1.1
+> Host: 192.168.99.101:8000
+> User-Agent: curl/7.54.0
+> Accept: */*
+>
+< HTTP/1.1 200 OK
+< content-type: text/html; charset=utf-8
+< content-length: 89
+< server: envoy
+< date: Sun, 04 Feb 2018 10:05:26 GMT
+< x-envoy-upstream-service-time: 2
+<
+Hello from behind Envoy (service 1)! hostname: 326cdcbf4dcf resolvedhostname: 172.18.0.3
+* Connection #0 to host 192.168.99.101 left intact
+```
+
+
+可以看到，多次请求会被路由到后端的不同容器上。这种负载均衡能力正是Envoy所擅长提供的，而是是以一种非常灵活的配置方式来提供可变的路由匹配路径。
+本例子中，front-envoy.yaml文件中包括了如下的负载均衡规则：
+```
+clusters:
+ - name: service1
+   connect_timeout: 0.25s
+   type: strict_dns
+   lb_policy: round_robin
+   http2_protocol_options: {}
+   hosts:
+   - socket_address:
+       address: service1
+       port_value: 80
 
 ```
