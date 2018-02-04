@@ -84,6 +84,71 @@ Mixer的配置有几个中心职责：
 - **适配器** 封装了Mixer和特定基础设施后端之间的接口。
 - **模板** 定义了从特定请求的属性到适配器输入的映射关系。一个适配器可以支持任意数量的模板。
 
+配置使用YAML格式来表示,围绕几个核心抽象构建：
+<| 概念           | 描述           |
+| :------------- | :------------- |
+| Handler        | Handlers就是一个配置完成的适配器。适配器的构造器参数就是Handler的配置。   |
+| 实例            | 一个（请求）实例就是请求属性到一个模板的映射结果。这种映射来自于实例的配置。 |
+| 规则            |规则确定了何时使用一个特定的模板配置来调用一个Handler                    |
+
+#### Handler
+适配器封装了Mixer和特定外部基础设施后端进行交互的必要接口，例如Prometheus、New Relic或者Stackdriver。各种适配器都需要参数配置才能工作。例如日志适配器可能需要IP地址和端口来进行日志的输出。
+
+这里的例子配置了一个类型为 listchecker 的适配器。listchecker适配器使用一个列表来检查输入。如果配置的是白名单模式且输入值存在于列表之中，就会返回成功的结果。
+```
+apiVersion: config.istio.io/v1alpha2
+kind: listchecker
+metadata:
+  name: staticversion
+  namespace: istio-system
+spec:
+  providerUrl: http://white_list_registry/
+  blacklist: false
+```
+ > {metadata.name}.{kind}.{metadata.namespace} 是Handler的完全限定名
+
+#### 实例
+配置实例将请求中的属性映射成为适配器的输入, 注意Handler配置中需要的所有维度都定义在这一映射之中。
+```
+apiVersion: config.istio.io/v1alpha2
+kind: metric
+metadata:
+  name: requestduration
+  namespace: istio-system
+spec:
+  value: response.duration | "0ms"
+  dimensions:
+    destination_service: destination.service | "unknown"
+    destination_version: destination.labels["version"] | "unknown"
+    response_code: response.code | 200
+  monitored_resource_type: '"UNSPECIFIED"'
+```
+
+#### 规则
+规则用于指定使用特定实例配置调用某一Handler的时机。比如我们想要把 service1 服务中，请求头中带有 x-user 的请求的 requestduration 指标发送给Prometheus Handler:
+```
+apiVersion: config.istio.io/v1alpha2
+kind: rule
+metadata:
+  name: promhttp
+  namespace: istio-system
+spec:
+  match: destination.service == "service1.ns.svc.cluster.local" && request.headers["xuser"] == "user1"
+  actions:
+  - handler: handler.prometheus
+    instances:
+    - requestduration.metric.istio-system
+```
+
+#### Adapter适配器定制开发
+- Go开发环境
+如果缺少依赖的库，执行如下命令:
+
+```
+go get -u github.com/golang/dep/cmd/dep
+```
+
+
 ![operator, adapter and template devs](/images/operator-template-adapter-dev.svg)
 
 ### Pilot (原Istio-Manager)
@@ -132,15 +197,6 @@ spec:
 - **discovery service** 实现了envoy的服务发现API，从而可以发布信息到envoy代理；
 
 这儿不得不提的是pilot的 **proxy injection** 能力，你可能已经想到了它是基于iptable规则来实现的。这样所有的服务交互都会被pilot捕获并重新转发。
-
-#### adapter定制开发
-- Go开发环境
-如果缺少依赖的库，执行如下命令:
-
-```
-go get -u github.com/golang/dep/cmd/dep
-```
-
 
 ### Istio-Auth
 提供服务间以及用户之间的认证,确保不需要修改服务code的前提下增强服务之间的安全性. 主要包括以下3个组件:
