@@ -195,6 +195,51 @@ spec:
 针对envoy，istio当前提供了2个组件：
 - **proxy agent** 一套用于从抽象服务模型和规则配置生成envoy配置信息的脚本命令，同时也会触发proxy的重启；
 - **discovery service** 实现了envoy的服务发现API，从而可以发布信息到envoy代理；
+```
+GET /v1/registration/(string: service_name)
+
+请求发现服务返回指定`service_name`的所有主机, 返回以下JSON格式的响应：
+{
+  "hosts": []
+}
+
+const std::string Json::Schema::SDS_SCHEMA(R"EOF(
+  {
+    "$schema": "http://json-schema.org/schema#",
+    "definitions" : {
+      "host" : {
+        "type" : "object",
+        "properties" : {
+          "ip_address" : {"type" : "string"},
+          "port" : {"type" : "integer"},
+          "tags" : {
+            "type" : "object",
+            "properties" : {
+              "az" : {"type" : "string"},
+              "canary" : {"type" : "boolean"},
+              "load_balancing_weight": {
+                "type" : "integer",
+                "minimum" : 1,
+                "maximum" : 100
+              }
+            }
+          }
+        },
+        "required" : ["ip_address", "port"]
+      }
+    },
+    "type" : "object",
+    "properties" : {
+      "hosts" : {
+        "type" : "array",
+        "items" : {"$ref" : "#/definitions/host"}
+      }
+    },
+    "required" : ["hosts"]
+  }
+  )EOF");
+```  
+
 
 这儿不得不提的是pilot的 **proxy injection** 能力，你可能已经想到了它是基于iptable规则来实现的。这样所有的服务交互都会被pilot捕获并重新转发。
 
