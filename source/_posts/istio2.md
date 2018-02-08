@@ -147,7 +147,7 @@ spec:
 ```
 go get -u github.com/golang/dep/cmd/dep
 ```
-
+将会在另外文章中详细介绍如何定制化开发适配器，此处不做赘述。
 
 ![operator, adapter and template devs](/images/operator-template-adapter-dev.svg)
 
@@ -195,10 +195,11 @@ spec:
 针对envoy，istio当前提供了2个组件：
 - **proxy agent** 一套用于从抽象服务模型和规则配置生成envoy配置信息的脚本命令，同时也会触发proxy的重启；
 - **discovery service** 实现了envoy的服务发现API，从而可以发布信息到envoy代理；
+
 ```
 GET /v1/registration/(string: service_name)
 
-请求发现服务返回指定`service_name`的所有主机, 返回以下JSON格式的响应：
+请求发现服务返回指定service_name的所有主机, 返回以下JSON格式的响应：
 {
   "hosts": []
 }
@@ -551,3 +552,5 @@ rules:
       blacklist: false
       checkExpression: source.labels["version"]
 ```
+## 结论
+本文主要从概念、架构到每个组件原理介绍了istio，作为一个用于连接、管理以及安全化微服务的开放平台, istio的确提供了一种简单的方式用于创建微服务网络。后续将会提供一系列的文章分别介绍具体的案例以及涉及的核心技术。
