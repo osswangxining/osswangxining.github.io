@@ -240,7 +240,8 @@ func resourceKafkaTopic() *schema.Resource {
 其中，
 - 里面最关键的逻辑就是CRUD部分，它会调用Kafka Go SDK API来管理topic；
 - Schema部分使用逻辑跟上述provider中使用Schema的方式是一样的，里面定义的变量是跟你最终定义terraform tf文件的结果保持一致的。例如，我们例子中的sample文件：
-```
+
+```hcl
 resource "kafka_topic" "my_test_topic" {
   name               = "my_test_topic"
   replication_factor = 1
