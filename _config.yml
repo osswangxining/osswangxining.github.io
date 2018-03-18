@@ -17,6 +17,13 @@ root: /
 permalink: :title/
 permalink_defaults:
 
+# Code highlight theme
+# available: normal | night | night eighties | night blue | night bright
+highlight_theme: night bright
+
+# Fancybox for image gallery
+fancybox: true
+
 # Directory
 source_dir: source
 public_dir: public
