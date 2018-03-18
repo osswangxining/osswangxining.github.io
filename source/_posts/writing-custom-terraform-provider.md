@@ -275,3 +275,10 @@ func main() {
 ```
 go build -o terraform-provider-kafka
 ```
+
+
+## 源代码 & TODO
+到这儿你可能已经明白了如何搭建一个定制的Terraform Provider, 我想你也一定认为一个provider的复杂逻辑其实是取决于你要管理的resource的CRUD的逻辑。
+本文中的resource是指kafka中的topic，逻辑不是很复杂，但一点我们没有提及的是security - 也就是说，如果kafka enable了ssl，那么管理topic的client API也需要相应地加上credential信息。
+
+最后，完整的源代码@ https://github.com/osswangxining/terraform-provider-kafka
