@@ -19,7 +19,6 @@ permalink_defaults:
 
 # Code highlight theme
 # available: normal | night | night eighties | night blue | night bright
-highlight_theme: "night bright"
 scheme: Gemini
 avatar: /images/bio.png
 # Fancybox for image gallery
@@ -27,11 +26,6 @@ fancybox: true
 
 # Specify the date when the site was setup
 since: 2013
-menu:
-    home: /
-    archives: /archives
-    tags: /tags
-    categories: /categories
 
 
 # Directory
