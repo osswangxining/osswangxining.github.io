@@ -124,3 +124,60 @@ xis-macbook-pro:kafka xiningwang$ go test -v
 PASS
 ok      github.com/terraform-providers/terraform-provider-kafka/kafka   0.020s
 ```
+
+### Schema
+我们的例子中Schema定义了2个变量，分别是TypeList类型的bootstrap_servers和TypeInt类型的timeout。
+其中，前者是required,后者则是optional.
+
+```
+Schema: map[string]*schema.Schema{
+	"bootstrap_servers": &schema.Schema{
+		Type:        schema.TypeList,
+		Elem:        &schema.Schema{Type: schema.TypeString},
+		Required:    true,
+		Description: "The list of kafka brokers",
+	},
+	"timeout": &schema.Schema{
+		Type:        schema.TypeInt,
+		Required:    false,
+		Optional:    true,
+		Default:     90,
+		Description: "Timeout in seconds",
+	},
+},
+```
+
+### providerConfigure
+接下来，就是获取Schema中定义的变量值，创建管理resource的Client API.
+
+```
+func providerConfigure(d *schema.ResourceData) (interface{}, error) {
+	var brokers *[]string
+
+	if brokersRaw, ok := d.GetOk("bootstrap_servers"); ok {
+		brokerI := brokersRaw.([]interface{})
+		log.Printf("[DEBUG] configuring provider with Brokers of size %d", len(brokerI))
+		b := make([]string, len(brokerI))
+		for i, v := range brokerI {
+			b[i] = v.(string)
+		}
+		log.Printf("[DEBUG] b of size %d", len(b))
+		brokers = &b
+	} else {
+		log.Printf("[ERROR] something wrong? %v , ", d.Get("timeout"))
+		return nil, fmt.Errorf("brokers was not set")
+	}
+
+	log.Printf("[DEBUG] configuring provider with Brokers @ %v", brokers)
+	timeout := d.Get("timeout").(int)
+
+	config := &Config{
+		BootstrapServers: brokers,
+		Timeout:          timeout,
+	}
+
+	log.Printf("[DEBUG] Config @ %v", config)
+
+	return NewClient(config)
+}
+```
