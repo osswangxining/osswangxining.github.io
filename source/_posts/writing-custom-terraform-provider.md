@@ -49,9 +49,9 @@ resource "kafka_topic" "my_test_topic" {
 当然，这些部分也不是必须的，例如import_<resource_name>.go，data_source_<resource_name>.go等在本文的例子中就没有用到。具体还是取决于你要实现的Provider逻辑本身。
 
 ## The provider
-实现一个Terraform provider,首先需要做的就是实现一个 [terraform.ResourceProvider]（https://godoc.org/github.com/hashicorp/terraform/helper/schema#Provider）
+实现一个Terraform provider,首先需要做的就是实现一个 [terraform.ResourceProvider](https://godoc.org/github.com/hashicorp/terraform/helper/schema#Provider)
 
-```
+```go
 // File : provider.go
 package kafka
 
@@ -79,7 +79,8 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 - ConfigureFunc：提供了实例化、配置客户端API调用的函数；
 
 相应地，我们提供了一个provider测试的如下代码：
-```
+
+```go
 // File : provider_test.go
 package kafka
 
@@ -129,7 +130,7 @@ ok      github.com/terraform-providers/terraform-provider-kafka/kafka   0.020s
 我们的例子中Schema定义了2个变量，分别是TypeList类型的bootstrap_servers和TypeInt类型的timeout。
 其中，前者是required,后者则是optional.
 
-```
+```go
 Schema: map[string]*schema.Schema{
 	"bootstrap_servers": &schema.Schema{
 		Type:        schema.TypeList,
@@ -150,7 +151,7 @@ Schema: map[string]*schema.Schema{
 ### providerConfigure
 接下来，就是获取Schema中定义的变量值，创建管理resource的Client API.
 
-```
+```go
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	var brokers *[]string
 
@@ -180,4 +181,97 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 
 	return NewClient(config)
 }
+```
+
+## Resource
+当然，Terraform Provider最精彩的部分其实是resource的CRUD逻辑，也就是这个部分要讲述的内容。
+
+```go
+package kafka
+
+import (
+	"fmt"
+	"log"
+	"time"
+
+	"github.com/hashicorp/terraform/helper/resource"
+	"github.com/hashicorp/terraform/helper/schema"
+)
+
+func resourceKafkaTopic() *schema.Resource {
+	return &schema.Resource{
+		Create: topicCreate,
+		Read:   topicRead,
+		Update: topicUpdate,
+		Delete: topicDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+		CustomizeDiff: customPartitionDiff,
+		Schema: map[string]*schema.Schema{
+			"name": {
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
+				Description: "The name of the topic",
+			},
+			"partitions": {
+				Type:        schema.TypeInt,
+				Required:    true,
+				Description: "number of partitions",
+			},
+			"replication_factor": {
+				Type:        schema.TypeInt,
+				Required:    true,
+				ForceNew:    true,
+				Description: "number of replicas",
+			},
+			"config": {
+				Type:        schema.TypeMap,
+				Optional:    true,
+				ForceNew:    false,
+				Description: "A map of string k/v attributes",
+			},
+		},
+	}
+}
+```
+
+其中，
+- 里面最关键的逻辑就是CRUD部分，它会调用Kafka Go SDK API来管理topic；
+- Schema部分使用逻辑跟上述provider中使用Schema的方式是一样的，里面定义的变量是跟你最终定义terraform tf文件的结果保持一致的。例如，我们例子中的sample文件：
+```
+resource "kafka_topic" "my_test_topic" {
+  name               = "my_test_topic"
+  replication_factor = 1
+  partitions         = 1
+
+  config = {
+    "segment.ms"   = "4000"
+    "retention.ms" = "86400000"
+  }
+}
+```
+
+## 编译与运行
+创建main.go,如下:
+
+```go
+package main
+
+import (
+	"github.com/hashicorp/terraform/plugin"
+	"github.com/terraform-providers/terraform-provider-kafka/kafka"
+)
+
+func main() {
+	plugin.Serve(&plugin.ServeOpts{
+		ProviderFunc: kafka.Provider})
+}
+```
+
+编译：
+
+```
+go build -o terraform-provider-kafka
 ```
