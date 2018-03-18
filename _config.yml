@@ -20,7 +20,7 @@ permalink_defaults:
 # Code highlight theme
 # available: normal | night | night eighties | night blue | night bright
 highlight_theme: night bright
-
+scheme: Gemini
 avatar: /images/bio.png
 
 # Fancybox for image gallery
