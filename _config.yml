@@ -21,6 +21,8 @@ permalink_defaults:
 # available: normal | night | night eighties | night blue | night bright
 highlight_theme: night bright
 
+avatar: /images/bio.png
+
 # Fancybox for image gallery
 fancybox: true
 
