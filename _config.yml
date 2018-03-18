@@ -34,9 +34,6 @@ menu:
     categories: /categories
 
 
-# Fancybox for image gallery
-fancybox: true
-
 # Directory
 source_dir: source
 public_dir: public
