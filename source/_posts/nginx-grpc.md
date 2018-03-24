@@ -211,3 +211,39 @@ $ docker logs mynginx4grpc
 172.17.0.1 - - [24/Mar/2018:14:27:15 +0000] "POST /Calculator/Calculate HTTP/2.0" 200 14 "-" "grpc-java-netty/1.10.0" "-"
 172.17.0.1 - - [24/Mar/2018:14:27:15 +0000] "POST /Calculator/Calculate HTTP/2.0" 200 14 "-" "grpc-java-netty/1.10.0" "-"
 ```
+
+## NGINX其他关于gRPC的支持
+关于加密 gRPC 流量，在 NGINX 配置中，需要更改用于将 gRPC 流量代理到上游服务器的协议：grpcs。
+
+![路由 gRPC 流量](https://cdn-1.wp.nginx.com/wp-content/uploads/2018/03/grpc-nginx-routing.png)
+
+
+如果有多个 gRPC 服务，每个服务都由不同的服务器应用程序实现。使用 NGINX，您可以识别服务和方法，然后使用位置指令路由流量。 可能你已经推断出每个 gRPC 请求的 URL 是从 proto 规范中的包，服务和方法名称派生的。 如下：
+
+```protobuf
+
+service Calculator {
+  // calculate
+  rpc Calculate(CalculatorRequest) returns (CalculatorResponse) {}
+}
+
+....
+"POST /Calculator/Calculate HTTP/2.0" 200
+....
+```
+因此，使用 NGINX 路由流量非常简单：
+
+```nginx
+upstream grpcservers {
+    server 192.168.1.3:6565;
+    server 192.168.1.4:6565;
+}
+
+location /Calculator/Calculate {
+    grpc_pass grpc://grpcservers;
+}
+
+location /Greeter/SayHello {
+    grpc_pass grpc://192.168.1.4:6565;
+}
+```
