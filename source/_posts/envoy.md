@@ -12,7 +12,7 @@ tags:
   - 代理
 ---
 
-![](../images/shape-2622299_1920.jpg)
+![](../images/pixabay/shape-2622299_1920.jpg)
 图片来自https://pixabay.com
 
 ### Envoy是什么？

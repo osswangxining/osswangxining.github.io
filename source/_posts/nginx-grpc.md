@@ -12,7 +12,7 @@ tags:
   - 代理
 ---
 
-![](../images/wire-mesh-1117741_1280.jpg)
+![](../images/pixabay/wire-mesh-1117741_1280.jpg)
 图片来自https://pixabay.com
 
 ## Nginx支持gRPC服务集群
