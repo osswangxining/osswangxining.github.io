@@ -10,7 +10,7 @@ tags:
   - Terraform
 ---
 
-![](../images/pixabay/devops-3148393_1920.png)
+![](https://raw.githubusercontent.com/osswangxining/myimages/master/devops-3148393_1920.png)
 图片来自https://pixabay.com
 
 ## Terraform
