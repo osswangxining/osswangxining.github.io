@@ -23,6 +23,8 @@ first-network这个示例的场景是由两个组织组成Hyperledger Fabric的�
 
 使用Ubuntu16.04主机作为运行环境，已经安装好了docker和docker-compose。
 
+<!-- more -->
+
 ## 安装Hyperledger Fabric
 下载源码并解压缩：
 ```sh

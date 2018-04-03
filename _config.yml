@@ -5,7 +5,7 @@
 # Site
 title: Technical Blog
 subtitle: Welcome to my world! 有问题请osswangxining（at）163.com
-description: [专注于分布式高性能技术架构、IoT云平台、机器/深度学习]
+description: [专注于分布式高性能技术架构、容器|K8S、IoT云平台, 喜欢用Java(script)|Python|Go]
 author: Xi Ning Wang
 language: zh-Hans
 timezone: Asia/Shanghai
@@ -25,7 +25,6 @@ avatar: /images/bio.png
 fancybox: true
 
 # Specify the date when the site was setup
-since: 2013
 
 
 # Directory
@@ -88,7 +87,3 @@ search:
   field: post
   format: html
   limit: 10000
-
-auto_excerpt:
-  enable: true
-  length: 150
