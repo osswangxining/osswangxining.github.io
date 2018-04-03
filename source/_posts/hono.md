@@ -17,7 +17,7 @@ tags:
 ```
 socat TCP-LISTEN:1234,reuseaddr,fork UNIX-CONNECT:/var/run/docker.sock
 ```
-
+<!-- more -->
 启用Docker Swarm Mode:
 ```
 docker swarm init

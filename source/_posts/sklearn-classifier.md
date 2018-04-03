@@ -19,7 +19,7 @@ All models are wrong, but some models are useful. — George Box (Box and Draper
 
 下面是可能的效果图：
 ![](/images/sklearn-classifier-sample.png)
-
+<!-- more -->
 ## 数据分析（Exploratory Data Analysis）
 在选择具体的算法之前，最好对数据中每一个特征的模式和产生原理有一定的了解：
 - 特征是连续的（real-valued）还是离散的（discrete）？

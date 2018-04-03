@@ -11,6 +11,7 @@ tags:
 
 # Callable、Future和FutureTask
 无论是直接继承Thread，还是实现Runnable接口来创建线程，在执行完任务之后都无法获取执行结果。而自从Java 1.5开始，就提供了Callable和Future，通过它们可以在任务执行完毕之后得到任务执行结果。
+<!-- more -->
 ## Callable
 Callable位于java.util.concurrent包下，它也是一个接口，在它里面也只声明了一个方法call();
 ```

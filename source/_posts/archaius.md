@@ -12,6 +12,8 @@ tags:
 ### 配置动态管理
 配置的值无论是存在Consul、etcd或者其他地方，一旦改变，仍然需要一些额外的动作才能加载更新后的值，例如重启server等等。而使用了Archaius动态管理的机制，尤其配合上Spring，修改了consul上的配置信息后，相应的项目不需要重启，也会读到最新的值。
 
+<!-- more -->
+
 ```
 package com.microservice.config;
 

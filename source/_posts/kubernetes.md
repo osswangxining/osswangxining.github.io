@@ -21,7 +21,7 @@ Kubernetes集群包含两种类型的资源：
 
 当部署应用的时候，我们通知Master节点启动应用容器。然后Master会调度这些应用将它们运行在Node节点上面。Node节点和Master节点通过Master节点暴露的Kubernetes API通信。当然我们也可以直接通过这些API和集群交互。
 ![kubernetes Cluster](http://kubernetes.io/docs/tutorials/kubernetes-basics/public/images/module_01_cluster.svg)
-
+<!-- more -->
 ### Master
 Master节点上面主要由四个模块组成：APIServer、scheduler、controller manager、etcd。
 - APIServer

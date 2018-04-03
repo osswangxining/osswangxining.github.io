@@ -23,7 +23,7 @@ Terraform 是一个高度可扩展的工具，通过 Provider 来支持新的基
 怎么编写一个定制的Terraform provider, 官方网站给出了一定的开发指导，但略感简单。本文试图从零开始整理一遍整个开发的过程以及涉及的一些关键点。
 
 一个Terraform provider最基本的两个要素就是provider本身以及所涉及到的resource。
-
+<!-- more -->
 ```hcl
 provider "kafka" {
   bootstrap_servers = ["localhost:9092"]

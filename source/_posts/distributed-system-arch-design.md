@@ -15,6 +15,8 @@ tags:
 
 ![](/images/distributed-arch-design.png)
 
+<!-- more -->
+
 ## 分布式配置管理
   - [Consul](/consul) | etcd
   - [Archaius动态管理](/archaius)

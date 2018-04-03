@@ -14,7 +14,7 @@ date: 2017-4-9 20:46:25
   - The pre-built UI dashboard is not powerful shown as below, but can easily use it to view the metrics data;
   -  For production environment, Graphite server should be running as cluster instead of stand-alone server;
 
-
+<!-- more -->
 
 #3. Grafana - powerful dashboard for visualizing the metrics data
   - easy to integrate with Graphite to visualize the metrics data;

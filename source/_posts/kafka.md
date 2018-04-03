@@ -6,7 +6,7 @@ date: 2016-5-9 20:46:25
 ![](http://kafka.apache.org/images/logo.png)
 
 ### kafka
-
+<!-- more -->
 1. Kafka Connect
     - Overview (http://kafka.apache.org/documentation/#connect)
     - User Guide

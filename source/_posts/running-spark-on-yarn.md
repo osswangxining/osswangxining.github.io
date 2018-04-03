@@ -19,6 +19,6 @@ $ ./bin/spark-submit --class org.apache.spark.examples.SparkPi \
     lib/spark-examples*.jar \
     10
 ```
-
+<!-- more -->
 See the detail from:
 http://spark.apache.org/docs/latest/running-on-yarn.html

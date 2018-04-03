@@ -21,7 +21,7 @@ Rasa Core takes in structured input: intents and entities, button clicks, etc., 
 
 Rather than writing a bunch of if/else statements, a Rasa bot learns from real conversations. A probabilistic model chooses which action to take, and this can be trained using supervised, reinforcement, or interactive learning.
 
-
+<!-- more -->
 
 ## The Big Differences: IoT Versus Traditional System Data and Architecture
 

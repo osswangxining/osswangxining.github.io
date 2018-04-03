@@ -5,7 +5,7 @@ date: 2017-2-9 20:46:25
 
 ## HBase QuickStart
 HBase是一个开源的分布式存储系统。他可以看作是Google的Bigtable的开源实现。如同Google的Bigtable使用Google File System一样，HBase构建于和Google File System类似的Hadoop HDFS之上。
-
+<!-- more -->
 With the completed config, issue the command: bin/start-hbase.sh
 
 ```

@@ -24,7 +24,7 @@ tags:
 Kubernetes会自动创建包含证书信息的Secret，并且使用它来访问api, Kubernetes也将自动修改pod来使用这个Secret。
 
 自动创建的Secret以及所使用的api证书,可以根据需要disable或者override。如果仅仅需要安全访问apiserver，那么上述的流程是推荐的方式。
-
+<!-- more -->
 ## 自定义Secrets
 ### 通过kubectl自定义Secrets
 数据中的字段为map类型。其中keys必须符合dns_subdomain规则，values可以为任意类型，使用base64编码。上述例子中，username和password的数据值在base64编码前的值为value-1 和 value-2。

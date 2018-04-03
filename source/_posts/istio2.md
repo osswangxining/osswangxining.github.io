@@ -26,7 +26,7 @@ Istio从架构上看,主要分为2个部分,即:
 - 数据面板: 由一系列的智能代理(Envoy)构成,用于仲裁和控制服务之间的网络交互;
 
 ![Istio Arch](/images/istio-arch.png)
-
+<!-- more -->
 ### Envoy
 Built-in features:
 - dynamic service discovery,

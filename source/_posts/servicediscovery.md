@@ -10,3 +10,4 @@ tags:
 ---
 
 ![servicediscovery](/images/servicediscovery.png)
+<!-- more -->

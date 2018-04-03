@@ -32,7 +32,7 @@ Execute the following commands to unpack 4.2.0 source release and build the bina
   > tail -f ~/logs/rocketmqlogs/broker.log
   The broker[%s, 172.30.30.233:10911] boot success...
 ```
-
+<!-- more -->
 #### Send & Receive Messages
 Before sending/receiving messages, we need to tell clients the location of name servers. RocketMQ provides multiple ways to achieve this. For simplicity, we use environment variable NAMESRV_ADDR.
 ```

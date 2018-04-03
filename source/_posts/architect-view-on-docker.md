@@ -21,5 +21,6 @@ tags:
 [Solution Brief: Modernize Traditional Apps](/files/docker-mta/SB_MTA_04.14.2017.pdf)
 
 [Docker or VM](/files/docker-mta/Docker-for-Virtualization-Admin-eBook.pdf)
+<!-- more -->
 
 TO BE CONTINUED

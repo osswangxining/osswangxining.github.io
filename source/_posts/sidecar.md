@@ -19,7 +19,7 @@ Sidecar起源于Netflix Prana。它提供了一个可以获取既定服务所有
 
 需要注意的是你所开发的Node.js应用，必须去实现一个健康检查接口，来让Sidecar可以把这个服务实例的健康状况报告给Eureka。
 非jvm应用应该实现一个健康检查，Sidecar能够以此来报告给Eureka注册中心该应用是up还是down状态。
-
+<!-- more -->
 ## 使用spring cloud netflix sidecar
 为了使用Sidecar，你可以创建一个带有@EnableSidecar注解的Spring Boot程序。在项目中使用Sidecar，需要添加依赖，其group为 org.springframework.cloud ，artifact id为 spring-cloud-netflix-sidecar 。
 

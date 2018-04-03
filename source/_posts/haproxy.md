@@ -13,6 +13,7 @@ tags:
 ## 为什么选择haproxy?
 apache、nginx之类的反向代理(转发)功能，通常只能用于http协议，其它协议只有在商业版才能得到支持。而haproxy可以弥补这方面的不足，它不仅可以支持http协议，也可以支持tcp多种协议。因此haproxy常常被当用来作为rpc(thrift/gRPC/avro)框架前端的负载均衡转发中间件。
 
+<!-- more -->
 下面介绍基本使用， 备注：仅为以下环境均为开发环境mac OSX。
 
 ## 安装haproxy

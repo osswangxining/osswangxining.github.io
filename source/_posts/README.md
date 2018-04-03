@@ -18,7 +18,7 @@ tags:
 配置的集中管理：采用consul的KV，将所有微服务的application.properties中的配置内容存入consul。
 
 配置的动态管理：采用archaius，将consul上的配置信息读到spring的PropertySource和archaius的PollResult中，当修改了配置信息后，经常改变的值通过DynamicFactory来获取，不经常改变的值可以通过其他方式获取. 大部分情况下，修改了consul上的配置信息后，相应的项目不需要重启，也会读到最新的值。
-
+<!-- more -->
 ### Spring Cloud Config
 - 集中管理的需求：一个使用微服务架构的应用系统可能会包括成百上千个微服务，因此集中管理很有必要
 - 不同环境不同配置：例如数据源在不同的环境（开发，测试，生产）是不同的

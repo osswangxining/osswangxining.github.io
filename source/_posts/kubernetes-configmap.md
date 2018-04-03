@@ -21,7 +21,7 @@ tags:
 - 环境变量
 - 命令行参数
 - 数据卷文件
-
+<!-- more -->
 ## 创建ConfigMap
 创建ConfigMap的方式有两种，一种是通过yaml文件来创建，另一种是通过kubectl直接在命令行下创建。
 

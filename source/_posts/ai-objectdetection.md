@@ -31,7 +31,7 @@ RCNN的算法：
 ![](/images/rcnn-fast-faster.png)
 
 fast RCNN在RCNN的基础之上，将分类和位置精修统一到了一个深度网络之内。faster RCNN可以简单地看做“区域生成网络+fast RCNN“的系统，用区域生成网络代替fast RCNN中的Selective Search方法。
-
+<!-- more -->
 ## Faster-RCNN的配置与编译
 ### 配置Caffe环境
 下载有关Caffe的所有的依赖项，可以查看安装Caffe的教程

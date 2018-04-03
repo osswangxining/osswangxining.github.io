@@ -22,7 +22,7 @@ NGINIX作为老牌负载均衡软件对gRPC进行了支持，之前已经可以�
 - 发布 gRPC 服务，然后使用 NGINX 应用 HTTP/2 TLS 加密、速率限制、基于 IP 的访问控制列表和日志记录；
 - 通过单个端点发布多个 gRPC 服务，使用 NGINX 检查并跟踪每个内部服务的调用；
 - 使用 Round Robin, Least Connections 或其他方法在集群分配调用，对 gRPC 服务集群进行负载均衡；
-
+<!-- more -->
 ## gRPC RPC服务
 gRPC是一种远程过程调用协议，用于客户端和服务器应用程序之间的通信, 具有紧凑（节省空间）和可跨多种语言移植的特点，并且支持请求响应和流式交互。 由于其广泛的语言支持和简单的面向用户的设计，该协议越来越受欢迎，其中包括服务网格实现。
 ![一个简单的基于 gRPC 的应用程序](https://cdn-1.wp.nginx.com/wp-content/uploads/2018/03/grpc-unproxied-cleartext.png)

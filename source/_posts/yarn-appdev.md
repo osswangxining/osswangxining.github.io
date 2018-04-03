@@ -25,7 +25,7 @@ date: 2016-4-9 20:46:25
 ### 1.开发Client启动AM
 Client部分是用于将应用提交到YARN, 从而可以启动application master.
 客户端通常只需与ResourceManager交互，期间涉及到多个数据结构和一个RPC协议，具体如下：
-
+<!-- more -->
 ![](/images/yarn-dev1.png)
 - 客户端通过RPC协议ApplicationClientProtocol向ResourceManager(也称之为ApplicationsManager、ASM)发送应用程序提交请求GetNewApplicationRequest，ResourceManager为其返回应答GetNewApplicationResponse，该数据结构中包含多种信息，包括ApplicationId、可资源使用上限和下限等。初始化并启动一个yarnClient:
 ```
