@@ -42,9 +42,20 @@ cd fabric-1.1.0/scripts/
 
 查看下载fabric二进制文件：
 ```sh
+cd bin
 ls
 configtxgen  configtxlator  cryptogen  get-byfn.sh  get-docker-images.sh  orderer  peer
 ```
+并将这些二进制文件设置到环境变量PATH中，例如：
+```sh
+vi ~/.profile
+.......
+export PATH="$PATH:$HOME/.rvm/bin:/usr/local/Cellar/graphviz/2.40.1/bin:/Users/xiningwang/Downloads/fabric-release-1.1/scripts/bin"
+.......
+
+source ~/.profile
+```
+
 查看pull的docker镜像：
 ```sh
 docker images
@@ -192,4 +203,45 @@ org2.example.com
 
 
 ## 体验Fabric
-执行下面的命令创建channel:
+执行下面的命令:
+```sh
+./byfn.sh up -i 1.1.0
+
+Starting with channel 'mychannel' and CLI timeout of '10' seconds and CLI delay of '3' seconds
+Continue? [Y/n] y
+proceeding ...
+2018-04-02 15:21:28.301 UTC [main] main -> INFO 001 Exiting.....
+LOCAL_VERSION=1.1.0
+DOCKER_IMAGE_VERSION=1.1.0
+
+Creating network "net_byfn" with the default driver
+Creating volume "net_peer0.org2.example.com" with default driver
+Creating volume "net_peer1.org2.example.com" with default driver
+Creating volume "net_peer1.org1.example.com" with default driver
+Creating volume "net_peer0.org1.example.com" with default driver
+Creating peer1.org1.example.com ... done
+Creating cli ... done
+Creating peer1.org1.example.com ...
+Creating peer0.org2.example.com ...
+Creating orderer.example.com ...
+Creating peer0.org1.example.com ...
+Creating cli ...
+
+ ____    _____      _      ____    _____
+/ ___|  |_   _|    / \    |  _ \  |_   _|
+\___ \    | |     / _ \   | |_) |   | |
+ ___) |   | |    / ___ \  |  _ <    | |
+|____/    |_|   /_/   \_\ |_| \_\   |_|
+
+Build your first network (BYFN) end-to-end test
+....
+========= All GOOD, BYFN execution completed ===========
+
+
+ _____   _   _   ____
+| ____| | \ | | |  _ \
+|  _|   |  \| | | | | |
+| |___  | |\  | | |_| |
+|_____| |_| \_| |____/
+
+```

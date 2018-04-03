@@ -88,3 +88,7 @@ search:
   field: post
   format: html
   limit: 10000
+
+auto_excerpt:
+  enable: true
+  length: 150
