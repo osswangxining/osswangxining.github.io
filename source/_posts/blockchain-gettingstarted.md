@@ -247,3 +247,60 @@ Build your first network (BYFN) end-to-end test
 |_____| |_| \_| |____/
 
 ```
+
+## 搭建Hyperledger Explorer
+搭建Hyperledger Explorer环境需要一个PostgreSQL数据库，并需要进行初始化。具体参见：https://github.com/osswangxining/blockchain-explorer。
+
+### PostgreSQL
+为简易起见，可以使用已构建好的针对Hyperledger Explorer所需的PostgreSQL Docker镜像，地址如下：
+https://hub.docker.com/r/osswangxining/hyperledger-explorer-postgresql/
+
+拉取镜像文件：
+```
+docker pull osswangxining/hyperledger-explorer-postgresql
+```
+
+启动容器：
+```
+docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=*******  osswangxining/hyperledger-explorer-postgresql
+```
+
+### Hyperledger Explorer
+Hyperledger Explorer本身是一个Nodejs编写的Web应用，为简易起见，可以使用已构建好的Docker镜像搭建环境，地址如下：
+https://hub.docker.com/r/osswangxining/hyperledger-explorer/
+
+数据库启动之后，拉取Hyperledger Explorer镜像文件：
+```
+docker pull osswangxining/hyperledger-explorer
+```
+
+启动容器：
+```
+docker run -v /Users/xiningwang/blockchain/blockchain-explorer/config.json:/blockchain-explorer/config.json -v /Users/xiningwang/Downloads/fabric-samples-1.1.0/first-network/crypto-config:/first-network/crypto-config -p 8080:8080 -d osswangxining/hyperledger-explorer
+```
+
+**Tips**
+
+- Mount your config.json to to /blockchain-explorer/config.json (path in container)
+    - Change "fabric-path" to your fabric network path, example: "/home/user1/workspace/fabric-samples" for the following keys: "tls_cacerts", "key", "cert".
+    - Final path for key "tls_cacerts" will be: "/first-network/crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt".
+- Modify config.json to update one of the channel
+    - pg host, username, password details.
+
+    ```
+    "channel": "mychannel",
+    "pg": {
+		"host": "127.0.0.1",
+		"port": "5432",
+		"database": "fabricexplorer",
+		"username": "hppoc",
+		"passwd": "password"
+	}
+    ```
+- Mount your crypto-config to {crypto-config} path in the container
+    -  {crypto-config} should be matched to the value specified in /blockchain-explorer/config.json
+
+### Explorer控制台
+打开浏览器，输入地址http://localhost:8080可以看到如下：
+
+![Explorer控制台](/images/hyperledger_explorer_screenshot.png)
