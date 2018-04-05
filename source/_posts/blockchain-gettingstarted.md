@@ -276,16 +276,14 @@ docker pull osswangxining/hyperledger-explorer
 
 启动容器：
 ```
-docker run -v /Users/xiningwang/blockchain/blockchain-explorer/config.json:/blockchain-explorer/config.json -v /Users/xiningwang/Downloads/fabric-samples-1.1.0/first-network/crypto-config:/first-network/crypto-config -p 8080:8080 -d osswangxining/hyperledger-explorer
+docker run  --name explorer -v /root/blockchain/fabric-samples-1.1.0/first-network/crypto-config:/first-network/crypto-config -v /root/blockchain/config/config.json:/blockchain-explorer/config.json -p 8888:8080 -d osswangxining/hyperledger-explorer
 ```
 
-**Tips**
-
-- Mount your config.json to to /blockchain-explorer/config.json (path in container)
-    - Change "fabric-path" to your fabric network path, example: "/home/user1/workspace/fabric-samples" for the following keys: "tls_cacerts", "key", "cert".
-    - Final path for key "tls_cacerts" will be: "/first-network/crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt".
-- Modify config.json to update one of the channel
-    - pg host, username, password details.
+**注意事项**
+- 挂载定制后的config.json到路径/blockchain-explorer/config.json (该路径是指在容器中的实际路径)
+- 挂载上述步骤生成的crypto-config目录到容器中的路径{crypto-config}
+    -  {crypto-config} 的值应当与/blockchain-explorer/config.json中指定的值匹配；
+- 修改config.json中连接PostgreSQL的信息
 
     ```
     "channel": "mychannel",
@@ -297,8 +295,7 @@ docker run -v /Users/xiningwang/blockchain/blockchain-explorer/config.json:/bloc
 		"passwd": "password"
 	}
     ```
-- Mount your crypto-config to {crypto-config} path in the container
-    -  {crypto-config} should be matched to the value specified in /blockchain-explorer/config.json
+
 
 ### Explorer控制台
 打开浏览器，输入地址http://localhost:8080可以看到如下：
