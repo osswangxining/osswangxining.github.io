@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="分布式,架构设计," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="简介Spring Cloud是目前非常流行的微服务化解决方案，它将Spring Boot的便捷开发和Netflix OSS的丰富解决方案结合起来。Spring Cloud不同于Dubbo，使用的是基于HTTP(s)的Rest服务来构建整个服务体系。 那么有没有可能使用一些非JVM语言，例如熟悉的Node.js来开发一些Rest服务呢？当然是可以的。但是如果只有Rest服务，还不能接入Spring">
+<meta name="keywords" content="分布式,架构设计">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Service Mesh - Spring Cloud [Netflix|Consul] Sidecar">
+<meta property="og:url" content="https://osswangxining.github.io/sidecar/index.html">
+<meta property="og:site_name" content="Technical Blog">
+<meta property="og:description" content="简介Spring Cloud是目前非常流行的微服务化解决方案，它将Spring Boot的便捷开发和Netflix OSS的丰富解决方案结合起来。Spring Cloud不同于Dubbo，使用的是基于HTTP(s)的Rest服务来构建整个服务体系。 那么有没有可能使用一些非JVM语言，例如熟悉的Node.js来开发一些Rest服务呢？当然是可以的。但是如果只有Rest服务，还不能接入Spring">
+<meta property="og:image" content="https://osswangxining.github.io/images/spring-cloud-consul-sidecar-project.png">
+<meta property="og:updated_time" content="2018-04-05T08:58:11.416Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Service Mesh - Spring Cloud [Netflix|Consul] Sidecar">
+<meta name="twitter:description" content="简介Spring Cloud是目前非常流行的微服务化解决方案，它将Spring Boot的便捷开发和Netflix OSS的丰富解决方案结合起来。Spring Cloud不同于Dubbo，使用的是基于HTTP(s)的Rest服务来构建整个服务体系。 那么有没有可能使用一些非JVM语言，例如熟悉的Node.js来开发一些Rest服务呢？当然是可以的。但是如果只有Rest服务，还不能接入Spring">
+<meta name="twitter:image" content="https://osswangxining.github.io/images/spring-cloud-consul-sidecar-project.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://osswangxining.github.io/sidecar/"/>
+
+
+
+
+
+  <title>Service Mesh - Spring Cloud [Netflix|Consul] Sidecar | Technical Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Technical Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Welcome to my world! 有问题请osswangxining（at）163.com</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://osswangxining.github.io/sidecar/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/bio.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Service Mesh - Spring Cloud [Netflix|Consul] Sidecar</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-27T12:46:25+00:00">
+                2018-01-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式&云计算</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/分布式技术架构/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式技术架构</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Spring Cloud是目前非常流行的微服务化解决方案，它将Spring Boot的便捷开发和Netflix OSS的丰富解决方案结合起来。Spring Cloud不同于Dubbo，使用的是基于HTTP(s)的Rest服务来构建整个服务体系。</p>
+<p>那么有没有可能使用一些非JVM语言，例如熟悉的Node.js来开发一些Rest服务呢？当然是可以的。但是如果只有Rest服务，还不能接入Spring Cloud系统。此外，还想使用起Spring Cloud提供的Eureka进行服务发现，使用Config Server做配置管理，使用Ribbon做客户端负载均衡。这个时候Spring sidecar就可以大显身手了。</p>
+<p>Sidecar起源于Netflix Prana。它提供了一个可以获取既定服务所有实例的信息(例如host，端口等)的http api。也可以通过一个嵌入的Zuul，代理服务到从Eureka获取的相关路由节点。Spring Cloud Config Server可以直接通过主机查找或通过代理Zuul进行访问。</p>
+<p>需要注意的是你所开发的Node.js应用，必须去实现一个健康检查接口，来让Sidecar可以把这个服务实例的健康状况报告给Eureka。<br>非jvm应用应该实现一个健康检查，Sidecar能够以此来报告给Eureka注册中心该应用是up还是down状态。<br><a id="more"></a></p>
+<h2 id="使用spring-cloud-netflix-sidecar"><a href="#使用spring-cloud-netflix-sidecar" class="headerlink" title="使用spring cloud netflix sidecar"></a>使用spring cloud netflix sidecar</h2><p>为了使用Sidecar，你可以创建一个带有@EnableSidecar注解的Spring Boot程序。在项目中使用Sidecar，需要添加依赖，其group为 org.springframework.cloud ，artifact id为 spring-cloud-netflix-sidecar 。</p>
+<p>启用Sidecar，创建一个Spring Boot应用程序，并在在应用主类上加上@EnableSidecar 注解。该注解包含 @EnableCircuitBreaker , @EnableDiscoveryClient 以及 @EnableZuulProxy 。</p>
+<p>配置Sidecar，在application.yml中添加 sidecar.port 和 sidecar.health-uri 。 sidecar.port 属性是非jre程序监听的端口号，这就是Sidecar可以正确注册应用到Eureka的原因。</p>
+<h3 id="健康检查"><a href="#健康检查" class="headerlink" title="健康检查"></a>健康检查</h3><p>sidecar.health-uri 是非jre应用提供的一个对外暴露的可访问uri地址，在该地址对应的接口中需要实现一个模仿Spring Boot健康检查指示器的功能。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    &quot;status&quot;: &quot;UP&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="DiscoveryClient"><a href="#DiscoveryClient" class="headerlink" title="DiscoveryClient"></a>DiscoveryClient</h3><p>API DiscoveryClient.getInstances() 所对应的访问方式是 /hosts/{serviceId} ，这是访问 /hosts/consul-sidecar-myapp 后的响应示例，它返回了一个或多个不同主机上的实例.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">[</div><div class="line">    &#123;</div><div class="line">        &quot;serviceId&quot;: &quot;consul-sidecar-myapp&quot;,</div><div class="line">        &quot;host&quot;: &quot;192.168.43.153&quot;,</div><div class="line">        &quot;port&quot;: 8092,</div><div class="line">        &quot;secure&quot;: false,</div><div class="line">        &quot;metadata&quot;: &#123;&#125;,</div><div class="line">        &quot;uri&quot;: &quot;http://192.168.43.153:8092&quot;</div><div class="line">    &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
+<h3 id="Zuul代理"><a href="#Zuul代理" class="headerlink" title="Zuul代理"></a>Zuul代理</h3><p>Zuul代理会自动为每个在Eureka注册中心上的服务添加路由到 /serviceId 上，所以上面那个consul-sidecar-myapp的服务可以通过 /consul-sidecar-myapp 访问。非Jre应用可以通过 <a href="http://localhost:port}/consul-sidecar-myapp" target="_blank" rel="external">http://localhost:port}/consul-sidecar-myapp</a> 来访问Service.</p>
+<p>如果你用的不是Eureka，譬如使用了consul, 实现有所不同。</p>
+<h2 id="Spring-Cloud-Consul-Sidecar"><a href="#Spring-Cloud-Consul-Sidecar" class="headerlink" title="Spring Cloud Consul Sidecar"></a>Spring Cloud Consul Sidecar</h2><p>官方并没有提供spring cloud consul Sidecar, <strong>是因为在大多数情况下，是通过本地代理的方式来连接Consul的，这个本地代理本身就是一个sidecar。这与netflix Eureka是不同的。</strong><br>下面会讲述一下假如仍然基于consul去打造一个类似于eureka的sidecar，如何定制实现该功能。<br>直接上代码先。</p>
+<p><img src="/images/spring-cloud-consul-sidecar-project.png" alt=""></p>
+<p>代码地址：<a href="https://github.com/osswangxining/spring-cloud-consul-sidecar/tree/master/spring-cloud-consul-sidecar" target="_blank" rel="external">https://github.com/osswangxining/spring-cloud-consul-sidecar/tree/master/spring-cloud-consul-sidecar</a></p>
+<p>使用该Sidecar的例子： <a href="https://github.com/osswangxining/spring-cloud-consul-sidecar/tree/master/spring-cloud-consul-sample" target="_blank" rel="external">https://github.com/osswangxining/spring-cloud-consul-sidecar/tree/master/spring-cloud-consul-sample</a></p>
+<p>下面不打算写太多文字了，直接看代码吧。</p>
+<h3 id="实现-EnableSidecar"><a href="#实现-EnableSidecar" class="headerlink" title="实现@EnableSidecar"></a>实现@EnableSidecar</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">package org.springframework.cloud.consul.sidecar;</div><div class="line"></div><div class="line">import java.lang.annotation.Documented;</div><div class="line">import java.lang.annotation.ElementType;</div><div class="line">import java.lang.annotation.Retention;</div><div class="line">import java.lang.annotation.RetentionPolicy;</div><div class="line">import java.lang.annotation.Target;</div><div class="line"></div><div class="line">import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;</div><div class="line">import org.springframework.cloud.netflix.zuul.EnableZuulProxy;</div><div class="line">import org.springframework.context.annotation.Import;</div><div class="line"></div><div class="line">/**</div><div class="line"> * @author Xi Ning Wang</div><div class="line"> */</div><div class="line">@EnableCircuitBreaker</div><div class="line">@EnableZuulProxy</div><div class="line">@Target(ElementType.TYPE)</div><div class="line">@Retention(RetentionPolicy.RUNTIME)</div><div class="line">@Documented</div><div class="line">@Import(SidecarConfiguration.class)</div><div class="line">public @interface EnableSidecar &#123;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="Healthcheck"><a href="#Healthcheck" class="headerlink" title="Healthcheck"></a>Healthcheck</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">package org.springframework.cloud.consul.sidecar;</div><div class="line"></div><div class="line">import java.net.URI;</div><div class="line">import java.util.Map;</div><div class="line"></div><div class="line">import org.springframework.beans.factory.annotation.Autowired;</div><div class="line">import org.springframework.boot.actuate.health.AbstractHealthIndicator;</div><div class="line">import org.springframework.boot.actuate.health.Health;</div><div class="line">import org.springframework.web.client.RestTemplate;</div><div class="line"></div><div class="line">/**</div><div class="line"> * @author Xi Ning Wang</div><div class="line"> */</div><div class="line">public class LocalApplicationHealthIndicator extends AbstractHealthIndicator &#123;</div><div class="line"></div><div class="line">	@Autowired</div><div class="line">	private SidecarProperties properties;</div><div class="line"></div><div class="line">	@SuppressWarnings(&quot;unchecked&quot;)</div><div class="line">	@Override</div><div class="line">	protected void doHealthCheck(Health.Builder builder) throws Exception &#123;</div><div class="line">		URI uri = this.properties.getHealthUri();</div><div class="line">		if (uri == null) &#123;</div><div class="line">			builder.up();</div><div class="line">			return;</div><div class="line">		&#125;</div><div class="line">		Map&lt;String, Object&gt; map = new RestTemplate().getForObject(uri, Map.class);</div><div class="line">		Object status = map.get(&quot;status&quot;);</div><div class="line">		if (status != null &amp;&amp; status instanceof String) &#123;</div><div class="line">			builder.status(status.toString());</div><div class="line">		&#125;</div><div class="line">		else if (status != null &amp;&amp; status instanceof Map) &#123;</div><div class="line">			Map&lt;String, Object&gt; statusMap = (Map&lt;String, Object&gt;) status;</div><div class="line">			Object code = statusMap.get(&quot;code&quot;);</div><div class="line">			if (code != null) &#123;</div><div class="line">				builder.status(code.toString());</div><div class="line">			&#125;</div><div class="line">			else &#123;</div><div class="line">				getWarning(builder);</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		else &#123;</div><div class="line">			getWarning(builder);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	private Health.Builder getWarning(Health.Builder builder) &#123;</div><div class="line">		return builder.unknown().withDetail(&quot;warning&quot;, &quot;no status field in response&quot;);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="SidecarConfiguration"><a href="#SidecarConfiguration" class="headerlink" title="SidecarConfiguration"></a>SidecarConfiguration</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div></pre></td><td class="code"><pre><div class="line">package org.springframework.cloud.consul.sidecar;</div><div class="line"></div><div class="line">import java.net.URI;</div><div class="line">import java.util.List;</div><div class="line"></div><div class="line">import org.springframework.beans.factory.ObjectProvider;</div><div class="line">import org.springframework.beans.factory.annotation.Autowired;</div><div class="line">import org.springframework.beans.factory.annotation.Value;</div><div class="line">import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;</div><div class="line">import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;</div><div class="line">import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;</div><div class="line">import org.springframework.boot.bind.RelaxedPropertyResolver;</div><div class="line">import org.springframework.boot.context.properties.EnableConfigurationProperties;</div><div class="line">import org.springframework.cloud.client.actuator.HasFeatures;</div><div class="line">import org.springframework.cloud.commons.util.InetUtils;</div><div class="line">import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;</div><div class="line">import org.springframework.cloud.consul.discovery.HeartbeatProperties;</div><div class="line">import org.springframework.cloud.consul.serviceregistry.ConsulAutoRegistration;</div><div class="line">import org.springframework.cloud.consul.serviceregistry.ConsulRegistrationCustomizer;</div><div class="line">import org.springframework.cloud.consul.serviceregistry.ConsulServiceRegistry;</div><div class="line">import org.springframework.context.ApplicationContext;</div><div class="line">import org.springframework.context.annotation.Bean;</div><div class="line">import org.springframework.context.annotation.Configuration;</div><div class="line">import org.springframework.core.env.ConfigurableEnvironment;</div><div class="line">import org.springframework.util.StringUtils;</div><div class="line"></div><div class="line">import com.ecwid.consul.v1.agent.model.NewService;</div><div class="line"></div><div class="line">/**</div><div class="line"> * Sidecar Configuration</div><div class="line"> * &lt;p&gt;</div><div class="line"> * Depends on &#123;@link SidecarProperties&#125; property.</div><div class="line"> * &lt;/p&gt;</div><div class="line"> * @author Xi Ning Wang</div><div class="line"> *</div><div class="line"> */</div><div class="line">@Configuration</div><div class="line">@EnableConfigurationProperties</div><div class="line">@ConditionalOnProperty(value = &quot;spring.cloud.consul.sidecar.enabled&quot;, matchIfMissing = true)</div><div class="line">public class SidecarConfiguration &#123;</div><div class="line"></div><div class="line">	@Bean</div><div class="line">	public HasFeatures Feature() &#123;</div><div class="line">		return HasFeatures.namedFeature(&quot;Consul Sidecar&quot;, SidecarConfiguration.class);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@Bean</div><div class="line">	public SidecarProperties sidecarProperties() &#123;</div><div class="line">		return new SidecarProperties();</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@Bean</div><div class="line">	@ConditionalOnMissingBean</div><div class="line">	public ConsulAutoRegistration consulRegistration(ConsulDiscoveryProperties properties, ApplicationContext applicationContext,</div><div class="line">			ObjectProvider&lt;List&lt;ConsulRegistrationCustomizer&gt;&gt; registrationCustomizers, HeartbeatProperties heartbeatProperties) &#123;</div><div class="line">		return registration(properties, applicationContext, registrationCustomizers.getIfAvailable(), heartbeatProperties);</div><div class="line">	&#125;</div><div class="line"></div><div class="line"></div><div class="line">	@Autowired</div><div class="line">	private InetUtils inetUtils;</div><div class="line"></div><div class="line">	@Value(&quot;$&#123;consul.instance.hostname:$&#123;CONSUL_INSTANCE_HOSTNAME:&#125;&#125;&quot;)</div><div class="line">	private String hostname;</div><div class="line"></div><div class="line">	@Autowired</div><div class="line">	private ConfigurableEnvironment env;</div><div class="line"></div><div class="line">	private  ConsulAutoRegistration registration(ConsulDiscoveryProperties properties, ApplicationContext context,</div><div class="line">			List&lt;ConsulRegistrationCustomizer&gt; registrationCustomizers,</div><div class="line">			HeartbeatProperties heartbeatProperties) &#123;</div><div class="line">		RelaxedPropertyResolver propertyResolver = new RelaxedPropertyResolver(context.getEnvironment());</div><div class="line"></div><div class="line">		SidecarProperties sidecarProperties = sidecarProperties();</div><div class="line">		int port = sidecarProperties.getPort();</div><div class="line">		String hostname = sidecarProperties.getHostname();</div><div class="line">		String ipAddress = sidecarProperties.getIpAddress();</div><div class="line">		if (!StringUtils.hasText(hostname) &amp;&amp; StringUtils.hasText(this.hostname)) &#123;</div><div class="line">			hostname = this.hostname;</div><div class="line">		&#125;</div><div class="line">		if(!StringUtils.hasText(hostname)) &#123;</div><div class="line">			hostname = properties.getHostname();</div><div class="line">		&#125;</div><div class="line">		URI healthUri = sidecarProperties.getHealthUri();</div><div class="line">		URI homePageUri = sidecarProperties.getHomePageUri();</div><div class="line">		NewService service = new NewService();</div><div class="line"></div><div class="line">		String appName = ConsulAutoRegistration.getAppName(properties, propertyResolver);</div><div class="line">		service.setId(ConsulAutoRegistration.getInstanceId(properties, context));</div><div class="line">		if(!properties.isPreferAgentAddress()) &#123;</div><div class="line">			service.setAddress(hostname);</div><div class="line">		&#125;</div><div class="line">		service.setName(ConsulAutoRegistration.normalizeForDns(appName));</div><div class="line">		service.setTags(ConsulAutoRegistration.createTags(properties));</div><div class="line"></div><div class="line">		if (properties.getPort() != null) &#123;</div><div class="line">			service.setPort(properties.getPort());</div><div class="line">			// we know the port and can set the check</div><div class="line">			ConsulAutoRegistration.setCheck(service, properties, context, heartbeatProperties);</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		ConsulAutoRegistration registration = new ConsulAutoRegistration(service, properties, context, heartbeatProperties);</div><div class="line">		ConsulAutoRegistration.customize(registrationCustomizers, registration);</div><div class="line">		return registration;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@Bean</div><div class="line">	public LocalApplicationHealthIndicator localApplicationHealthIndicator() &#123;</div><div class="line">		return new LocalApplicationHealthIndicator();</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@Bean</div><div class="line">	public SidecarController sidecarController() &#123;</div><div class="line">		return new SidecarController();</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="附录1-RetryLoadBalancerInterceptor"><a href="#附录1-RetryLoadBalancerInterceptor" class="headerlink" title="附录1 - RetryLoadBalancerInterceptor"></a>附录1 - RetryLoadBalancerInterceptor</h2><p>org.springframework.cloud.client.loadbalancer.RetryLoadBalancerInterceptor</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">	public ClientHttpResponse intercept(final HttpRequest request, final byte[] body,</div><div class="line">										final ClientHttpRequestExecution execution) throws IOException &#123;</div><div class="line">		final URI originalUri = request.getURI();</div><div class="line">		final String serviceName = originalUri.getHost();</div><div class="line">		Assert.state(serviceName != null, &quot;Request URI does not contain a valid hostname: &quot; + originalUri);</div><div class="line">		final LoadBalancedRetryPolicy retryPolicy = lbRetryPolicyFactory.create(serviceName,</div><div class="line">				loadBalancer);</div><div class="line">		RetryTemplate template = this.retryTemplate == null ? new RetryTemplate() : this.retryTemplate;</div><div class="line">		BackOffPolicy backOffPolicy = backOffPolicyFactory.createBackOffPolicy(serviceName);</div><div class="line">		template.setBackOffPolicy(backOffPolicy == null ? new NoBackOffPolicy() : backOffPolicy);</div><div class="line">		template.setThrowLastExceptionOnExhausted(true);</div><div class="line">		template.setRetryPolicy(</div><div class="line">				!lbProperties.isEnabled() || retryPolicy == null ? new NeverRetryPolicy()</div><div class="line">						: new InterceptorRetryPolicy(request, retryPolicy, loadBalancer,</div><div class="line">						serviceName));</div><div class="line">		return template</div><div class="line">				.execute(new RetryCallback&lt;ClientHttpResponse, IOException&gt;() &#123;</div><div class="line">					@Override</div><div class="line">					public ClientHttpResponse doWithRetry(RetryContext context)</div><div class="line">							throws IOException &#123;</div><div class="line">						ServiceInstance serviceInstance = null;</div><div class="line">						if (context instanceof LoadBalancedRetryContext) &#123;</div><div class="line">							LoadBalancedRetryContext lbContext = (LoadBalancedRetryContext) context;</div><div class="line">							serviceInstance = lbContext.getServiceInstance();</div><div class="line">						&#125;</div><div class="line">						if (serviceInstance == null) &#123;</div><div class="line">							serviceInstance = loadBalancer.choose(serviceName);</div><div class="line">						&#125;</div><div class="line">						ClientHttpResponse response = RetryLoadBalancerInterceptor.this.loadBalancer.execute(</div><div class="line">								serviceName, serviceInstance,</div><div class="line">								requestFactory.createRequest(request, body, execution));</div><div class="line">						int statusCode = response.getRawStatusCode();</div><div class="line">						if(retryPolicy != null &amp;&amp; retryPolicy.retryableStatusCode(statusCode)) &#123;</div><div class="line">							response.close();</div><div class="line">							throw new RetryableStatusCodeException(serviceName, statusCode);</div><div class="line">						&#125;</div><div class="line">						return response;</div><div class="line">					&#125;</div><div class="line">				&#125;);</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Xi Ning Wang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://osswangxining.github.io/sidecar/" title="Service Mesh - Spring Cloud [Netflix|Consul] Sidecar">https://osswangxining.github.io/sidecar/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/分布式/" rel="tag"># 分布式</a>
+          
+            <a href="/tags/架构设计/" rel="tag"># 架构设计</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/spring-cloud-bus-stream-rocketmq/" rel="next" title="Spring Cloud Bus based on RocketMQ">
+                <i class="fa fa-chevron-left"></i> Spring Cloud Bus based on RocketMQ
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/istio2/" rel="prev" title="Istio">
+                Istio <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/bio.png"
+                alt="Xi Ning Wang" />
+            
+              <p class="site-author-name" itemprop="name">Xi Ning Wang</p>
+              <p class="site-description motion-element" itemprop="description">专注于分布式高性能技术架构、容器|K8S、IoT云平台，支持语言：Java(script) | Python | Golang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/osswangxining" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:osswangxining@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://plus.google.com/osswangxining" target="_blank" title="Google">
+                      
+                        <i class="fa fa-fw fa-google"></i>Google</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/osswangxining" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://istio.io" title="Istio" target="_blank">Istio</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://grpc.io/" title="gRPC" target="_blank">gRPC</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用spring-cloud-netflix-sidecar"><span class="nav-number">2.</span> <span class="nav-text">使用spring cloud netflix sidecar</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#健康检查"><span class="nav-number">2.1.</span> <span class="nav-text">健康检查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DiscoveryClient"><span class="nav-number">2.2.</span> <span class="nav-text">DiscoveryClient</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Zuul代理"><span class="nav-number">2.3.</span> <span class="nav-text">Zuul代理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring-Cloud-Consul-Sidecar"><span class="nav-number">3.</span> <span class="nav-text">Spring Cloud Consul Sidecar</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实现-EnableSidecar"><span class="nav-number">3.1.</span> <span class="nav-text">实现@EnableSidecar</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Healthcheck"><span class="nav-number">3.2.</span> <span class="nav-text">Healthcheck</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SidecarConfiguration"><span class="nav-number">3.3.</span> <span class="nav-text">SidecarConfiguration</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#附录1-RetryLoadBalancerInterceptor"><span class="nav-number">4.</span> <span class="nav-text">附录1 - RetryLoadBalancerInterceptor</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xi Ning Wang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=5.1.4"></script>
+
+
+</body>
+</html>

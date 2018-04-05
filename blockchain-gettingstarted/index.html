@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="blockchain,Kubernetes,container,容器,区块链," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="图片来自https://pixabay.com 前言本篇我们将按照Hyperledger Doc: Building Your First Network，体验fabric-samples-1.1.0中的first-network示例。 first-network这个示例的场景是由两个组织组成Hyperledger Fabric的网络，其中只有一个orderer节点，每个组织有2个peer节点。">
+<meta name="keywords" content="blockchain,Kubernetes,container,容器,区块链">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在Ubuntu16.04上构建第一个fabric网络">
+<meta property="og:url" content="https://osswangxining.github.io/blockchain-gettingstarted/index.html">
+<meta property="og:site_name" content="Technical Blog">
+<meta property="og:description" content="图片来自https://pixabay.com 前言本篇我们将按照Hyperledger Doc: Building Your First Network，体验fabric-samples-1.1.0中的first-network示例。 first-network这个示例的场景是由两个组织组成Hyperledger Fabric的网络，其中只有一个orderer节点，每个组织有2个peer节点。">
+<meta property="og:image" content="https://raw.githubusercontent.com/osswangxining/myimages/master/blockchain-3277336_1280.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/hyperledger_explorer_screenshot.png">
+<meta property="og:updated_time" content="2018-04-05T08:58:11.412Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在Ubuntu16.04上构建第一个fabric网络">
+<meta name="twitter:description" content="图片来自https://pixabay.com 前言本篇我们将按照Hyperledger Doc: Building Your First Network，体验fabric-samples-1.1.0中的first-network示例。 first-network这个示例的场景是由两个组织组成Hyperledger Fabric的网络，其中只有一个orderer节点，每个组织有2个peer节点。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/osswangxining/myimages/master/blockchain-3277336_1280.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://osswangxining.github.io/blockchain-gettingstarted/"/>
+
+
+
+
+
+  <title>在Ubuntu16.04上构建第一个fabric网络 | Technical Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Technical Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Welcome to my world! 有问题请osswangxining（at）163.com</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://osswangxining.github.io/blockchain-gettingstarted/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/bio.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">在Ubuntu16.04上构建第一个fabric网络</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-01T08:36:25+00:00">
+                2018-04-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式&云计算</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/blockchain/" itemprop="url" rel="index">
+                    <span itemprop="name">blockchain</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="https://raw.githubusercontent.com/osswangxining/myimages/master/blockchain-3277336_1280.png" alt=""><br>图片来自<a href="https://pixabay.com" target="_blank" rel="external">https://pixabay.com</a></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本篇我们将按照<a href="http://hyperledger-fabric.readthedocs.io/en/latest/build_network.html" target="_blank" rel="external">Hyperledger Doc: Building Your First Network</a>，体验<a href="https://github.com/hyperledger/fabric-samples/releases/tag/v1.1.0" target="_blank" rel="external">fabric-samples-1.1.0</a>中的first-network示例。</p>
+<p>first-network这个示例的场景是由两个组织组成Hyperledger Fabric的网络，其中只有一个orderer节点，每个组织有2个peer节点。</p>
+<p>使用Ubuntu16.04主机作为运行环境，已经安装好了docker和docker-compose。</p>
+<a id="more"></a>
+<h2 id="安装Hyperledger-Fabric"><a href="#安装Hyperledger-Fabric" class="headerlink" title="安装Hyperledger Fabric"></a>安装Hyperledger Fabric</h2><p>下载源码并解压缩：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">wget https://github.com/hyperledger/fabric/archive/v1.1.0.tar.gz -o fabric-1.1.0.tar.gz</div><div class="line">tar -zxvf fabric-1.1.0.tar.gz</div><div class="line"><span class="built_in">cd</span> fabric-1.1.0/scripts/</div></pre></td></tr></table></figure></p>
+<p>执行bootstrap.sh脚本可下载对应平台的fabric二进制版本和pull相关的docker镜像。<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">./bootstrap.sh</div><div class="line">===&gt; Downloading platform specific fabric binaries</div><div class="line">  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current</div><div class="line">                                 Dload  Upload   Total   Spent    Left  Speed</div><div class="line"> 11 35.4M   11 4332k    0     0   169k      0  0:03:33  0:00:25  0:03:08  163k</div></pre></td></tr></table></figure></p>
+<p>查看下载fabric二进制文件：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">cd</span> bin</div><div class="line">ls</div><div class="line">configtxgen  configtxlator  cryptogen  get-byfn.sh  get-docker-images.sh  orderer  peer</div></pre></td></tr></table></figure></p>
+<p>并将这些二进制文件设置到环境变量PATH中，例如：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">vi ~/.profile</div><div class="line">.......</div><div class="line"><span class="built_in">export</span> PATH=<span class="string">"<span class="variable">$PATH</span>:<span class="variable">$HOME</span>/.rvm/bin:/usr/local/Cellar/graphviz/2.40.1/bin:/Users/xiningwang/Downloads/fabric-release-1.1/scripts/bin"</span></div><div class="line">.......</div><div class="line"></div><div class="line"><span class="built_in">source</span> ~/.profile</div></pre></td></tr></table></figure></p>
+<p>查看pull的docker镜像：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">docker images</div><div class="line">REPOSITORY                     TAG                 IMAGE ID            CREATED             SIZE</div><div class="line">hyperledger/fabric-ca          latest              72617b4fa9b4        2 weeks ago         299MB</div><div class="line">hyperledger/fabric-ca          x86_64-1.1.0        72617b4fa9b4        2 weeks ago         299MB</div><div class="line">hyperledger/fabric-tools       latest              b7bfddf508bc        2 weeks ago         1.46GB</div><div class="line">hyperledger/fabric-tools       x86_64-1.1.0        b7bfddf508bc        2 weeks ago         1.46GB</div><div class="line">hyperledger/fabric-orderer     latest              ce0c810df36a        2 weeks ago         180MB</div><div class="line">hyperledger/fabric-orderer     x86_64-1.1.0        ce0c810df36a        2 weeks ago         180MB</div><div class="line">hyperledger/fabric-peer        latest              b023f9be0771        2 weeks ago         187MB</div><div class="line">hyperledger/fabric-peer        x86_64-1.1.0        b023f9be0771        2 weeks ago         187MB</div><div class="line">hyperledger/fabric-javaenv     latest              82098abb1a17        2 weeks ago         1.52GB</div><div class="line">hyperledger/fabric-javaenv     x86_64-1.1.0        82098abb1a17        2 weeks ago         1.52GB</div><div class="line">hyperledger/fabric-ccenv       latest              c8b4909d8d46        2 weeks ago         1.39GB</div><div class="line">hyperledger/fabric-ccenv       x86_64-1.1.0        c8b4909d8d46        2 weeks ago         1.39GB</div><div class="line">hyperledger/fabric-zookeeper   latest              92cbb952b6f8        6 weeks ago         1.39GB</div><div class="line">hyperledger/fabric-zookeeper   x86_64-0.4.6        92cbb952b6f8        6 weeks ago         1.39GB</div><div class="line">hyperledger/fabric-kafka       latest              554c591b86a8        6 weeks ago         1.4GB</div><div class="line">hyperledger/fabric-kafka       x86_64-0.4.6        554c591b86a8        6 weeks ago         1.4GB</div><div class="line">hyperledger/fabric-couchdb     latest              7e73c828<span class="built_in">fc</span>5b        6 weeks ago         1.56GB</div><div class="line">hyperledger/fabric-couchdb     x86_64-0.4.6        7e73c828<span class="built_in">fc</span>5b        6 weeks ago         1.56GB</div></pre></td></tr></table></figure></p>
+<h2 id="安装fabric-samples-1-1-0"><a href="#安装fabric-samples-1-1-0" class="headerlink" title="安装fabric-samples-1.1.0"></a>安装fabric-samples-1.1.0</h2><p>下载fabric-samples-1.1.0：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">wget https://github.com/hyperledger/fabric-samples/archive/v1.1.0.tar.gz -o fabric-samples-v1.1.0.tar.gz</div><div class="line">tar -zxvf fabric-samples-1.1.0.tar.gz</div><div class="line"></div><div class="line"><span class="built_in">cd</span> fabric-samples-1.1.0/first-network/</div><div class="line">ls</div><div class="line">README.md  channel-artifacts   docker-compose-cli.yaml         docker-compose<span class="_">-e</span>2e-template.yaml  org3-artifacts</div><div class="line">base       configtx.yaml       docker-compose-couch-org3.yaml  docker-compose-org3.yaml          scripts</div><div class="line">byfn.sh    crypto-config.yaml  docker-compose-couch.yaml       eyfn.sh</div></pre></td></tr></table></figure>
+<p>其中byfn.sh是一个完整的脚本，提供了快速引导启动4个分别属于两个不同组织的peer节点容器和一个排序服务orderer节点容器成的Hyperledger Fabric网络。这个脚本还将启动一个容器来运行将peer节点加入channel，部署实例化chaincode以及驱动以及部署的chaincode执行交易的脚本。<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">./byfn.sh</div><div class="line">Usage:</div><div class="line"> byfn.sh up|down|restart|generate|upgrade [-c &lt;channel name&gt;] [-t &lt;timeout&gt;] [<span class="_">-d</span> &lt;delay&gt;] [<span class="_">-f</span> &lt;docker-compose-file&gt;] [<span class="_">-s</span> &lt;dbtype&gt;] [-i &lt;imagetag&gt;]</div><div class="line"> byfn.sh -h|--help (<span class="built_in">print</span> this message)</div><div class="line">   &lt;mode&gt; - one of <span class="string">'up'</span>, <span class="string">'down'</span>, <span class="string">'restart'</span> or <span class="string">'generate'</span></div><div class="line">     - <span class="string">'up'</span> - bring up the network with docker-compose up</div><div class="line">     - <span class="string">'down'</span> - clear the network with docker-compose down</div><div class="line">     - <span class="string">'restart'</span> - restart the network</div><div class="line">     - <span class="string">'generate'</span> - generate required certificates and genesis block</div><div class="line">     - <span class="string">'upgrade'</span>  - upgrade the network from v1.0.x to v1.1</div><div class="line">   -c &lt;channel name&gt; - channel name to use (defaults to <span class="string">"mychannel"</span>)</div><div class="line">   -t &lt;timeout&gt; - CLI timeout duration <span class="keyword">in</span> seconds (defaults to 10)</div><div class="line">   <span class="_">-d</span> &lt;delay&gt; - delay duration <span class="keyword">in</span> seconds (defaults to 3)</div><div class="line">   <span class="_">-f</span> &lt;docker-compose-file&gt; - specify <span class="built_in">which</span> docker-compose file use (defaults to docker-compose-cli.yaml)</div><div class="line">   <span class="_">-s</span> &lt;dbtype&gt; - the database backend to use: goleveldb (default) or couchdb</div><div class="line">   <span class="_">-l</span> &lt;language&gt; - the chaincode language: golang (default) or node</div><div class="line">   -i &lt;imagetag&gt; - the tag to be used to launch the network (defaults to <span class="string">"latest"</span>)</div><div class="line"></div><div class="line">Typically, one would first generate the required certificates and</div><div class="line">genesis block, <span class="keyword">then</span> bring up the network. e.g.:</div><div class="line"></div><div class="line"> byfn.sh generate -c mychannel</div><div class="line"> byfn.sh up -c mychannel <span class="_">-s</span> couchdb</div><div class="line">       byfn.sh up -c mychannel <span class="_">-s</span> couchdb -i 1.1.0-alpha</div><div class="line"> byfn.sh up <span class="_">-l</span> node</div><div class="line"> byfn.sh down -c mychannel</div><div class="line">       byfn.sh upgrade -c mychannel</div><div class="line"></div><div class="line">Taking all defaults:</div><div class="line"> byfn.sh generate</div><div class="line"> byfn.sh up</div><div class="line"> byfn.sh down</div></pre></td></tr></table></figure></p>
+<h2 id="生成证书和区块"><a href="#生成证书和区块" class="headerlink" title="生成证书和区块"></a>生成证书和区块</h2><p>下载的二进制文件cryptogen、configtxgen拷贝到first-network目录下。<br>执行./byfn.sh generate命令就可以生成证书和区块。<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div></pre></td><td class="code"><pre><div class="line">./byfn.sh generate</div><div class="line">Generating certs and genesis block <span class="keyword">for</span> with channel <span class="string">'mychannel'</span> and CLI timeout of <span class="string">'10'</span> seconds and CLI delay of <span class="string">'3'</span> seconds</div><div class="line">Continue? [Y/n] y</div><div class="line">proceeding ...</div><div class="line">/root/blockchain/fabric-samples-1.1.0/first-network/cryptogen</div><div class="line"></div><div class="line"><span class="comment">##########################################################</span></div><div class="line"><span class="comment">##### Generate certificates using cryptogen tool #########</span></div><div class="line"><span class="comment">##########################################################</span></div><div class="line">+ cryptogen generate --config=./crypto-config.yaml</div><div class="line">org1.example.com</div><div class="line">org2.example.com</div><div class="line">+ res=0</div><div class="line">+ <span class="built_in">set</span> +x</div><div class="line"></div><div class="line">/root/blockchain/fabric-samples-1.1.0/first-network/configtxgen</div><div class="line"><span class="comment">##########################################################</span></div><div class="line"><span class="comment">#########  Generating Orderer Genesis block ##############</span></div><div class="line"><span class="comment">##########################################################</span></div><div class="line">+ configtxgen -profile TwoOrgsOrdererGenesis -outputBlock ./channel-artifacts/genesis.block</div><div class="line">2018-04-02 13:45:17.133 CST [common/tools/configtxgen] main -&gt; INFO 001 Loading configuration</div><div class="line">2018-04-02 13:45:17.140 CST [msp] getMspConfig -&gt; INFO 002 Loading NodeOUs</div><div class="line">2018-04-02 13:45:17.140 CST [msp] getMspConfig -&gt; INFO 003 Loading NodeOUs</div><div class="line">2018-04-02 13:45:17.141 CST [common/tools/configtxgen] <span class="keyword">do</span>OutputBlock -&gt; INFO 004 Generating genesis block</div><div class="line">2018-04-02 13:45:17.141 CST [common/tools/configtxgen] <span class="keyword">do</span>OutputBlock -&gt; INFO 005 Writing genesis block</div><div class="line">+ res=0</div><div class="line">+ <span class="built_in">set</span> +x</div><div class="line"></div><div class="line"><span class="comment">#################################################################</span></div><div class="line"><span class="comment">### Generating channel configuration transaction 'channel.tx' ###</span></div><div class="line"><span class="comment">#################################################################</span></div><div class="line">+ configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./channel-artifacts/channel.tx -channelID mychannel</div><div class="line">2018-04-02 13:45:17.158 CST [common/tools/configtxgen] main -&gt; INFO 001 Loading configuration</div><div class="line">2018-04-02 13:45:17.165 CST [common/tools/configtxgen] <span class="keyword">do</span>OutputChannelCreateTx -&gt; INFO 002 Generating new channel configtx</div><div class="line">2018-04-02 13:45:17.165 CST [msp] getMspConfig -&gt; INFO 003 Loading NodeOUs</div><div class="line">2018-04-02 13:45:17.166 CST [msp] getMspConfig -&gt; INFO 004 Loading NodeOUs</div><div class="line">2018-04-02 13:45:17.187 CST [common/tools/configtxgen] <span class="keyword">do</span>OutputChannelCreateTx -&gt; INFO 005 Writing new channel tx</div><div class="line">+ res=0</div><div class="line">+ <span class="built_in">set</span> +x</div><div class="line"></div><div class="line"><span class="comment">#################################################################</span></div><div class="line"><span class="comment">#######    Generating anchor peer update for Org1MSP   ##########</span></div><div class="line"><span class="comment">#################################################################</span></div><div class="line">+ configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org1MSPanchors.tx -channelID mychannel -asOrg Org1MSP</div><div class="line">2018-04-02 13:45:17.204 CST [common/tools/configtxgen] main -&gt; INFO 001 Loading configuration</div><div class="line">2018-04-02 13:45:17.211 CST [common/tools/configtxgen] <span class="keyword">do</span>OutputAnchorPeersUpdate -&gt; INFO 002 Generating anchor peer update</div><div class="line">2018-04-02 13:45:17.211 CST [common/tools/configtxgen] <span class="keyword">do</span>OutputAnchorPeersUpdate -&gt; INFO 003 Writing anchor peer update</div><div class="line">+ res=0</div><div class="line">+ <span class="built_in">set</span> +x</div><div class="line"></div><div class="line"><span class="comment">#################################################################</span></div><div class="line"><span class="comment">#######    Generating anchor peer update for Org2MSP   ##########</span></div><div class="line"><span class="comment">#################################################################</span></div><div class="line">+ configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org2MSPanchors.tx -channelID mychannel -asOrg Org2MSP</div><div class="line">2018-04-02 13:45:17.228 CST [common/tools/configtxgen] main -&gt; INFO 001 Loading configuration</div><div class="line">2018-04-02 13:45:17.235 CST [common/tools/configtxgen] <span class="keyword">do</span>OutputAnchorPeersUpdate -&gt; INFO 002 Generating anchor peer update</div><div class="line">2018-04-02 13:45:17.235 CST [common/tools/configtxgen] <span class="keyword">do</span>OutputAnchorPeersUpdate -&gt; INFO 003 Writing anchor peer update</div><div class="line">+ res=0</div><div class="line">+ <span class="built_in">set</span> +x</div></pre></td></tr></table></figure></p>
+<p>如果遇到dns解析错误，请参考如下：</p>
+<blockquote>
+<blockquote>
+<p>原因分析：<br>  近期新创建的ECS主机中的resolv.conf内容发生了变化 -&gt; 导致Hyperledger Fabric的容器内域名解析从pure Go resolver切换至cgo resolver -&gt; 触发了一个已知的由静态链接cgo导致的SIGSEGV错误 -&gt; 导致Hyperledger Fabric部署失败<br>  解决方案：<br>  更新Hyperledger Fabric的docker compose yaml模板，为所有Hyperledger Fabric的节点（如orderer, peer, ca, cli等）添加环境变量GODEBUG=netdns=go以强制使用pure Go resolver。</p>
+</blockquote>
+</blockquote>
+<h2 id="体验Fabric"><a href="#体验Fabric" class="headerlink" title="体验Fabric"></a>体验Fabric</h2><p>执行下面的命令:<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line">./byfn.sh up -i 1.1.0</div><div class="line"></div><div class="line">Starting with channel <span class="string">'mychannel'</span> and CLI timeout of <span class="string">'10'</span> seconds and CLI delay of <span class="string">'3'</span> seconds</div><div class="line">Continue? [Y/n] y</div><div class="line">proceeding ...</div><div class="line">2018-04-02 15:21:28.301 UTC [main] main -&gt; INFO 001 Exiting.....</div><div class="line">LOCAL_VERSION=1.1.0</div><div class="line">DOCKER_IMAGE_VERSION=1.1.0</div><div class="line"></div><div class="line">Creating network <span class="string">"net_byfn"</span> with the default driver</div><div class="line">Creating volume <span class="string">"net_peer0.org2.example.com"</span> with default driver</div><div class="line">Creating volume <span class="string">"net_peer1.org2.example.com"</span> with default driver</div><div class="line">Creating volume <span class="string">"net_peer1.org1.example.com"</span> with default driver</div><div class="line">Creating volume <span class="string">"net_peer0.org1.example.com"</span> with default driver</div><div class="line">Creating peer1.org1.example.com ... <span class="keyword">done</span></div><div class="line">Creating cli ... <span class="keyword">done</span></div><div class="line">Creating peer1.org1.example.com ...</div><div class="line">Creating peer0.org2.example.com ...</div><div class="line">Creating orderer.example.com ...</div><div class="line">Creating peer0.org1.example.com ...</div><div class="line">Creating cli ...</div><div class="line"></div><div class="line"> ____    _____      _      ____    _____</div><div class="line">/ ___|  |_   _|    / \    |  _ \  |_   _|</div><div class="line">\___ \    | |     / _ \   | |_) |   | |</div><div class="line"> ___) |   | |    / ___ \  |  _ &lt;    | |</div><div class="line">|____/    |_|   /_/   \_\ |_| \_\   |_|</div><div class="line"></div><div class="line">Build your first network (BYFN) end-to-end <span class="built_in">test</span></div><div class="line">....</div><div class="line">========= All GOOD, BYFN execution completed ===========</div><div class="line"></div><div class="line"></div><div class="line"> _____   _   _   ____</div><div class="line">| ____| | \ | | |  _ \</div><div class="line">|  _|   |  \| | | | | |</div><div class="line">| |___  | |\  | | |_| |</div><div class="line">|_____| |_| \_| |____/</div></pre></td></tr></table></figure></p>
+<h2 id="搭建Hyperledger-Explorer"><a href="#搭建Hyperledger-Explorer" class="headerlink" title="搭建Hyperledger Explorer"></a>搭建Hyperledger Explorer</h2><p>搭建Hyperledger Explorer环境需要一个PostgreSQL数据库，并需要进行初始化。具体参见：<a href="https://github.com/osswangxining/blockchain-explorer。" target="_blank" rel="external">https://github.com/osswangxining/blockchain-explorer。</a></p>
+<h3 id="PostgreSQL"><a href="#PostgreSQL" class="headerlink" title="PostgreSQL"></a>PostgreSQL</h3><p>为简易起见，可以使用已构建好的针对Hyperledger Explorer所需的PostgreSQL Docker镜像，地址如下：<br><a href="https://hub.docker.com/r/osswangxining/hyperledger-explorer-postgresql/" target="_blank" rel="external">https://hub.docker.com/r/osswangxining/hyperledger-explorer-postgresql/</a></p>
+<p>拉取镜像文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker pull osswangxining/hyperledger-explorer-postgresql</div></pre></td></tr></table></figure></p>
+<p>启动容器：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=*******  osswangxining/hyperledger-explorer-postgresql</div></pre></td></tr></table></figure></p>
+<h3 id="Hyperledger-Explorer"><a href="#Hyperledger-Explorer" class="headerlink" title="Hyperledger Explorer"></a>Hyperledger Explorer</h3><p>Hyperledger Explorer本身是一个Nodejs编写的Web应用，为简易起见，可以使用已构建好的Docker镜像搭建环境，地址如下：<br><a href="https://hub.docker.com/r/osswangxining/hyperledger-explorer/" target="_blank" rel="external">https://hub.docker.com/r/osswangxining/hyperledger-explorer/</a></p>
+<p>数据库启动之后，拉取Hyperledger Explorer镜像文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker pull osswangxining/hyperledger-explorer</div></pre></td></tr></table></figure></p>
+<p>启动容器：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run  --name explorer -v /root/blockchain/fabric-samples-1.1.0/first-network/crypto-config:/first-network/crypto-config -v /root/blockchain/config/config.json:/blockchain-explorer/config.json -p 8888:8080 -d osswangxining/hyperledger-explorer</div></pre></td></tr></table></figure></p>
+<p><strong>注意事项</strong></p>
+<ul>
+<li>挂载定制后的config.json到路径/blockchain-explorer/config.json (该路径是指在容器中的实际路径)</li>
+<li>挂载上述步骤生成的crypto-config目录到容器中的路径{crypto-config}<ul>
+<li>{crypto-config} 的值应当与/blockchain-explorer/config.json中指定的值匹配；</li>
+</ul>
+</li>
+<li><p>修改config.json中连接PostgreSQL的信息</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">   &quot;channel&quot;: &quot;mychannel&quot;,</div><div class="line">   &quot;pg&quot;: &#123;</div><div class="line">	&quot;host&quot;: &quot;127.0.0.1&quot;,</div><div class="line">	&quot;port&quot;: &quot;5432&quot;,</div><div class="line">	&quot;database&quot;: &quot;fabricexplorer&quot;,</div><div class="line">	&quot;username&quot;: &quot;hppoc&quot;,</div><div class="line">	&quot;passwd&quot;: &quot;password&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="Explorer控制台"><a href="#Explorer控制台" class="headerlink" title="Explorer控制台"></a>Explorer控制台</h3><p>打开浏览器，输入地址<a href="http://localhost:8080可以看到如下：" target="_blank" rel="external">http://localhost:8080可以看到如下：</a></p>
+<p><img src="/images/hyperledger_explorer_screenshot.png" alt="Explorer控制台"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Xi Ning Wang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://osswangxining.github.io/blockchain-gettingstarted/" title="在Ubuntu16.04上构建第一个fabric网络">https://osswangxining.github.io/blockchain-gettingstarted/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/blockchain/" rel="tag"># blockchain</a>
+          
+            <a href="/tags/Kubernetes/" rel="tag"># Kubernetes</a>
+          
+            <a href="/tags/container/" rel="tag"># container</a>
+          
+            <a href="/tags/容器/" rel="tag"># 容器</a>
+          
+            <a href="/tags/区块链/" rel="tag"># 区块链</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/nginx-grpc/" rel="next" title="Service Mesh利器：NGINX+gRPC">
+                <i class="fa fa-chevron-left"></i> Service Mesh利器：NGINX+gRPC
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/bio.png"
+                alt="Xi Ning Wang" />
+            
+              <p class="site-author-name" itemprop="name">Xi Ning Wang</p>
+              <p class="site-description motion-element" itemprop="description">专注于分布式高性能技术架构、容器|K8S、IoT云平台，支持语言：Java(script) | Python | Golang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/osswangxining" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:osswangxining@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://plus.google.com/osswangxining" target="_blank" title="Google">
+                      
+                        <i class="fa fa-fw fa-google"></i>Google</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/osswangxining" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://istio.io" title="Istio" target="_blank">Istio</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://grpc.io/" title="gRPC" target="_blank">gRPC</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Hyperledger-Fabric"><span class="nav-number">2.</span> <span class="nav-text">安装Hyperledger Fabric</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装fabric-samples-1-1-0"><span class="nav-number">3.</span> <span class="nav-text">安装fabric-samples-1.1.0</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#生成证书和区块"><span class="nav-number">4.</span> <span class="nav-text">生成证书和区块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#体验Fabric"><span class="nav-number">5.</span> <span class="nav-text">体验Fabric</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#搭建Hyperledger-Explorer"><span class="nav-number">6.</span> <span class="nav-text">搭建Hyperledger Explorer</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PostgreSQL"><span class="nav-number">6.1.</span> <span class="nav-text">PostgreSQL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hyperledger-Explorer"><span class="nav-number">6.2.</span> <span class="nav-text">Hyperledger Explorer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Explorer控制台"><span class="nav-number">6.3.</span> <span class="nav-text">Explorer控制台</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xi Ning Wang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=5.1.4"></script>
+
+
+</body>
+</html>

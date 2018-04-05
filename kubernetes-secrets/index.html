@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="分布式,Kubernetes,容器,配置,Secrets," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Secrets描述在Kubernetes中，Secret对象类型主要目的是保存一些私密数据，比如密码, tokens, ssh keys等信息。将这些信息放在Secret对象中比直接放在pod或docker image中更安全，也更方便使用。 创建Secrets对象的方式有两种，一种是用户手动创建，另一种是集群自动创建。一个已经创建好的Secrets对象有两种方式被pod对象使用，其一，在cont">
+<meta name="keywords" content="分布式,Kubernetes,容器,配置,Secrets">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetes Secrets">
+<meta property="og:url" content="https://osswangxining.github.io/kubernetes-secrets/index.html">
+<meta property="og:site_name" content="Technical Blog">
+<meta property="og:description" content="Secrets描述在Kubernetes中，Secret对象类型主要目的是保存一些私密数据，比如密码, tokens, ssh keys等信息。将这些信息放在Secret对象中比直接放在pod或docker image中更安全，也更方便使用。 创建Secrets对象的方式有两种，一种是用户手动创建，另一种是集群自动创建。一个已经创建好的Secrets对象有两种方式被pod对象使用，其一，在cont">
+<meta property="og:updated_time" content="2018-04-05T08:58:11.416Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Kubernetes Secrets">
+<meta name="twitter:description" content="Secrets描述在Kubernetes中，Secret对象类型主要目的是保存一些私密数据，比如密码, tokens, ssh keys等信息。将这些信息放在Secret对象中比直接放在pod或docker image中更安全，也更方便使用。 创建Secrets对象的方式有两种，一种是用户手动创建，另一种是集群自动创建。一个已经创建好的Secrets对象有两种方式被pod对象使用，其一，在cont">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://osswangxining.github.io/kubernetes-secrets/"/>
+
+
+
+
+
+  <title>Kubernetes Secrets | Technical Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Technical Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Welcome to my world! 有问题请osswangxining（at）163.com</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://osswangxining.github.io/kubernetes-secrets/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/bio.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Kubernetes Secrets</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-10T12:46:25+00:00">
+                2017-03-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式&云计算</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Secrets描述"><a href="#Secrets描述" class="headerlink" title="Secrets描述"></a>Secrets描述</h2><p>在Kubernetes中，Secret对象类型主要目的是保存一些私密数据，比如密码, tokens, ssh keys等信息。将这些信息放在Secret对象中比直接放在pod或docker image中更安全，也更方便使用。</p>
+<p>创建Secrets对象的方式有两种，一种是用户手动创建，另一种是集群自动创建。<br>一个已经创建好的Secrets对象有两种方式被pod对象使用，其一，在container中的volume对象里以file的形式被使用，其二，在pull images时被kubelet使用。</p>
+<p>为了使用Secret对象，pod必须引用这个Secret，同样可以手动或者自动来执行引用操作。</p>
+<h2 id="Built-in-Secrets"><a href="#Built-in-Secrets" class="headerlink" title="Built-in Secrets"></a>Built-in Secrets</h2><p>Kubernetes会自动创建包含证书信息的Secret，并且使用它来访问api, Kubernetes也将自动修改pod来使用这个Secret。</p>
+<p>自动创建的Secret以及所使用的api证书,可以根据需要disable或者override。如果仅仅需要安全访问apiserver，那么上述的流程是推荐的方式。<br><a id="more"></a></p>
+<h2 id="自定义Secrets"><a href="#自定义Secrets" class="headerlink" title="自定义Secrets"></a>自定义Secrets</h2><h3 id="通过kubectl自定义Secrets"><a href="#通过kubectl自定义Secrets" class="headerlink" title="通过kubectl自定义Secrets"></a>通过kubectl自定义Secrets</h3><p>数据中的字段为map类型。其中keys必须符合dns_subdomain规则，values可以为任意类型，使用base64编码。上述例子中，username和password的数据值在base64编码前的值为value-1 和 value-2。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ echo -n &quot;admin&quot; &gt; ./username.txt</div><div class="line">xis-macbook-pro:~ xiningwang$  echo -n &quot;1f2d1e2e67df&quot; &gt; ./password.txt</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl create secret generic db-user-pass --from-file=./username.txt --from-file=./password.txt</div><div class="line">secret &quot;db-user-pass&quot; created</div></pre></td></tr></table></figure></p>
+<p>查看创建的Secrets:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get secrets</div><div class="line">NAME                  TYPE                                  DATA      AGE</div><div class="line">db-user-pass          Opaque                                2         6m</div><div class="line">default-token-t5bk8   kubernetes.io/service-account-token   3         4d</div><div class="line">xis-macbook-pro:~ xiningwang$ kubectl describe secrets/db-user-pass</div><div class="line">Name:  		db-user-pass</div><div class="line">Namespace:     	default</div><div class="line">Labels:		&lt;none&gt;</div><div class="line">Annotations:   	&lt;none&gt;</div><div class="line"></div><div class="line">Type:  	Opaque</div><div class="line"></div><div class="line">Data</div><div class="line">====</div><div class="line">password.txt:  	12 bytes</div><div class="line">username.txt:  	5 bytes</div></pre></td></tr></table></figure></p>
+<h3 id="手工创建Secrets"><a href="#手工创建Secrets" class="headerlink" title="手工创建Secrets"></a>手工创建Secrets</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ echo -n &quot;admin&quot; | base64</div><div class="line">YWRtaW4=</div><div class="line">xis-macbook-pro:~ xiningwang$ echo -n &quot;1f2d1e2e67df&quot; | base64</div><div class="line">MWYyZDFlMmU2N2Rm</div><div class="line">xis-macbook-pro:~ xiningwang$ vi mysecrect.yaml</div><div class="line">apiVersion: v1</div><div class="line">kind: Secret</div><div class="line">metadata:</div><div class="line">  name: mysecret</div><div class="line">type: Opaque</div><div class="line">data:</div><div class="line">  username: YWRtaW4=</div><div class="line">  password: MWYyZDFlMmU2N2Rm</div></pre></td></tr></table></figure>
+<p>使用yaml文件创建Secrets:</p>
+<blockquote>
+<p>xis-macbook-pro:~ xiningwang$ kubectl create -f ./mysecrect.yaml<br>secret “mysecret” created</p>
+</blockquote>
+<h2 id="查看Secrets"><a href="#查看Secrets" class="headerlink" title="查看Secrets"></a>查看Secrets</h2><p>使用如下命令获取创建的Secrets内容:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ kubectl get secret db-user-pass -o yaml</div><div class="line">apiVersion: v1</div><div class="line">data:</div><div class="line">  password.txt: MWYyZDFlMmU2N2Rm</div><div class="line">  username.txt: YWRtaW4=</div><div class="line">kind: Secret</div><div class="line">metadata:</div><div class="line">  creationTimestamp: 2017-05-09T07:54:29Z</div><div class="line">  name: db-user-pass</div><div class="line">  namespace: default</div><div class="line">  resourceVersion: &quot;84609&quot;</div><div class="line">  selfLink: /api/v1/namespaces/default/secrets/db-user-pass</div><div class="line">  uid: bb23a365-348c-11e7-ab36-080027fd8883</div><div class="line">type: Opaque</div></pre></td></tr></table></figure></p>
+<p>base64解密:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ echo &quot;MWYyZDFlMmU2N2Rm&quot; | base64 --decode</div><div class="line">1f2d1e2e67df</div></pre></td></tr></table></figure></p>
+<h2 id="使用Secrets"><a href="#使用Secrets" class="headerlink" title="使用Secrets"></a>使用Secrets</h2><h3 id="手动为pod绑定secret"><a href="#手动为pod绑定secret" class="headerlink" title="手动为pod绑定secret"></a>手动为pod绑定secret</h3><p>必须有spec.volumes才能使用secret。 如果一个pod中有多个container，每个container需要他们单独对应的volumeMounts ，但是一个secret只能对应一个spec.volumes。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line"> &quot;apiVersion&quot;: &quot;v1&quot;,</div><div class="line"> &quot;kind&quot;: &quot;Pod&quot;,</div><div class="line">  &quot;metadata&quot;: &#123;</div><div class="line">    &quot;name&quot;: &quot;mypod&quot;,</div><div class="line">    &quot;namespace&quot;: &quot;myns&quot;</div><div class="line">  &#125;,</div><div class="line">  &quot;spec&quot;: &#123;</div><div class="line">    &quot;containers&quot;: [&#123;</div><div class="line">      &quot;name&quot;: &quot;mypod&quot;,</div><div class="line">      &quot;image&quot;: &quot;redis&quot;,</div><div class="line">      &quot;volumeMounts&quot;: [&#123;</div><div class="line">        &quot;name&quot;: &quot;foo&quot;,</div><div class="line">        &quot;mountPath&quot;: &quot;/etc/foo&quot;,</div><div class="line">        &quot;readOnly&quot;: true</div><div class="line">      &#125;]</div><div class="line">    &#125;],</div><div class="line">    &quot;volumes&quot;: [&#123;</div><div class="line">      &quot;name&quot;: &quot;foo&quot;,</div><div class="line">      &quot;secret&quot;: &#123;</div><div class="line">        &quot;secretName&quot;: &quot;mysecret&quot;</div><div class="line">      &#125;</div><div class="line">    &#125;]</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>查看Secrets的值:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">$ ls /etc/foo/</div><div class="line">username</div><div class="line">password</div><div class="line">$ cat /etc/foo/username</div><div class="line">admin</div><div class="line">$ cat /etc/foo/password</div><div class="line">1f2d1e2e67df</div></pre></td></tr></table></figure></p>
+<h3 id="使用Secrets作为环境变量"><a href="#使用Secrets作为环境变量" class="headerlink" title="使用Secrets作为环境变量"></a>使用Secrets作为环境变量</h3><blockquote>
+<p> 定义对Secrets的引用: env[x].valueFrom.secretKeyRef.</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">apiVersion: v1</div><div class="line">kind: Pod</div><div class="line">metadata:</div><div class="line">  name: secret-env-pod</div><div class="line">spec:</div><div class="line">  containers:</div><div class="line">    - name: mycontainer</div><div class="line">      image: redis</div><div class="line">      env:</div><div class="line">        - name: SECRET_USERNAME</div><div class="line">          valueFrom:</div><div class="line">            secretKeyRef:</div><div class="line">              name: mysecret</div><div class="line">              key: username</div><div class="line">        - name: SECRET_PASSWORD</div><div class="line">          valueFrom:</div><div class="line">            secretKeyRef:</div><div class="line">              name: mysecret</div><div class="line">              key: password</div><div class="line">  restartPolicy: Never</div></pre></td></tr></table></figure>
+<p>查看Secrets的值:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">$ echo $SECRET_USERNAME</div><div class="line">admin</div><div class="line">$ echo $SECRET_PASSWORD</div><div class="line">1f2d1e2e67df</div></pre></td></tr></table></figure></p>
+<h2 id="Secret与Pod的生命周期"><a href="#Secret与Pod的生命周期" class="headerlink" title="Secret与Pod的生命周期"></a>Secret与Pod的生命周期</h2><p>当通过api创建一个pod后，不会去检查所引用的secret是否存在。一旦这个pod被使用，kubelet将会尝试去获取引用的secret的值。如果这个secret不存在，或者kubelet暂时链接不上apiserver，kubelet将会定期重试，并发送一个event来解释pod没有启动的原因。如果获取到了对应的secret，kubelet将会创建对应的volume并绑定到container。</p>
+<p>一旦kubelet创建了一个pod，则container使用的相关secret volume不会在改变，即使对应的secret对象被修改。如果为了改变使用的secret，则必须删除旧的pod，并重新创建一个新的pod。</p>
+<p>##限制<br>在使用之前，Secret volume 资源被验证，以确保指定的对象引用真是指向一个secret对象。因此，在pod使用它之前必须保证需要的secret被成功创建。Secret api对象从属于namespace，一个Secret对象只能被同namespace的pod所使用。</p>
+<p>单个secret限制在1Mb之内，防止过大的secret耗尽apiserver &amp; kubelet的内存。然而，创建许多类似的secret同样也会无用的消耗掉apiserver&amp;kubelet的内存。</p>
+<p>kubelet目前只支持pod使用来自于apiserver的secret。pods包括了被 kubectl创建的pod 或者 被replication controller间接创建的。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Xi Ning Wang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://osswangxining.github.io/kubernetes-secrets/" title="Kubernetes Secrets">https://osswangxining.github.io/kubernetes-secrets/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/分布式/" rel="tag"># 分布式</a>
+          
+            <a href="/tags/Kubernetes/" rel="tag"># Kubernetes</a>
+          
+            <a href="/tags/容器/" rel="tag"># 容器</a>
+          
+            <a href="/tags/配置/" rel="tag"># 配置</a>
+          
+            <a href="/tags/Secrets/" rel="tag"># Secrets</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/kubernetes-configmap/" rel="next" title="Kubernetes ConfigMap">
+                <i class="fa fa-chevron-left"></i> Kubernetes ConfigMap
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/spark/" rel="prev" title="Spark">
+                Spark <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/bio.png"
+                alt="Xi Ning Wang" />
+            
+              <p class="site-author-name" itemprop="name">Xi Ning Wang</p>
+              <p class="site-description motion-element" itemprop="description">专注于分布式高性能技术架构、容器|K8S、IoT云平台，支持语言：Java(script) | Python | Golang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/osswangxining" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:osswangxining@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://plus.google.com/osswangxining" target="_blank" title="Google">
+                      
+                        <i class="fa fa-fw fa-google"></i>Google</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/osswangxining" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://istio.io" title="Istio" target="_blank">Istio</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://grpc.io/" title="gRPC" target="_blank">gRPC</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Secrets描述"><span class="nav-number">1.</span> <span class="nav-text">Secrets描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Built-in-Secrets"><span class="nav-number">2.</span> <span class="nav-text">Built-in Secrets</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自定义Secrets"><span class="nav-number">3.</span> <span class="nav-text">自定义Secrets</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#通过kubectl自定义Secrets"><span class="nav-number">3.1.</span> <span class="nav-text">通过kubectl自定义Secrets</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#手工创建Secrets"><span class="nav-number">3.2.</span> <span class="nav-text">手工创建Secrets</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看Secrets"><span class="nav-number">4.</span> <span class="nav-text">查看Secrets</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用Secrets"><span class="nav-number">5.</span> <span class="nav-text">使用Secrets</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#手动为pod绑定secret"><span class="nav-number">5.1.</span> <span class="nav-text">手动为pod绑定secret</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用Secrets作为环境变量"><span class="nav-number">5.2.</span> <span class="nav-text">使用Secrets作为环境变量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Secret与Pod的生命周期"><span class="nav-number">6.</span> <span class="nav-text">Secret与Pod的生命周期</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xi Ning Wang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=5.1.4"></script>
+
+
+</body>
+</html>

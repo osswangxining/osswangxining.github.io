@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="IoT," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="扫盲LoRaLoRa是个什么鬼?物联网应用中的无线技术有多种，可组成局域网或广域网。组成局域网的无线技术主要有2.4GHz的WiFi，蓝牙、Zigbee等，组成广域网的无线技术主要有2G/3G/4G等。这些无线技术，优缺点非常明显，如下图所示：  在低功耗广域网（Low Power Wide Area Network, LPWAN）产生之前，似乎远距离和低功耗两者之间只能二选一。当采用LPWAN技">
+<meta name="keywords" content="IoT">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用LoRa在Edge端组网并接入IoT云平台">
+<meta property="og:url" content="https://osswangxining.github.io/iot-connect/index.html">
+<meta property="og:site_name" content="Technical Blog">
+<meta property="og:description" content="扫盲LoRaLoRa是个什么鬼?物联网应用中的无线技术有多种，可组成局域网或广域网。组成局域网的无线技术主要有2.4GHz的WiFi，蓝牙、Zigbee等，组成广域网的无线技术主要有2G/3G/4G等。这些无线技术，优缺点非常明显，如下图所示：  在低功耗广域网（Low Power Wide Area Network, LPWAN）产生之前，似乎远距离和低功耗两者之间只能二选一。当采用LPWAN技">
+<meta property="og:image" content="https://osswangxining.github.io/images/iot-connect-protocol.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/iot-connect-protocol-2.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/lorawan_protocol_architecture.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/lora-alliance.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/lorawan_ecosystem.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/iot-connect-class.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/LoRaWAN_JoinProcedure.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/lora-device-gateway-cloud.png">
+<meta property="og:image" content="https://docs.loraserver.io/img/architecture.png">
+<meta property="og:updated_time" content="2018-04-05T08:58:11.416Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用LoRa在Edge端组网并接入IoT云平台">
+<meta name="twitter:description" content="扫盲LoRaLoRa是个什么鬼?物联网应用中的无线技术有多种，可组成局域网或广域网。组成局域网的无线技术主要有2.4GHz的WiFi，蓝牙、Zigbee等，组成广域网的无线技术主要有2G/3G/4G等。这些无线技术，优缺点非常明显，如下图所示：  在低功耗广域网（Low Power Wide Area Network, LPWAN）产生之前，似乎远距离和低功耗两者之间只能二选一。当采用LPWAN技">
+<meta name="twitter:image" content="https://osswangxining.github.io/images/iot-connect-protocol.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://osswangxining.github.io/iot-connect/"/>
+
+
+
+
+
+  <title>使用LoRa在Edge端组网并接入IoT云平台 | Technical Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Technical Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Welcome to my world! 有问题请osswangxining（at）163.com</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://osswangxining.github.io/iot-connect/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/bio.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用LoRa在Edge端组网并接入IoT云平台</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-30T12:46:25+00:00">
+                2017-10-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/IoT/" itemprop="url" rel="index">
+                    <span itemprop="name">IoT</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="扫盲LoRa"><a href="#扫盲LoRa" class="headerlink" title="扫盲LoRa"></a>扫盲LoRa</h2><h3 id="LoRa是个什么鬼"><a href="#LoRa是个什么鬼" class="headerlink" title="LoRa是个什么鬼?"></a>LoRa是个什么鬼?</h3><p>物联网应用中的无线技术有多种，可组成局域网或广域网。组成局域网的无线技术主要有2.4GHz的WiFi，蓝牙、Zigbee等，组成广域网的无线技术主要有2G/3G/4G等。这些无线技术，优缺点非常明显，如下图所示：</p>
+<p><img src="/images/iot-connect-protocol.png" alt=""></p>
+<p>在低功耗广域网（Low Power Wide Area Network, LPWAN）产生之前，似乎远距离和低功耗两者之间只能二选一。当采用LPWAN技术之后，设计人员可做到两者都兼顾，最大程度地实现更长距离通信与更低功耗，同时还可节省额外的中继器成本。</p>
+<p>LoRa是LPWAN通信技术中的一种，是美国Semtech公司采用和推广的一种基于扩频技术的超远距离无线传输方案。这一方案改变了以往关于传输距离与功耗的折衷考虑方式，为用户提供一种简单的能实现远距离、长电池寿命、大容量的系统，进而扩展传感网络。目前，LoRa 主要在全球免费频段运行，包括433、868、915 MHz等。<br><a id="more"></a><br>LoRa技术具有远距离、低功耗（电池寿命长）、多节点、低成本的特性。LoRa网络主要由终端（可内置LoRa模块）、网关、Server和云四部分组成。应用数据可双向传输。如下所示：</p>
+<p><img src="/images/iot-connect-protocol-2.png" alt=""></p>
+<p>可以看到一个LoRaWAN网络架构中包含了终端、基站、NS(网络服务器)、应用服务器这四个部分。基站和终端之间采用星型网络拓扑，由于LoRa的长距离特性，它们之间得以使用单跳传输。在终端部分官方列了6个典型应用，有个细节，你会发现终端节点可以同时发给多个基站。基站则对NS和终端之间的LoRaWAN协议数据做转发处理，将LoRaWAN数据分别承载在了LoRa射频传输和Tcp/IP上。</p>
+<h3 id="协议栈"><a href="#协议栈" class="headerlink" title="协议栈"></a>协议栈</h3><p>下面这张图虽然有点略偏技术，但还是比较清晰地介绍了LoRaWAN在协议和网络架构的设计层次。此外，协议也考虑了节点功耗，网络容量，QoS，安全性和网络应用多样性等因素。</p>
+<p><img src="/images/lorawan_protocol_architecture.png" alt=""></p>
+<h3 id="背后的利益"><a href="#背后的利益" class="headerlink" title="背后的利益"></a>背后的利益</h3><p>和LoRa相爱相杀的 NB-IoT 出自于全球标准化组织 3GPP ，由大名鼎鼎的ETSI（欧洲电信标准化委员会）、日本ARIB（无线行业企业协会）和TTC（电信技术委员会）、CCSA（中国通信标准化协会）、韩国TTA（电信技术协会）和北美ATIS（世界无线通讯解决方案联盟）等等组成。</p>
+<p>相比于 3GPP 的根正苗红，LoRaWAN 背后的LoRa联盟则势力弱了一些。从协议的封面可以看到作者是来自于3个董事会成员公司: Semtech, IBM，Actility。</p>
+<p>我们知道每一项技术的推广，都伴随着利益的推动。虽然组织和联盟都是非盈利性组织，但是旗下的企业成员都不是一心来做公益的。从企业角度来讲，花5W去投入做的事情，注定是抱着撬动至少50W美金的预期去做的。</p>
+<p>LoRa联盟于2015年上半年由思科（Cisco）、IBM和升特（Semtech）等多家厂商共同发起创立，截止目前(2017.04)有400+的成员，董事会成员中也有不少大企业，大家共同为瓜分未来低功耗广域网的蛋糕而抱团努力着。这是我做的一个表格，收集了现阶段愿意交纳5W美金会费的19个董事会成员，你可以看到这些企业的愿景。</p>
+<p><img src="/images/lora-alliance.png" alt=""></p>
+<h3 id="行业生态"><a href="#行业生态" class="headerlink" title="行业生态"></a>行业生态</h3><p>结合行业生态再来看下上面提到的网络架构，大家可以各自想想自己的位置。</p>
+<p><img src="/images/lorawan_ecosystem.png" alt=""></p>
+<h2 id="LoRa协议概述"><a href="#LoRa协议概述" class="headerlink" title="LoRa协议概述"></a>LoRa协议概述</h2><h3 id="终端设备分类"><a href="#终端设备分类" class="headerlink" title="终端设备分类"></a>终端设备分类</h3><p>LoRaWAN网络根据实际应用的不同，把终端设备划分成A/B/C三类：</p>
+<ul>
+<li>Class A：双向通信终端设备。<ul>
+<li>这一类的终端设备允许双向通信，每一个终端设备上行传输会伴随着两个下行接收窗口。终端设备的传输槽是基于其自身通信需求，其微调是基于一个随机的时间基准（ALOHA协议）。Class  A所属的终端设备在应用时功耗最低，终端发送一个上行传输信号后，服务器能很迅速地进行下行通信，任何时候，服务器的下行通信都只能在上行通信之后。</li>
+<li>下行时机:必须等待终端上报数据后才能对其下发数据。</li>
+<li>应用场景:垃圾桶监测、烟雾报警器、气体监测等</li>
+</ul>
+</li>
+<li>Class B：具有预设接收槽的双向通信终端设备。<ul>
+<li>这一类的终端设备会在预设时间中开放多余的接收窗口，为了达到这一目的，终端设备会同步从网关接收一个Beacon，通过Beacon将基站与模块的时间进行同步。这种方式能使服务器知晓终端设备正在接收数据。</li>
+<li>下行时机:在终端固定接收窗口即可对其下发数据，下发的延时有所提高。</li>
+<li>应用场景:阀控水气电表等</li>
+</ul>
+</li>
+<li>Class C：具有最大接收槽的双向通信终端设备。<ul>
+<li>这一类的终端设备持续开放接收窗口，只在传输时关闭。Class C 的终端会比 Class A 和 Class B 更加耗电。</li>
+<li>下行时机:由于终端处于持续接收状态，可在任意时间对终端下发数据。</li>
+<li>应用场景:路灯控制等</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/iot-connect-class.png" alt=""></p>
+<h3 id="终端节点的上下行传输"><a href="#终端节点的上下行传输" class="headerlink" title="终端节点的上下行传输"></a>终端节点的上下行传输</h3><ul>
+<li>对于Class A来说， 接收窗口RX1一般是在上行后1秒开始，接收窗口RX2是在上行后2秒开始。</li>
+<li>Class B 的时隙则复杂一些，它有一个同步时隙beacon，还有一个固定周期的接收窗口ping时隙。</li>
+<li>Class C 和 A 基本是相同的，只是在 Class A 休眠的期间，它都打开了接收窗口RX2。</li>
+</ul>
+<h3 id="终端节点的加网"><a href="#终端节点的加网" class="headerlink" title="终端节点的加网"></a>终端节点的加网</h3><p>在正式收发数据之前，终端都必须先加网。</p>
+<p>有两种加网方式：Over-the-Air Activation(空中激活方式 OTAA)，Activation by Personalization(独立激活方式 ABP)。</p>
+<p>商用的LoRaWAN网络一般都是走OTAA激活流程，这样安全性才得以保证。此种方式需要准备 DevEUI，AppEUI，AppKey 这三个参数。</p>
+<p><img src="/images/LoRaWAN_JoinProcedure.png" alt=""></p>
+<ul>
+<li>DevEUI 是一个类似IEEE EUI64的全球唯一ID，标识唯一的终端设备。相当于是设备的MAC地址。</li>
+<li>AppEUI 是一个类似IEEE EUI64的全球唯一ID，标识唯一的应用提供者。比如各家的垃圾桶监测应用、烟雾报警器应用等等，都具有自己的唯一ID。</li>
+<li>AppKey 是由应用程序拥有者分配给终端。</li>
+</ul>
+<p>终端在发起加网join流程后，发出加网命令，NS(网络服务器)确认无误后会给终端做加网回复，分配网络地址 DevAddr(32位ID)，双方利用加网回复中的相关信息以及AppKey，产生会话密钥NwkSKey和AppSKey，用来对数据进行加密和校验。</p>
+<p>如果是采用第二种加网方式，即ABP激活，则比较简单粗暴，直接配置 DevAddr，NwkSKey，AppSKey 这三个LoRaWAN最终通讯的参数，不再需要join流程。在这种情况下，这个设备是可以直接发应用数据的。</p>
+<h3 id="数据收发"><a href="#数据收发" class="headerlink" title="数据收发"></a>数据收发</h3><p>加网之后，应用数据就被加密处理了。 LoRaWAN规定数据帧类型有 Confirmed 或者 Unconfirmed 两种，即 需要应答 和不需要应答类型。厂商可以根据应用需要选择合适的类型。</p>
+<p>另外，从介绍中可以看到，LoRaWAN设计之初的一大考虑就是要支持应用多样性。除了利用 AppEUI 来划分应用外，在传输时也可以利用 FPort 应用端口来对数据分别处理。FPort 的取值范围是(1~223)，由应用层来指定。</p>
+<h3 id="空中唤醒技术"><a href="#空中唤醒技术" class="headerlink" title="空中唤醒技术"></a>空中唤醒技术</h3><p>无线网络应用中，通常要求节点尽可能休眠，最大限度降低功耗，但又希望节点能尽可能及时地收发无线数据，这似乎是个不可调和的矛盾。</p>
+<p>但是有个神奇的功能，空中唤醒。节点即使处于休眠，当需要节点工作时可以直接通过无线手段唤醒该节点。</p>
+<h2 id="LoRa组网"><a href="#LoRa组网" class="headerlink" title="LoRa组网"></a>LoRa组网</h2><p>千言万语汇成一句话，oh，一幅画。</p>
+<p><img src="/images/lora-device-gateway-cloud.png" alt=""></p>
+<h3 id="开源实现"><a href="#开源实现" class="headerlink" title="开源实现"></a>开源实现</h3><p>A LoRa Server architecture constists out of multiple components:</p>
+<p><img src="https://docs.loraserver.io/img/architecture.png" alt=""></p>
+<h3 id="LoRa数据包转发"><a href="#LoRa数据包转发" class="headerlink" title="LoRa数据包转发"></a>LoRa数据包转发</h3><p>A LoRa packet forwarder is a program running on the host of a LoRa gateway that forwards RF packets receive by the concentrator to a server through a IP/UDP link, and emits RF packets that are sent by the server.</p>
+<p>Uplink: radio packets received by the gateway, with metadata added by the gateway, forwarded to the server. Might also include gateway status.</p>
+<p>Downlink: packets generated by the server, with additional metadata, to be transmitted by the gateway on the radio channel. Might also include configuration data for the gateway.</p>
+<h3 id="LoRa网关桥"><a href="#LoRa网关桥" class="headerlink" title="LoRa网关桥"></a>LoRa网关桥</h3><p>LoRa Gateway Bridge is a service which abstracts the packet_forwarder UDP protocol running on most LoRa gateways into JSON over MQTT. It enables you to use MQTT for receiving data from and sending data to your gateways.</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Xi Ning Wang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://osswangxining.github.io/iot-connect/" title="使用LoRa在Edge端组网并接入IoT云平台">https://osswangxining.github.io/iot-connect/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/IoT/" rel="tag"># IoT</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/ai-objectdetection/" rel="next" title="使用定制数据集训练Faster-RCNN模型">
+                <i class="fa fa-chevron-left"></i> 使用定制数据集训练Faster-RCNN模型
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/architect-view-on-docker/" rel="prev" title="以架构师的角度看Docker">
+                以架构师的角度看Docker <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/bio.png"
+                alt="Xi Ning Wang" />
+            
+              <p class="site-author-name" itemprop="name">Xi Ning Wang</p>
+              <p class="site-description motion-element" itemprop="description">专注于分布式高性能技术架构、容器|K8S、IoT云平台，支持语言：Java(script) | Python | Golang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/osswangxining" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:osswangxining@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://plus.google.com/osswangxining" target="_blank" title="Google">
+                      
+                        <i class="fa fa-fw fa-google"></i>Google</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/osswangxining" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://istio.io" title="Istio" target="_blank">Istio</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://grpc.io/" title="gRPC" target="_blank">gRPC</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#扫盲LoRa"><span class="nav-number">1.</span> <span class="nav-text">扫盲LoRa</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#LoRa是个什么鬼"><span class="nav-number">1.1.</span> <span class="nav-text">LoRa是个什么鬼?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#协议栈"><span class="nav-number">1.2.</span> <span class="nav-text">协议栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#背后的利益"><span class="nav-number">1.3.</span> <span class="nav-text">背后的利益</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#行业生态"><span class="nav-number">1.4.</span> <span class="nav-text">行业生态</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LoRa协议概述"><span class="nav-number">2.</span> <span class="nav-text">LoRa协议概述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#终端设备分类"><span class="nav-number">2.1.</span> <span class="nav-text">终端设备分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#终端节点的上下行传输"><span class="nav-number">2.2.</span> <span class="nav-text">终端节点的上下行传输</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#终端节点的加网"><span class="nav-number">2.3.</span> <span class="nav-text">终端节点的加网</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据收发"><span class="nav-number">2.4.</span> <span class="nav-text">数据收发</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#空中唤醒技术"><span class="nav-number">2.5.</span> <span class="nav-text">空中唤醒技术</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LoRa组网"><span class="nav-number">3.</span> <span class="nav-text">LoRa组网</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#开源实现"><span class="nav-number">3.1.</span> <span class="nav-text">开源实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LoRa数据包转发"><span class="nav-number">3.2.</span> <span class="nav-text">LoRa数据包转发</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LoRa网关桥"><span class="nav-number">3.3.</span> <span class="nav-text">LoRa网关桥</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xi Ning Wang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=5.1.4"></script>
+
+
+</body>
+</html>

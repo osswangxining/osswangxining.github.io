@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="AI,CNN,RCNN,DL,ML," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="基本概念介绍目标检测的四个基本步骤：  候选区域生成 特征提取 分类 位置精修  RCNN的算法：   将一张图片生成2K个候选区域；    对每个候选区域，使用深度网络(deep net)提取特征；    特征送入每一类的SVM分类器，判别是否属于该类；    使用回归器精细修正候选框的位置；    从RCNN到fast RCNN，再到faster RCNN，目标检测的四个基本步骤终于被统一到一">
+<meta name="keywords" content="AI,CNN,RCNN,DL,ML">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用定制数据集训练Faster-RCNN模型">
+<meta property="og:url" content="https://osswangxining.github.io/ai-objectdetection/index.html">
+<meta property="og:site_name" content="Technical Blog">
+<meta property="og:description" content="基本概念介绍目标检测的四个基本步骤：  候选区域生成 特征提取 分类 位置精修  RCNN的算法：   将一张图片生成2K个候选区域；    对每个候选区域，使用深度网络(deep net)提取特征；    特征送入每一类的SVM分类器，判别是否属于该类；    使用回归器精细修正候选框的位置；    从RCNN到fast RCNN，再到faster RCNN，目标检测的四个基本步骤终于被统一到一">
+<meta property="og:image" content="https://osswangxining.github.io/images/rcnn-fast-faster.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/frcnn-caffe-compile-error-gcc.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/frcnn-caffe-compile-error-gcc-version.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/voc2007-folder.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/annotations-sample-xml.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/jpegimages-sample.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/training-1.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/training-2.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/training-3.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/training-4.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/training-5.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/training-6.png">
+<meta property="og:updated_time" content="2018-04-05T08:58:11.412Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用定制数据集训练Faster-RCNN模型">
+<meta name="twitter:description" content="基本概念介绍目标检测的四个基本步骤：  候选区域生成 特征提取 分类 位置精修  RCNN的算法：   将一张图片生成2K个候选区域；    对每个候选区域，使用深度网络(deep net)提取特征；    特征送入每一类的SVM分类器，判别是否属于该类；    使用回归器精细修正候选框的位置；    从RCNN到fast RCNN，再到faster RCNN，目标检测的四个基本步骤终于被统一到一">
+<meta name="twitter:image" content="https://osswangxining.github.io/images/rcnn-fast-faster.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://osswangxining.github.io/ai-objectdetection/"/>
+
+
+
+
+
+  <title>使用定制数据集训练Faster-RCNN模型 | Technical Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Technical Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Welcome to my world! 有问题请osswangxining（at）163.com</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://osswangxining.github.io/ai-objectdetection/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/bio.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用定制数据集训练Faster-RCNN模型</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-10T12:46:25+00:00">
+                2017-10-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Machine-Learning/" itemprop="url" rel="index">
+                    <span itemprop="name">Machine Learning</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Machine-Learning/Deep-Learning/" itemprop="url" rel="index">
+                    <span itemprop="name">Deep Learning</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="基本概念介绍"><a href="#基本概念介绍" class="headerlink" title="基本概念介绍"></a>基本概念介绍</h2><p>目标检测的四个基本步骤：</p>
+<ul>
+<li>候选区域生成</li>
+<li>特征提取</li>
+<li>分类</li>
+<li>位置精修</li>
+</ul>
+<p>RCNN的算法：</p>
+<ul>
+<li><ol>
+<li>将一张图片生成2K个候选区域；</li>
+</ol>
+</li>
+<li><ol>
+<li>对每个候选区域，使用深度网络(deep net)提取特征；</li>
+</ol>
+</li>
+<li><ol>
+<li>特征送入每一类的SVM分类器，判别是否属于该类；</li>
+</ol>
+</li>
+<li><ol>
+<li>使用回归器精细修正候选框的位置；</li>
+</ol>
+</li>
+</ul>
+<p>从RCNN到fast RCNN，再到faster RCNN，目标检测的四个基本步骤终于被统一到一个深度网络框架之内。所有计算没有重复，完全在GPU中完成，大大提高了运行速度。<br><img src="/images/rcnn-fast-faster.png" alt=""></p>
+<p>fast RCNN在RCNN的基础之上，将分类和位置精修统一到了一个深度网络之内。faster RCNN可以简单地看做“区域生成网络+fast RCNN“的系统，用区域生成网络代替fast RCNN中的Selective Search方法。<br><a id="more"></a></p>
+<h2 id="Faster-RCNN的配置与编译"><a href="#Faster-RCNN的配置与编译" class="headerlink" title="Faster-RCNN的配置与编译"></a>Faster-RCNN的配置与编译</h2><h3 id="配置Caffe环境"><a href="#配置Caffe环境" class="headerlink" title="配置Caffe环境"></a>配置Caffe环境</h3><p>下载有关Caffe的所有的依赖项，可以查看安装Caffe的教程</p>
+<h3 id="配置Faster-RCNN环境"><a href="#配置Faster-RCNN环境" class="headerlink" title="配置Faster-RCNN环境"></a>配置Faster-RCNN环境</h3><p>安装cython,python-opencv,easydict:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">sudo apt-get install python-numpy</div><div class="line">sudo apt-get install python-scipy</div><div class="line">pip install cython</div><div class="line">pip install easydict</div><div class="line">pip install shutil</div><div class="line">pip install cPickle</div><div class="line">pip install uuid</div><div class="line">pip install multiprocessing</div><div class="line">pip install xml</div></pre></td></tr></table></figure></p>
+<p>  下载py-faster-rcnn<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"># Make sure to clone with --recursive  </div><div class="line">git clone --recursive https://github.com/rbgirshick/py-faster-rcnn.git</div></pre></td></tr></table></figure></p>
+<p>  进入py-faster-rcnn/lib，执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">make</div></pre></td></tr></table></figure></p>
+<p>  进入py-faster-rcnn/caffe-faster-rcnn，将我改好的Makefile.config复制该路径下:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div></pre></td><td class="code"><pre><div class="line">## Refer to http://caffe.berkeleyvision.org/installation.html</div><div class="line"># Contributions simplifying and improving our build system are welcome!</div><div class="line"></div><div class="line"># cuDNN acceleration switch (uncomment to build with cuDNN).</div><div class="line">USE_CUDNN := 1</div><div class="line"></div><div class="line"># CPU-only switch (uncomment to build without GPU support).</div><div class="line"># CPU_ONLY := 1</div><div class="line"></div><div class="line"># uncomment to disable IO dependencies and corresponding data layers</div><div class="line"># USE_OPENCV := 0</div><div class="line"># USE_LEVELDB := 0</div><div class="line"># USE_LMDB := 0</div><div class="line"></div><div class="line"># uncomment to allow MDB_NOLOCK when reading LMDB files (only if necessary)</div><div class="line">#	You should not set this flag if you will be reading LMDBs with any</div><div class="line">#	possibility of simultaneous read and write</div><div class="line"># ALLOW_LMDB_NOLOCK := 1</div><div class="line"></div><div class="line"># Uncomment if you&apos;re using OpenCV 3</div><div class="line">OPENCV_VERSION := 3</div><div class="line"></div><div class="line"># To customize your choice of compiler, uncomment and set the following.</div><div class="line"># N.B. the default for Linux is g++ and the default for OSX is clang++</div><div class="line"># CUSTOM_CXX := g++</div><div class="line"></div><div class="line"># CUDA directory contains bin/ and lib/ directories that we need.</div><div class="line">CUDA_DIR := /usr/local/cuda</div><div class="line"># On Ubuntu 14.04, if cuda tools are installed via</div><div class="line"># &quot;sudo apt-get install nvidia-cuda-toolkit&quot; then use this instead:</div><div class="line"># CUDA_DIR := /usr</div><div class="line"></div><div class="line"># CUDA architecture setting: going with all of them.</div><div class="line"># For CUDA &lt; 6.0, comment the *_50 through *_61 lines for compatibility.</div><div class="line"># For CUDA &lt; 8.0, comment the *_60 and *_61 lines for compatibility.</div><div class="line">CUDA_ARCH := -gencode arch=compute_20,code=sm_20 \</div><div class="line">		-gencode arch=compute_20,code=sm_21 \</div><div class="line">		-gencode arch=compute_30,code=sm_30 \</div><div class="line">		-gencode arch=compute_35,code=sm_35 \</div><div class="line">		-gencode arch=compute_50,code=sm_50 \</div><div class="line">		-gencode arch=compute_52,code=sm_52 \</div><div class="line">		-gencode arch=compute_60,code=sm_60 \</div><div class="line">		-gencode arch=compute_61,code=sm_61 \</div><div class="line">		-gencode arch=compute_61,code=compute_61</div><div class="line"></div><div class="line"># BLAS choice:</div><div class="line"># atlas for ATLAS (default)</div><div class="line"># mkl for MKL</div><div class="line"># open for OpenBlas</div><div class="line">BLAS := open</div><div class="line"># Custom (MKL/ATLAS/OpenBLAS) include and lib directories.</div><div class="line"># Leave commented to accept the defaults for your choice of BLAS</div><div class="line"># (which should work)!</div><div class="line"># BLAS_INCLUDE := /path/to/your/blas</div><div class="line"># BLAS_LIB := /path/to/your/blas</div><div class="line"></div><div class="line"># Homebrew puts openblas in a directory that is not on the standard search path</div><div class="line"># BLAS_INCLUDE := $(shell brew --prefix openblas)/include</div><div class="line"># BLAS_LIB := $(shell brew --prefix openblas)/lib</div><div class="line"></div><div class="line"># This is required only if you will compile the matlab interface.</div><div class="line"># MATLAB directory should contain the mex binary in /bin.</div><div class="line"># MATLAB_DIR := /usr/local</div><div class="line"># MATLAB_DIR := /Applications/MATLAB_R2012b.app</div><div class="line"></div><div class="line"># NOTE: this is required only if you will compile the python interface.</div><div class="line"># We need to be able to find Python.h and numpy/arrayobject.h.</div><div class="line">PYTHON_INCLUDE := /usr/include/python2.7 \</div><div class="line">		/usr/lib/python2.7/dist-packages/numpy/core/include</div><div class="line"># Anaconda Python distribution is quite popular. Include path:</div><div class="line"># Verify anaconda location, sometimes it&apos;s in root.</div><div class="line"># ANACONDA_HOME := $(HOME)/anaconda</div><div class="line"># PYTHON_INCLUDE := $(ANACONDA_HOME)/include \</div><div class="line">		# $(ANACONDA_HOME)/include/python2.7 \</div><div class="line">		# $(ANACONDA_HOME)/lib/python2.7/site-packages/numpy/core/include</div><div class="line"></div><div class="line"># Uncomment to use Python 3 (default is Python 2)</div><div class="line"># PYTHON_LIBRARIES := boost_python3 python3.5m</div><div class="line"># PYTHON_INCLUDE := /usr/include/python3.5m \</div><div class="line">#                 /usr/lib/python3.5/dist-packages/numpy/core/include</div><div class="line"></div><div class="line"># We need to be able to find libpythonX.X.so or .dylib.</div><div class="line">PYTHON_LIB := /usr/lib</div><div class="line"># PYTHON_LIB := $(ANACONDA_HOME)/lib</div><div class="line"></div><div class="line"># Homebrew installs numpy in a non standard path (keg only)</div><div class="line"># PYTHON_INCLUDE += $(dir $(shell python -c &apos;import numpy.core; print(numpy.core.__file__)&apos;))/include</div><div class="line"># PYTHON_LIB += $(shell brew --prefix numpy)/lib</div><div class="line"></div><div class="line"># Uncomment to support layers written in Python (will link against Python libs)</div><div class="line"> WITH_PYTHON_LAYER := 1</div><div class="line"></div><div class="line"># Whatever else you find you need goes here.</div><div class="line">INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include /usr/include</div><div class="line">LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib</div><div class="line">JAVA_HOME := /usr/lib/jvm/java-8-openjdk-ppc64el</div><div class="line">INCLUDE_DIRS += $(JAVA_HOME)/include $(JAVA_HOME)/include/linux</div><div class="line">INCLUDE_DIRS += /usr/include/hdf5/serial</div><div class="line">LIBRARY_DIRS += /usr/lib/powerpc64le-linux-gnu/hdf5/serial</div><div class="line">INCLUDE_DIRS += /opt/DL/nccl/include</div><div class="line">LIBRARY_DIRS += /opt/DL/nccl/lib</div><div class="line">INCLUDE_DIRS += /usr/local/lib/python2.7/dist-packages/numpy/core/include</div><div class="line">LIBRARY_DIRS += /usr/local/nvidia/lib /usr/local/nvidia/lib64  /opt/DL/nccl/lib /opt/DL/openblas/lib</div><div class="line"></div><div class="line"># If Homebrew is installed at a non standard location (for example your home directory) and you use it for general dependencies</div><div class="line"># INCLUDE_DIRS += $(shell brew --prefix)/include</div><div class="line"># LIBRARY_DIRS += $(shell brew --prefix)/lib</div><div class="line"></div><div class="line"># NCCL acceleration switch (uncomment to build with NCCL)</div><div class="line"># https://github.com/NVIDIA/nccl (last tested version: v1.2.3-1+cuda8.0)</div><div class="line"># USE_NCCL := 1</div><div class="line"></div><div class="line"># Uncomment to use `pkg-config` to specify OpenCV library paths.</div><div class="line"># (Usually not necessary -- OpenCV libraries are normally installed in one of the above $LIBRARY_DIRS.)</div><div class="line"># USE_PKG_CONFIG := 1</div><div class="line"></div><div class="line"># N.B. both build and distribute dirs are cleared on `make clean`</div><div class="line">BUILD_DIR := build</div><div class="line">DISTRIBUTE_DIR := distribute</div><div class="line"></div><div class="line"># Uncomment for debugging. Does not work on OSX due to https://github.com/BVLC/caffe/issues/171</div><div class="line"># DEBUG := 1</div><div class="line"></div><div class="line"># The ID of the GPU that &apos;make runtest&apos; will use to run unit tests.</div><div class="line">TEST_GPUID := 0</div><div class="line"></div><div class="line"># enable pretty build (comment to see full commands)</div><div class="line">Q ?= @</div></pre></td></tr></table></figure></p>
+<p>配置好Makefile.config文件，执行：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">make -j8 &amp;&amp; make pycaffe</div></pre></td></tr></table></figure></p>
+<p>编译caffe时报错memcpy在此作用域中尚未声明,如下：<br><img src="/images/frcnn-caffe-compile-error-gcc.png" alt=""></p>
+<p>这可能是GCC的版本太高了，我们需要在makefile修改NVCCFLAGS变量，来强制将GCC的版本降低:<br><img src="/images/frcnn-caffe-compile-error-gcc-version.png" alt=""></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">NVCCFLAGS += -D_FORCE_INLINES -ccbin=$(CXX) -Xcompiler -fPIC $(COMMON_FLAGS)</div></pre></td></tr></table></figure>
+<h2 id="处理思路"><a href="#处理思路" class="headerlink" title="处理思路"></a>处理思路</h2><p>使用自己定制的数据集训练Faster-RCNN模型，一般有两种思路：其一，修改Faster-RCNN代码,适合自己的数据集；其二，将自己的数据集格式改为VOC2007形式的数据集。从工作量上看，无疑后者更加容易一些（下面的例子采取第二种方法）。</p>
+<ol>
+<li>图片的命名格式<br>虽然图片的命名理论上不会影响训练。因为训练的数据都是从txt文件中读取图片的名称。但是为了统一数据集，仍然建议批量、有规律的命名数据图片。</li>
+<li><p>VOC格式的数据集格式<br>VOC格式的数据集格式如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">---VOC2007</div><div class="line">------Annotations</div><div class="line">------ImagesSet</div><div class="line">---------Main</div><div class="line">------JPEGImages</div></pre></td></tr></table></figure>
+</li>
+<li><p>Main中的四个txt文件<br>txt内容即是图片名字，所以遍历一遍JPEGImages或者Annotations都行.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">test.txt是测试集，大概是整个数据集的50%；</div><div class="line">trainval是训练和验证数据集，也就是整个数据集的剩余的50%</div><div class="line">train.txt是训练集，是trainval的50%</div><div class="line">val.txt是验证集，trainval剩余的50%</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="数据处理"><a href="#数据处理" class="headerlink" title="数据处理"></a>数据处理</h2><p>从最原始的Faster-RCNN来看，VOC2007格式的数据格式如下所示：<br><img src="/images/voc2007-folder.png" alt=""></p>
+<p>Annotations中存在的是.xml文件，文件中记录描述每张图的ground truth信息,如下所示：<br><img src="/images/annotations-sample-xml.png" alt=""></p>
+<p>每个xml文件的内容具体如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">&lt;annotation&gt;</div><div class="line">	&lt;folder&gt;shoe&lt;/folder&gt;</div><div class="line">	&lt;filename&gt;shoe-001.jpg&lt;/filename&gt;</div><div class="line">	&lt;path&gt;/home/xiningwang/Downloads/shoe/shoe-001.jpg&lt;/path&gt;</div><div class="line">	&lt;source&gt;</div><div class="line">		&lt;database&gt;Unknown&lt;/database&gt;</div><div class="line">	&lt;/source&gt;</div><div class="line">	&lt;size&gt;</div><div class="line">		&lt;width&gt;1000&lt;/width&gt;</div><div class="line">		&lt;height&gt;1000&lt;/height&gt;</div><div class="line">		&lt;depth&gt;3&lt;/depth&gt;</div><div class="line">	&lt;/size&gt;</div><div class="line">	&lt;segmented&gt;0&lt;/segmented&gt;</div><div class="line">	&lt;object&gt;</div><div class="line">		&lt;name&gt;shoe&lt;/name&gt;</div><div class="line">		&lt;pose&gt;Unspecified&lt;/pose&gt;</div><div class="line">		&lt;truncated&gt;0&lt;/truncated&gt;</div><div class="line">		&lt;difficult&gt;0&lt;/difficult&gt;</div><div class="line">		&lt;bndbox&gt;</div><div class="line">			&lt;xmin&gt;44&lt;/xmin&gt;</div><div class="line">			&lt;ymin&gt;150&lt;/ymin&gt;</div><div class="line">			&lt;xmax&gt;975&lt;/xmax&gt;</div><div class="line">			&lt;ymax&gt;842&lt;/ymax&gt;</div><div class="line">		&lt;/bndbox&gt;</div><div class="line">	&lt;/object&gt;</div><div class="line">&lt;/annotation&gt;</div></pre></td></tr></table></figure></p>
+<p>ImageSets/Main存放的是test.txt、trainval.txt、train.txt、val.txt。 其中，test.txt是测试集，大概占整个数据集的20%；trainval.txt是训练集和验证集的组合，也就是整个数据集剩下的80%；train.txt是训练集，是trainval.txt的90%；val.txt是验证集，是trainval.txt的10%。</p>
+<p>每个TXT文件的内容都是相应图片的前缀（去掉后缀.jpg），如下所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">handbag-001</div><div class="line">handbag-002</div><div class="line">handbag-003</div><div class="line">handbag-004</div><div class="line">handbag-005</div><div class="line">handbag-006</div><div class="line">handbag-007</div><div class="line">handbag-008</div><div class="line">handbag-009</div><div class="line">handbag-010</div><div class="line">handbag-011</div><div class="line">handbag-012</div><div class="line">shoe-001</div><div class="line">shoe-002</div><div class="line">shoe-003</div><div class="line">shoe-004</div><div class="line">shoe-005</div><div class="line">shoe-006</div><div class="line">shoe-007</div><div class="line">shoe-008</div><div class="line">shoe-009</div><div class="line">shoe-010</div><div class="line">shoe-011</div><div class="line">shoe-012</div></pre></td></tr></table></figure></p>
+<p>JPEGImages中存放的是.jpg图片，如下所示：<br><img src="/images/jpegimages-sample.png" alt=""></p>
+<p>到此为止，你可以用自己定制的数据集的Annotations,ImageSets和JPEGImages替换py-faster-rcnn/data/VOCdevkit2007/VOC2007中对应的文件夹。</p>
+<h2 id="修改Faster-RCNN的训练参数"><a href="#修改Faster-RCNN的训练参数" class="headerlink" title="修改Faster-RCNN的训练参数"></a>修改Faster-RCNN的训练参数</h2><h3 id="修改stage1-fast-rcnn-train-pt"><a href="#修改stage1-fast-rcnn-train-pt" class="headerlink" title="修改stage1_fast_rcnn_train.pt"></a>修改stage1_fast_rcnn_train.pt</h3><p>第1步：py-faster-rcnn/models/pascal_voc/ZF/faster_rcnn_alt_opt/stage1_fast_rcnn_train.pt修改如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">layer &#123;  </div><div class="line">  name: &apos;data&apos;  </div><div class="line">  type: &apos;Python&apos;  </div><div class="line">  top: &apos;data&apos;  </div><div class="line">  top: &apos;rois&apos;  </div><div class="line">  top: &apos;labels&apos;  </div><div class="line">  top: &apos;bbox_targets&apos;  </div><div class="line">  top: &apos;bbox_inside_weights&apos;  </div><div class="line">  top: &apos;bbox_outside_weights&apos;  </div><div class="line">  python_param &#123;  </div><div class="line">    module: &apos;roi_data_layer.layer&apos;  </div><div class="line">    layer: &apos;RoIDataLayer&apos;  </div><div class="line">    param_str: &quot;&apos;num_classes&apos;: 3&quot; #按训练集类别改，该值为类别数+1  </div><div class="line">  &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">layer &#123;  </div><div class="line">  name: &quot;cls_score&quot;  </div><div class="line">  type: &quot;InnerProduct&quot;  </div><div class="line">  bottom: &quot;fc7&quot;  </div><div class="line">  top: &quot;cls_score&quot;  </div><div class="line">  param &#123; lr_mult: 1.0 &#125;  </div><div class="line">  param &#123; lr_mult: 2.0 &#125;  </div><div class="line">  inner_product_param &#123;  </div><div class="line">    num_output: 3 #按训练集类别改，该值为类别数+1  </div><div class="line">    weight_filler &#123;  </div><div class="line">      type: &quot;gaussian&quot;  </div><div class="line">      std: 0.01  </div><div class="line">    &#125;  </div><div class="line">    bias_filler &#123;  </div><div class="line">      type: &quot;constant&quot;  </div><div class="line">      value: 0  </div><div class="line">    &#125;  </div><div class="line">  &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">layer &#123;  </div><div class="line">  name: &quot;bbox_pred&quot;  </div><div class="line">  type: &quot;InnerProduct&quot;  </div><div class="line">  bottom: &quot;fc7&quot;  </div><div class="line">  top: &quot;bbox_pred&quot;  </div><div class="line">  param &#123; lr_mult: 1.0 &#125;  </div><div class="line">  param &#123; lr_mult: 2.0 &#125;  </div><div class="line">  inner_product_param &#123;  </div><div class="line">    num_output: 12 #按训练集类别改，该值为（类别数+1）*4  </div><div class="line">    weight_filler &#123;  </div><div class="line">      type: &quot;gaussian&quot;  </div><div class="line">      std: 0.001  </div><div class="line">    &#125;  </div><div class="line">    bias_filler &#123;  </div><div class="line">      type: &quot;constant&quot;  </div><div class="line">      value: 0  </div><div class="line">    &#125;  </div><div class="line">  &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="修改stage1-rpn-train-pt"><a href="#修改stage1-rpn-train-pt" class="headerlink" title="修改stage1_rpn_train.pt"></a>修改stage1_rpn_train.pt</h3><p>第2步：py-faster-rcnn/models/pascal_voc/ZF/faster_rcnn_alt_opt/stage1_rpn_train.pt修改如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">layer &#123;  </div><div class="line">    name: &apos;input-data&apos;  </div><div class="line">    type: &apos;Python&apos;  </div><div class="line">    top: &apos;data&apos;  </div><div class="line">    top: &apos;im_info&apos;  </div><div class="line">    top: &apos;gt_boxes&apos;  </div><div class="line">    python_param &#123;  </div><div class="line">        module: &apos;roi_data_layer.layer&apos;  </div><div class="line">        layer: &apos;RoIDataLayer&apos;  </div><div class="line">        param_str: &quot;&apos;num_classes&apos;: 3&quot; #按训练集类别改，该值为类别数+1  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="修改stage2-fast-rcnn-train-pt"><a href="#修改stage2-fast-rcnn-train-pt" class="headerlink" title="修改stage2_fast_rcnn_train.pt"></a>修改stage2_fast_rcnn_train.pt</h3><p>第3步：py-faster-rcnn/models/pascal_voc/ZF/faster_rcnn_alt_opt/stage2_fast_rcnn_train.pt修改如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">layer &#123;  </div><div class="line">  name: &apos;data&apos;  </div><div class="line">  type: &apos;Python&apos;  </div><div class="line">  top: &apos;data&apos;  </div><div class="line">  top: &apos;rois&apos;  </div><div class="line">  top: &apos;labels&apos;  </div><div class="line">  top: &apos;bbox_targets&apos;  </div><div class="line">  top: &apos;bbox_inside_weights&apos;  </div><div class="line">  top: &apos;bbox_outside_weights&apos;  </div><div class="line">  python_param &#123;  </div><div class="line">    module: &apos;roi_data_layer.layer&apos;  </div><div class="line">    layer: &apos;RoIDataLayer&apos;  </div><div class="line">    param_str: &quot;&apos;num_classes&apos;: 3&quot; #按训练集类别改，该值为类别数+1  </div><div class="line">  &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">layer &#123;  </div><div class="line">  name: &quot;cls_score&quot;  </div><div class="line">  type: &quot;InnerProduct&quot;  </div><div class="line">  bottom: &quot;fc7&quot;  </div><div class="line">  top: &quot;cls_score&quot;  </div><div class="line">  param &#123; lr_mult: 1.0 &#125;  </div><div class="line">  param &#123; lr_mult: 2.0 &#125;  </div><div class="line">  inner_product_param &#123;  </div><div class="line">    num_output: 3 #按训练集类别改，该值为类别数+1  </div><div class="line">    weight_filler &#123;  </div><div class="line">      type: &quot;gaussian&quot;  </div><div class="line">      std: 0.01  </div><div class="line">    &#125;  </div><div class="line">    bias_filler &#123;  </div><div class="line">      type: &quot;constant&quot;  </div><div class="line">      value: 0  </div><div class="line">    &#125;  </div><div class="line">  &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">layer &#123;  </div><div class="line">  name: &quot;bbox_pred&quot;  </div><div class="line">  type: &quot;InnerProduct&quot;  </div><div class="line">  bottom: &quot;fc7&quot;  </div><div class="line">  top: &quot;bbox_pred&quot;  </div><div class="line">  param &#123; lr_mult: 1.0 &#125;  </div><div class="line">  param &#123; lr_mult: 2.0 &#125;  </div><div class="line">  inner_product_param &#123;  </div><div class="line">    num_output: 12 #按训练集类别改，该值为（类别数+1）*4  </div><div class="line">    weight_filler &#123;  </div><div class="line">      type: &quot;gaussian&quot;  </div><div class="line">      std: 0.001  </div><div class="line">    &#125;  </div><div class="line">    bias_filler &#123;  </div><div class="line">      type: &quot;constant&quot;  </div><div class="line">      value: 0  </div><div class="line">    &#125;  </div><div class="line">  &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="修改stage2-rpn-train-pt"><a href="#修改stage2-rpn-train-pt" class="headerlink" title="修改stage2_rpn_train.pt"></a>修改stage2_rpn_train.pt</h3><p>第4步：py-faster-rcnn/models/pascal_voc/ZF/faster_rcnn_alt_opt/stage2_rpn_train.pt修改:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">layer &#123;  </div><div class="line">  name: &apos;input-data&apos;  </div><div class="line">  type: &apos;Python&apos;  </div><div class="line">  top: &apos;data&apos;  </div><div class="line">  top: &apos;im_info&apos;  </div><div class="line">  top: &apos;gt_boxes&apos;  </div><div class="line">  python_param &#123;  </div><div class="line">    module: &apos;roi_data_layer.layer&apos;  </div><div class="line">    layer: &apos;RoIDataLayer&apos;  </div><div class="line">    param_str: &quot;&apos;num_classes&apos;: 3&quot; #按训练集类别改，该值为类别数+1  </div><div class="line">  &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="修改faster-rcnn-test-pt"><a href="#修改faster-rcnn-test-pt" class="headerlink" title="修改faster_rcnn_test.pt"></a>修改faster_rcnn_test.pt</h3><p>第5步：py-faster-rcnn/models/pascal_voc/ZF/faster_rcnn_alt_opt/faster_rcnn_test.pt修改:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">layer &#123;  </div><div class="line">  name: &quot;cls_score&quot;  </div><div class="line">  type: &quot;InnerProduct&quot;  </div><div class="line">  bottom: &quot;fc7&quot;  </div><div class="line">  top: &quot;cls_score&quot;  </div><div class="line">  inner_product_param &#123;  </div><div class="line">    num_output: 3 #按训练集类别改，该值为类别数+1  </div><div class="line">  &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">layer &#123;  </div><div class="line">  name: &quot;bbox_pred&quot;  </div><div class="line">  type: &quot;InnerProduct&quot;  </div><div class="line">  bottom: &quot;fc7&quot;  </div><div class="line">  top: &quot;bbox_pred&quot;  </div><div class="line">  inner_product_param &#123;  </div><div class="line">    num_output: 12 #按训练集类别改，该值为（类别数+1）*4  </div><div class="line">  &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="修改pascal-voc-py"><a href="#修改pascal-voc-py" class="headerlink" title="修改pascal_voc.py"></a>修改pascal_voc.py</h3><p>  第6步：py-faster-rcnn/lib/datasets/pascal_voc.py修改:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">class pascal_voc(imdb):  </div><div class="line">def __init__(self, image_set, year, devkit_path=None):  </div><div class="line">    imdb.__init__(self, &apos;voc_&apos; + year + &apos;_&apos; + image_set)  </div><div class="line">    self._year = year  </div><div class="line">    self._image_set = image_set  </div><div class="line">    self._devkit_path = self._get_default_path() if devkit_path is None \  </div><div class="line">                        else devkit_path  </div><div class="line">    self._data_path = os.path.join(self._devkit_path, &apos;VOC&apos; + self._year)  </div><div class="line">    self._classes = (&apos;__background__&apos;, # always index 0  </div><div class="line">                     &apos;你的标签1&apos;,&apos;你的标签2&apos;)</div></pre></td></tr></table></figure></p>
+<h3 id="修改pascal-voc-py-1"><a href="#修改pascal-voc-py-1" class="headerlink" title="修改pascal_voc.py"></a>修改pascal_voc.py</h3><p>第7步：修改lib/datasets/pascal_voc.py的_load_pascal_annotation()函数:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line">def _load_pascal_annotation(self, index):</div><div class="line">    &quot;&quot;&quot;</div><div class="line">    Load image and bounding boxes info from XML file in the PASCAL VOC</div><div class="line">    format.</div><div class="line">    &quot;&quot;&quot;</div><div class="line">    filename = os.path.join(self._data_path, &apos;Annotations&apos;, index + &apos;.xml&apos;)</div><div class="line">    tree = ET.parse(filename)</div><div class="line">    objs = tree.findall(&apos;object&apos;)</div><div class="line">    if not self.config[&apos;use_diff&apos;]:</div><div class="line">        # Exclude the samples labeled as difficult</div><div class="line">        non_diff_objs = [</div><div class="line">            obj for obj in objs if int(obj.find(&apos;difficult&apos;).text) == 0]</div><div class="line">        # if len(non_diff_objs) != len(objs):</div><div class="line">        #     print &apos;Removed &#123;&#125; difficult objects&apos;.format(</div><div class="line">        #         len(objs) - len(non_diff_objs))</div><div class="line">        objs = non_diff_objs</div><div class="line">    num_objs = len(objs)</div><div class="line">    boxes = np.zeros((num_objs, 4), dtype=np.uint16)</div><div class="line">    gt_classes = np.zeros((num_objs), dtype=np.int32)</div><div class="line">    overlaps = np.zeros((num_objs, self.num_classes), dtype=np.float32)</div><div class="line">    # &quot;Seg&quot; area for pascal is just the box area</div><div class="line">    seg_areas = np.zeros((num_objs), dtype=np.float32)</div><div class="line">    # Load object bounding boxes into a data frame.</div><div class="line">    for ix, obj in enumerate(objs):</div><div class="line">        bbox = obj.find(&apos;bndbox&apos;)</div><div class="line">        # Make pixel indexes 0-based</div><div class="line">        # x1 = float(bbox.find(&apos;xmin&apos;).text) - 1</div><div class="line">        # y1 = float(bbox.find(&apos;ymin&apos;).text) - 1</div><div class="line">        # x2 = float(bbox.find(&apos;xmax&apos;).text) - 1</div><div class="line">        # y2 = float(bbox.find(&apos;ymax&apos;).text) - 1</div><div class="line">        ### 因为标注过程中，可能存在标注的目标框太靠近边缘或者自己没注意，导致标注的数据在训练时产生了异常</div><div class="line">        x1 = float(bbox.find(&apos;xmin&apos;).text)</div><div class="line">        y1 = float(bbox.find(&apos;ymin&apos;).text)</div><div class="line">        x2 = float(bbox.find(&apos;xmax&apos;).text)</div><div class="line">        y2 = float(bbox.find(&apos;ymax&apos;).text)</div><div class="line">        cls = self._class_to_ind[obj.find(&apos;name&apos;).text.lower().strip()]</div><div class="line">        boxes[ix, :] = [x1, y1, x2, y2]</div><div class="line">        gt_classes[ix] = cls</div><div class="line">        overlaps[ix, cls] = 1.0</div><div class="line">        seg_areas[ix] = (x2 - x1 + 1) * (y2 - y1 + 1)</div><div class="line">    overlaps = scipy.sparse.csr_matrix(overlaps)</div><div class="line">    return &#123;&apos;boxes&apos; : boxes,</div><div class="line">            &apos;gt_classes&apos;: gt_classes,</div><div class="line">            &apos;gt_overlaps&apos; : overlaps,</div><div class="line">            &apos;flipped&apos; : False,</div><div class="line">            &apos;seg_areas&apos; : seg_areas&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="修改学习率"><a href="#修改学习率" class="headerlink" title="修改学习率"></a>修改学习率</h3><p>第8步：学习率可以在py-faster-rcnn/models/pascal_voc/ZF/faster_rcnn_alt_opt中的solve文件设置；</p>
+<h3 id="修改迭代次数"><a href="#修改迭代次数" class="headerlink" title="修改迭代次数"></a>修改迭代次数</h3><p>第9步：迭代次数可以在py-faster-rcnn/tools的train_faster_rcnn_alt_opt.py中修改。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">max_iters = [80000, 40000, 80000, 40000]</div></pre></td></tr></table></figure></p>
+<p>分别为4个阶段（rpn第1阶段，fast-rcnn第1阶段，rpn第2阶段，fast-rcnn第2阶段）的迭代次数。可改成你希望的迭代次数。<br>如果改了这些数值，最好把py-faster-rcnn/models/pascal_voc/ZF/faster_rcnn_alt_opt里对应的solver文件（有4个）也修改，stepsize小于上面修改的数值。</p>
+<h2 id="训练模型"><a href="#训练模型" class="headerlink" title="训练模型"></a>训练模型</h2><p>我们采用ZF模型进行训练，输入如下命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./experiments/scripts/faster_rcnn_alt_opt.sh 0 ZF pascal_voc</div></pre></td></tr></table></figure></p>
+<p><strong>！！！为防止与之前的模型搞混,训练前把output文件夹删除（或改个其他名），还要把py-faster-rcnn/data/cache中的文件和py-faster-rcnn/data/VOCdevkit2007/annotations_cache中的文件删除（如果有的话）</strong></p>
+<p>训练过程如下图所示：<br><img src="/images/training-1.png" alt=""></p>
+<p><img src="/images/training-2.png" alt=""></p>
+<p><img src="/images/training-3.png" alt=""></p>
+<p><img src="/images/training-4.png" alt=""></p>
+<p><img src="/images/training-5.png" alt=""></p>
+<p><img src="/images/training-6.png" alt=""></p>
+<h2 id="测试模型"><a href="#测试模型" class="headerlink" title="测试模型"></a>测试模型</h2><p>将训练得到的<strong>py-faster-rcnn/output/faster-rcnn-alt-opt/voc_2007_trainval/ZF_faster_rcnn_final.caffemodel</strong>模型拷贝到<strong>py-faster-rcnn/data/faster_rcnn_model</strong></p>
+<p>修改py-faster-rcnn/tools/demo.py或者新建demo-wangxn.py，具体代码如下所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div><div class="line">197</div><div class="line">198</div><div class="line">199</div><div class="line">200</div><div class="line">201</div><div class="line">202</div><div class="line">203</div><div class="line">204</div></pre></td><td class="code"><pre><div class="line">#!/usr/bin/env python</div><div class="line"></div><div class="line"># --------------------------------------------------------</div><div class="line"># Faster R-CNN</div><div class="line"># Copyright (c) 2015 Microsoft</div><div class="line"># Licensed under The MIT License [see LICENSE for details]</div><div class="line"># Written by Ross Girshick</div><div class="line"># --------------------------------------------------------</div><div class="line"></div><div class="line">&quot;&quot;&quot;</div><div class="line">Demo script showing detections in sample images.</div><div class="line"></div><div class="line">See README.md for installation instructions before running.</div><div class="line">&quot;&quot;&quot;</div><div class="line"></div><div class="line">import _init_paths</div><div class="line">from fast_rcnn.config import cfg</div><div class="line">from fast_rcnn.test import im_detect</div><div class="line">from fast_rcnn.nms_wrapper import nms</div><div class="line">from utils.timer import Timer</div><div class="line">import matplotlib.pyplot as plt</div><div class="line">import matplotlib</div><div class="line">matplotlib.use(&apos;Agg&apos;)</div><div class="line">import numpy as np</div><div class="line">import scipy.io as sio</div><div class="line">import caffe, os, sys, cv2</div><div class="line">import argparse</div><div class="line">import shutil</div><div class="line"></div><div class="line">CLASSES = (&apos;__background__&apos;,</div><div class="line">           &apos;handbag&apos;, &apos;shoe&apos;)</div><div class="line"></div><div class="line">NETS = &#123;&apos;vgg16&apos;: (&apos;VGG16&apos;,</div><div class="line">                  &apos;VGG16_faster_rcnn_final.caffemodel&apos;),</div><div class="line">        &apos;zf&apos;: (&apos;ZF&apos;,</div><div class="line">                  &apos;ZF_faster_rcnn_final_wangxn.caffemodel&apos;)&#125;</div><div class="line"></div><div class="line"></div><div class="line">def vis_detections(im, class_name, dets, image_name, thresh=0.5):</div><div class="line">    &quot;&quot;&quot;Draw detected bounding boxes.&quot;&quot;&quot;</div><div class="line">    inds = np.where(dets[:, -1] &gt;= thresh)[0]</div><div class="line">    if len(inds) == 0:</div><div class="line">        return</div><div class="line"></div><div class="line">    im = im[:, :, (2, 1, 0)]</div><div class="line">    fig, ax = plt.subplots(figsize=(12, 12))</div><div class="line">    ax.imshow(im, aspect=&apos;equal&apos;)</div><div class="line">    for i in inds:</div><div class="line">        bbox = dets[i, :4]</div><div class="line">        score = dets[i, -1]</div><div class="line"></div><div class="line">        ax.add_patch(</div><div class="line">            plt.Rectangle((bbox[0], bbox[1]),</div><div class="line">                          bbox[2] - bbox[0],</div><div class="line">                          bbox[3] - bbox[1], fill=False,</div><div class="line">                          edgecolor=&apos;red&apos;, linewidth=3.5)</div><div class="line">            )</div><div class="line">        ax.text(bbox[0], bbox[1] - 2,</div><div class="line">                &apos;&#123;:s&#125; &#123;:.3f&#125;&apos;.format(class_name, score),</div><div class="line">                bbox=dict(facecolor=&apos;blue&apos;, alpha=0.5),</div><div class="line">                fontsize=14, color=&apos;white&apos;)</div><div class="line"></div><div class="line">    ax.set_title((&apos;&#123;&#125; detections with &apos;</div><div class="line">                  &apos;p(&#123;&#125; | box) &gt;= &#123;:.1f&#125;&apos;).format(class_name, class_name,</div><div class="line">                                                  thresh),</div><div class="line">                  fontsize=14)</div><div class="line">    plt.axis(&apos;off&apos;)</div><div class="line">    plt.tight_layout()</div><div class="line">    plt.draw()</div><div class="line">    im_file = os.path.join(&apos;/home/wangxn&apos;, &apos;test100&apos;, &apos;new-&#123;&#125;&apos;.format(image_name))</div><div class="line">    plt.savefig(im_file)</div><div class="line"></div><div class="line">def demo(net, image_name):</div><div class="line">    &quot;&quot;&quot;Detect object classes in an image using pre-computed object proposals.&quot;&quot;&quot;</div><div class="line"></div><div class="line">    # Load the demo image</div><div class="line">    im_file = os.path.join(cfg.DATA_DIR, &apos;demo&apos;, image_name)</div><div class="line">    im = cv2.imread(im_file)</div><div class="line"></div><div class="line">    # Detect all object classes and regress object bounds</div><div class="line">    timer = Timer()</div><div class="line">    timer.tic()</div><div class="line">    scores, boxes = im_detect(net, im)</div><div class="line">    timer.toc()</div><div class="line">    print (&apos;Detection took &#123;:.3f&#125;s for &apos;</div><div class="line">           &apos;&#123;:d&#125; object proposals&apos;).format(timer.total_time, boxes.shape[0])</div><div class="line"></div><div class="line">    # Visualize detections for each class</div><div class="line">    CONF_THRESH = 0.8</div><div class="line">    NMS_THRESH = 0.3</div><div class="line">    for cls_ind, cls in enumerate(CLASSES[1:]):</div><div class="line">        cls_ind += 1 # because we skipped background</div><div class="line">        cls_boxes = boxes[:, 4*cls_ind:4*(cls_ind + 1)]</div><div class="line">        cls_scores = scores[:, cls_ind]</div><div class="line">        dets = np.hstack((cls_boxes,</div><div class="line">                          cls_scores[:, np.newaxis])).astype(np.float32)</div><div class="line">        keep = nms(dets, NMS_THRESH)</div><div class="line">        dets = dets[keep, :]</div><div class="line">        vis_detections(im, cls, dets, image_name,  thresh=CONF_THRESH)</div><div class="line"></div><div class="line">def save_det(im, class_name, dets, thresh=0.5):</div><div class="line">    &quot;&quot;&quot;Save results with bounding boxes.&quot;&quot;&quot;</div><div class="line">    inds = np.where(dets[:, -1] &gt;= thresh)[0]</div><div class="line">    if len(inds) == 0:</div><div class="line">        print &quot;WARNING: none bounding box!&quot;</div><div class="line">        return im</div><div class="line">    font = cv2.FONT_HERSHEY_SIMPLEX</div><div class="line">    for i in inds:</div><div class="line">        bbox = dets[i, :4]</div><div class="line">        rect_start = (bbox[0], bbox[1])</div><div class="line">        rect_end = (bbox[2], bbox[3])</div><div class="line">        color = (0, 255, 0)</div><div class="line">        cv2.rectangle(im, rect_start, rect_end, color, 1, 0)</div><div class="line">        cv2.putText(im, class_name, (bbox[0], bbox[1]), font, 1, (255,0,0), 2, cv2.CV_AA)</div><div class="line">    #cv2.imwrite(&quot;out.jpg&quot;, im)</div><div class="line">    return im</div><div class="line"></div><div class="line">def test(net, input_images, output_images):</div><div class="line">    &quot;&quot;&quot;Save test images with bounding boxes&quot;&quot;&quot;</div><div class="line">    print input_images</div><div class="line">    for (input_image, output_image) in zip(input_images, output_images):</div><div class="line">        if not os.path.exists(input_image):</div><div class="line">            print &quot;ERROR: file is not existed!\n&quot;</div><div class="line">            exit(-1)</div><div class="line">        print &quot;input_image = &quot; + input_image</div><div class="line">        im = cv2.imread(input_image)</div><div class="line">        # Detect all object classes and regress object bounds</div><div class="line">        scores,boxes = im_detect(net, im)</div><div class="line">        # Save detections for each class</div><div class="line">        CONF_THRESH = 0.8</div><div class="line">        NMS_THRESH = 0.3</div><div class="line">        for cls_ind, cls in enumerate(CLASSES[1:]):</div><div class="line">            cls_ind += 1 # because we skipped background</div><div class="line">            cls_boxes = boxes[:, 4*cls_ind : 4*(cls_ind + 1)]</div><div class="line">            cls_scores = scores[:, cls_ind]</div><div class="line">            dets = np.hstack((cls_boxes, cls_scores[:, np.newaxis])).astype(np.float32)</div><div class="line">            keep = nms(dets, NMS_THRESH)</div><div class="line">            dets = dets[keep, :]</div><div class="line">            im = save_det(im, cls, dets, thresh=CONF_THRESH)</div><div class="line">        cv2.imwrite(output_image, im)</div><div class="line">        print &quot;output_image = &quot; + output_image</div><div class="line"></div><div class="line">def gen_test_image_list(list_file, input_root, output_root):</div><div class="line">    &quot;&quot;&quot;Generate test image lists&quot;&quot;&quot;</div><div class="line">    open_file = open(list_file, &apos;r&apos;)</div><div class="line">    input_images = []</div><div class="line">    output_images = []</div><div class="line">    for image_prefix in open_file.readlines():</div><div class="line">        image_prefix = image_prefix.strip()</div><div class="line">        input_image = os.path.join(input_root, image_prefix + &quot;.jpg&quot;)</div><div class="line">        output_image = os.path.join(output_root, &quot;result_&quot; + image_prefix + &quot;.jpg&quot;)</div><div class="line">        input_images.append(input_image)</div><div class="line">        output_images.append(output_image)</div><div class="line">    return (input_images, output_images)</div><div class="line"></div><div class="line">def parse_args():</div><div class="line">    &quot;&quot;&quot;Parse input arguments.&quot;&quot;&quot;</div><div class="line">    parser = argparse.ArgumentParser(description=&apos;Faster R-CNN demo&apos;)</div><div class="line">    parser.add_argument(&apos;--gpu&apos;, dest=&apos;gpu_id&apos;, help=&apos;GPU device id to use [0]&apos;,</div><div class="line">                        default=0, type=int)</div><div class="line">    parser.add_argument(&apos;--cpu&apos;, dest=&apos;cpu_mode&apos;,</div><div class="line">                        help=&apos;Use CPU mode (overrides --gpu)&apos;,</div><div class="line">                        action=&apos;store_true&apos;)</div><div class="line">    parser.add_argument(&apos;--net&apos;, dest=&apos;demo_net&apos;, help=&apos;Network to use [vgg16]&apos;,</div><div class="line">                        choices=NETS.keys(), default=&apos;vgg16&apos;)</div><div class="line"></div><div class="line">    args = parser.parse_args()</div><div class="line"></div><div class="line">    return args</div><div class="line"></div><div class="line">if __name__ == &apos;__main__&apos;:</div><div class="line">    cfg.TEST.HAS_RPN = True  # Use RPN for proposals</div><div class="line"></div><div class="line">    args = parse_args()</div><div class="line"></div><div class="line">    prototxt = os.path.join(cfg.MODELS_DIR, NETS[args.demo_net][0],</div><div class="line">                            &apos;faster_rcnn_alt_opt&apos;, &apos;faster_rcnn_test.pt&apos;)</div><div class="line">    caffemodel = os.path.join(cfg.DATA_DIR, &apos;faster_rcnn_models&apos;,</div><div class="line">                              NETS[args.demo_net][1])</div><div class="line"></div><div class="line">    print args</div><div class="line">    if not os.path.isfile(caffemodel):</div><div class="line">        raise IOError((&apos;&#123;:s&#125; not found.\nDid you run ./data/script/&apos;</div><div class="line">                       &apos;fetch_faster_rcnn_models.sh?&apos;).format(caffemodel))</div><div class="line"></div><div class="line">    if args.cpu_mode:</div><div class="line">        caffe.set_mode_cpu()</div><div class="line">    else:</div><div class="line">        caffe.set_mode_gpu()</div><div class="line">        caffe.set_device(args.gpu_id)</div><div class="line">        cfg.GPU_ID = args.gpu_id</div><div class="line">    net = caffe.Net(prototxt, caffemodel, caffe.TEST)</div><div class="line"></div><div class="line">    print &apos;\n\nLoaded network &#123;:s&#125;&apos;.format(caffemodel)</div><div class="line"></div><div class="line">    VOC_ROOT = os.path.join(cfg.DATA_DIR, &quot;VOCdevkit2007&quot;, &quot;VOC2007&quot;)</div><div class="line">    list_file = os.path.join(VOC_ROOT, &quot;ImageSets&quot;, &quot;Main&quot;, &quot;test.txt&quot;)</div><div class="line">    input_root = os.path.join(VOC_ROOT, &quot;JPEGImages&quot;)</div><div class="line">    output_root = os.path.join(VOC_ROOT, &quot;TestResults&quot;)</div><div class="line">    if os.path.exists(output_root):</div><div class="line">        shutil.rmtree(output_root)</div><div class="line">    os.mkdir(output_root)</div><div class="line">    input_images, output_images = gen_test_image_list(list_file, input_root, output_root)</div><div class="line">    test(net, input_images, output_images)</div></pre></td></tr></table></figure></p>
+<p>输入测试命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./tools/demo-wangxn.py --net zf</div></pre></td></tr></table></figure></p>
+<p>或者将默认的模型改为zf：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">parser.add_argument(&apos;--net&apos;, dest=&apos;demo_net&apos;, help=&apos;Network to use [vgg16]&apos;,  </div><div class="line">                        choices=NETS.keys(), default=&apos;zf&apos;)</div></pre></td></tr></table></figure></p>
+<p>测试的结果保存到<strong>py-faster-rcnn/data/VOCdevkit2007/VOC2007/TestResults</strong>.</p>
+<h2 id="Trouble-Shooting"><a href="#Trouble-Shooting" class="headerlink" title="Trouble Shooting"></a>Trouble Shooting</h2><h3 id="‘assert（boxes-2-gt-boxes-0-）-all-issue"><a href="#‘assert（boxes-2-gt-boxes-0-）-all-issue" class="headerlink" title="‘assert（boxes[:,2]&gt;=boxes[:,0]）.all() issue"></a>‘assert（boxes[:,2]&gt;=boxes[:,0]）.all() issue</h3><p>出现问题：训练faster rcnn时出现如下报错：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">File &quot;/py-faster-rcnn/tools/../lib/datasets/imdb.py&quot;, line 108, in append_flipped_images</div><div class="line">    assert (boxes[:, 2] &gt;= boxes[:, 0]).all()</div><div class="line">AssertionError</div></pre></td></tr></table></figure></p>
+<p>检查自己数据发现，左上角坐标（x,y）可能为0，或标定区域溢出图片.<br>而faster rcnn会对Xmin,Ymin,Xmax,Ymax进行减一操作, 如果Xmin为0，减一后变为65535<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"># Make pixel indexes 0-based</div><div class="line">        # x1 = float(bbox.find(&apos;xmin&apos;).text) - 1</div><div class="line">        # y1 = float(bbox.find(&apos;ymin&apos;).text) - 1</div><div class="line">        # x2 = float(bbox.find(&apos;xmax&apos;).text) - 1</div><div class="line">        # y2 = float(bbox.find(&apos;ymax&apos;).text) - 1</div></pre></td></tr></table></figure></p>
+<p>问题解决:<br>1、修改lib/datasets/imdb.py，append_flipped_images()函数<br>数据整理，在一行代码为 boxes[:, 2] = widths[i] - oldx1 - 1下加入代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">for b in range(len(boxes)):</div><div class="line">  if boxes[b][2]&lt; boxes[b][0]:</div><div class="line">    boxes[b][0] = 0</div></pre></td></tr></table></figure></p>
+<p>2、修改lib/datasets/pascal_voc.py, load_pascal_annotation(,)函数将对Xmin,Ymin,Xmax,Ymax减一去掉.</p>
+<p>3、（可选，如果1和2可以解决问题，就没必要用3）修改lib/fast_rcnn/config.py，不使图片实现翻转，如下改为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"># Use horizontally-flipped images during training?</div><div class="line">__C.TRAIN.USE_FLIPPED = False</div></pre></td></tr></table></figure></p>
+<h3 id="‘max-overlaps’-issue"><a href="#‘max-overlaps’-issue" class="headerlink" title="‘max_overlaps’ issue"></a>‘max_overlaps’ issue</h3><p>使用自己数据集训练Faster-RCNN模型时，如果出现’max_overlaps’ issue， 极有可能是因为之前训练时出现错误，但pkl文件仍在cache中。所以解决的方法是删除在py-faster-rcnn/data/cache目录下的pkl文件。</p>
+<h3 id="中文显示"><a href="#中文显示" class="headerlink" title="中文显示"></a>中文显示</h3><p>以py-faster-rcnn的demo.py代码为基础，在demo.py中的修改如下：</p>
+<ol>
+<li><p>指定默认编码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">import caffe, os, sys, cv2  </div><div class="line">reload(sys)  </div><div class="line">sys.setdefaultencoding(&apos;utf-8&apos;)</div></pre></td></tr></table></figure>
+</li>
+<li><p>设置中文字体：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">def vis_detections(im, class_name, dets, thresh=0.5):  </div><div class="line">    &quot;&quot;&quot;Draw detected bounding boxes.&quot;&quot;&quot;  </div><div class="line">    inds = np.where(dets[:, -1] &gt;= thresh)[0]  </div><div class="line">    if len(inds) == 0:  </div><div class="line">        return  </div><div class="line"></div><div class="line">    im = im[:, :, (2, 1, 0)]  </div><div class="line">    zhfont = matplotlib.font_manager.FontProperties(fname=&quot;/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf&quot;) #字体  </div><div class="line"></div><div class="line">    fig, ax = plt.subplots(figsize=(12, 12))  </div><div class="line">    ax.imshow(im, aspect=&apos;equal&apos;)</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>上面的zhfont就是设置的中文字体，由于系统的原因，这个路径不一定相同，所以，用下面的命令确定你的中文字体路径：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">$ fc-match -v &quot;AR PL UKai CN&quot;</div><div class="line">Pattern has 37 elts (size 48)</div><div class="line">       	family: &quot;DejaVu Sans&quot;(s)</div><div class="line">       	familylang: &quot;en&quot;(s)</div><div class="line">       	style: &quot;Book&quot;(s)</div><div class="line">       	stylelang: &quot;en&quot;(s)</div><div class="line">       	fullname: &quot;DejaVu Sans&quot;(s)</div><div class="line">       	fullnamelang: &quot;en&quot;(s)</div><div class="line">       	slant: 0(i)(s)</div><div class="line">       	weight: 80(i)(s)</div><div class="line">       	width: 100(i)(s)</div><div class="line">       	size: 12(f)(s)</div><div class="line">       	pixelsize: 12.5(f)(s)</div><div class="line">       	foundry: &quot;PfEd&quot;(w)</div><div class="line">       	antialias: True(w)</div><div class="line">       	hintstyle: 1(i)(w)</div><div class="line">       	hinting: True(w)</div><div class="line">       	verticallayout: False(s)</div><div class="line">       	autohint: False(s)</div><div class="line">       	globaladvance: True(s)</div><div class="line">       	file: &quot;/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf&quot;(w)</div><div class="line">       	index: 0(i)(w)</div><div class="line">       	outline: True(w)</div><div class="line">       	scalable: True(w)</div><div class="line">       	dpi: 75(f)(s)</div></pre></td></tr></table></figure></p>
+<ol>
+<li>添加参数</li>
+</ol>
+<p>还是vis_detections()这个函数，修改：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">ax.text(bbox[0], bbox[1] - 2,  </div><div class="line">                &apos;&#123;:s&#125;&apos;.format(s),  </div><div class="line">                bbox=dict(facecolor=&apos;blue&apos;, alpha=0.5),  </div><div class="line">                fontsize=14, color=&apos;white&apos;, fontproperties = zhfont)</div></pre></td></tr></table></figure></p>
+<p>那个s就是识别的结果（有中文），color后面添加fontproperties = zhfont</p>
+<p>这样，就可以在图像上显示中文了.</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Xi Ning Wang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://osswangxining.github.io/ai-objectdetection/" title="使用定制数据集训练Faster-RCNN模型">https://osswangxining.github.io/ai-objectdetection/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/AI/" rel="tag"># AI</a>
+          
+            <a href="/tags/CNN/" rel="tag"># CNN</a>
+          
+            <a href="/tags/RCNN/" rel="tag"># RCNN</a>
+          
+            <a href="/tags/DL/" rel="tag"># DL</a>
+          
+            <a href="/tags/ML/" rel="tag"># ML</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/chatterbot-iot/" rel="next" title="Applying Chatbots to the Internet of Things">
+                <i class="fa fa-chevron-left"></i> Applying Chatbots to the Internet of Things
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/iot-connect/" rel="prev" title="使用LoRa在Edge端组网并接入IoT云平台">
+                使用LoRa在Edge端组网并接入IoT云平台 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/bio.png"
+                alt="Xi Ning Wang" />
+            
+              <p class="site-author-name" itemprop="name">Xi Ning Wang</p>
+              <p class="site-description motion-element" itemprop="description">专注于分布式高性能技术架构、容器|K8S、IoT云平台，支持语言：Java(script) | Python | Golang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/osswangxining" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:osswangxining@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://plus.google.com/osswangxining" target="_blank" title="Google">
+                      
+                        <i class="fa fa-fw fa-google"></i>Google</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/osswangxining" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://istio.io" title="Istio" target="_blank">Istio</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://grpc.io/" title="gRPC" target="_blank">gRPC</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#基本概念介绍"><span class="nav-number">1.</span> <span class="nav-text">基本概念介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Faster-RCNN的配置与编译"><span class="nav-number">2.</span> <span class="nav-text">Faster-RCNN的配置与编译</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置Caffe环境"><span class="nav-number">2.1.</span> <span class="nav-text">配置Caffe环境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置Faster-RCNN环境"><span class="nav-number">2.2.</span> <span class="nav-text">配置Faster-RCNN环境</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#处理思路"><span class="nav-number">3.</span> <span class="nav-text">处理思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据处理"><span class="nav-number">4.</span> <span class="nav-text">数据处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修改Faster-RCNN的训练参数"><span class="nav-number">5.</span> <span class="nav-text">修改Faster-RCNN的训练参数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#修改stage1-fast-rcnn-train-pt"><span class="nav-number">5.1.</span> <span class="nav-text">修改stage1_fast_rcnn_train.pt</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改stage1-rpn-train-pt"><span class="nav-number">5.2.</span> <span class="nav-text">修改stage1_rpn_train.pt</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改stage2-fast-rcnn-train-pt"><span class="nav-number">5.3.</span> <span class="nav-text">修改stage2_fast_rcnn_train.pt</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改stage2-rpn-train-pt"><span class="nav-number">5.4.</span> <span class="nav-text">修改stage2_rpn_train.pt</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改faster-rcnn-test-pt"><span class="nav-number">5.5.</span> <span class="nav-text">修改faster_rcnn_test.pt</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改pascal-voc-py"><span class="nav-number">5.6.</span> <span class="nav-text">修改pascal_voc.py</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改pascal-voc-py-1"><span class="nav-number">5.7.</span> <span class="nav-text">修改pascal_voc.py</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改学习率"><span class="nav-number">5.8.</span> <span class="nav-text">修改学习率</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改迭代次数"><span class="nav-number">5.9.</span> <span class="nav-text">修改迭代次数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#训练模型"><span class="nav-number">6.</span> <span class="nav-text">训练模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试模型"><span class="nav-number">7.</span> <span class="nav-text">测试模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Trouble-Shooting"><span class="nav-number">8.</span> <span class="nav-text">Trouble Shooting</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#‘assert（boxes-2-gt-boxes-0-）-all-issue"><span class="nav-number">8.1.</span> <span class="nav-text">‘assert（boxes[:,2]>=boxes[:,0]）.all() issue</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#‘max-overlaps’-issue"><span class="nav-number">8.2.</span> <span class="nav-text">‘max_overlaps’ issue</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#中文显示"><span class="nav-number">8.3.</span> <span class="nav-text">中文显示</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xi Ning Wang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=5.1.4"></script>
+
+
+</body>
+</html>

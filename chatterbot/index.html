@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="IoT,人工智能," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Chatbot的开发框架目前聊天机器人的云服务在各大公司中都有自己的框架，例如Facebook, 微软, Google以及IBM的Watson等。开源的框架中，基于机器学习的聊天机器人不多。其中，ChatterBot算是比较简洁（换种说话就是功能还比较弱）的一个，项目活跃, 文档清晰，代码也算干净利落。 具体说来，ChatterBot是一个基于机器学习的聊天机器人引擎,构建在python上,可以从">
+<meta name="keywords" content="IoT,人工智能">
+<meta property="og:type" content="article">
+<meta property="og:title" content="构建自己的聊天机器人（及如何接入微信）">
+<meta property="og:url" content="https://osswangxining.github.io/chatterbot/index.html">
+<meta property="og:site_name" content="Technical Blog">
+<meta property="og:description" content="Chatbot的开发框架目前聊天机器人的云服务在各大公司中都有自己的框架，例如Facebook, 微软, Google以及IBM的Watson等。开源的框架中，基于机器学习的聊天机器人不多。其中，ChatterBot算是比较简洁（换种说话就是功能还比较弱）的一个，项目活跃, 文档清晰，代码也算干净利落。 具体说来，ChatterBot是一个基于机器学习的聊天机器人引擎,构建在python上,可以从">
+<meta property="og:image" content="https://osswangxining.github.io/images/chatbot-api-chrome.png">
+<meta property="og:updated_time" content="2018-04-05T08:58:11.412Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="构建自己的聊天机器人（及如何接入微信）">
+<meta name="twitter:description" content="Chatbot的开发框架目前聊天机器人的云服务在各大公司中都有自己的框架，例如Facebook, 微软, Google以及IBM的Watson等。开源的框架中，基于机器学习的聊天机器人不多。其中，ChatterBot算是比较简洁（换种说话就是功能还比较弱）的一个，项目活跃, 文档清晰，代码也算干净利落。 具体说来，ChatterBot是一个基于机器学习的聊天机器人引擎,构建在python上,可以从">
+<meta name="twitter:image" content="https://osswangxining.github.io/images/chatbot-api-chrome.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://osswangxining.github.io/chatterbot/"/>
+
+
+
+
+
+  <title>构建自己的聊天机器人（及如何接入微信） | Technical Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Technical Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Welcome to my world! 有问题请osswangxining（at）163.com</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://osswangxining.github.io/chatterbot/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/bio.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">构建自己的聊天机器人（及如何接入微信）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-03T02:46:25+00:00">
+                2017-09-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/AI/" itemprop="url" rel="index">
+                    <span itemprop="name">AI</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Chatbot的开发框架"><a href="#Chatbot的开发框架" class="headerlink" title="Chatbot的开发框架"></a>Chatbot的开发框架</h2><p>目前聊天机器人的云服务在各大公司中都有自己的框架，例如Facebook, 微软, Google以及IBM的Watson等。开源的框架中，基于机器学习的聊天机器人不多。其中，ChatterBot算是比较简洁（换种说话就是功能还比较弱）的一个，项目活跃, 文档清晰，代码也算干净利落。</p>
+<p>具体说来，ChatterBot是一个基于机器学习的聊天机器人引擎,构建在python上,可以从已有的对话中学习, 该项目的设计允许它接入任何语言。</p>
+<p>其特性：</p>
+<ul>
+<li>一个未经训练的ChatterBot机器人,并没有与用户交谈所需的知识。</li>
+<li>每当用户输入一句话，机器人将存下它，同时也存下答复的句子。 </li>
+<li>随着机器人接受的输入的增加，它能够回答的问题的数量和准确度都会相应提升.</li>
+</ul>
+<p>实现原理：</p>
+<ul>
+<li>首先从已知句子中匹配出与用户输入最相近的句子（如何衡量相近, 大家可以想想）；</li>
+<li>之后找到最有可能的回复，那么如何得出最有可能的回复呢？由所有和机器交流过的人们，对这个输入问题（匹配过的）的各个回答的频率决定；<a id="more"></a>
+<h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2></li>
+</ul>
+<h3 id="Python3"><a href="#Python3" class="headerlink" title="Python3"></a>Python3</h3><ul>
+<li>By default, python3.5.2 is installed in Ubuntu 16.04</li>
+<li>sudo apt-get install -y python3-pip</li>
+<li>pip3 install package_name</li>
+</ul>
+<h3 id="Installing-ChatterBot-from-source"><a href="#Installing-ChatterBot-from-source" class="headerlink" title="Installing ChatterBot from source"></a>Installing ChatterBot from source</h3><ul>
+<li>git clone <a href="https://github.com/gunthercox/ChatterBot.git" target="_blank" rel="external">https://github.com/gunthercox/ChatterBot.git</a></li>
+<li>pip3 install ./ChatterBot</li>
+</ul>
+<h3 id="Checking-the-version-of-ChatterBot-that-you-have-installed"><a href="#Checking-the-version-of-ChatterBot-that-you-have-installed" class="headerlink" title="Checking the version of ChatterBot that you have installed"></a>Checking the version of ChatterBot that you have installed</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">python3 -m chatterbot --version</div><div class="line">0.7.6</div></pre></td></tr></table></figure>
+<p>我用的是当前最新的版本0.7.6。</p>
+<h2 id="快速入门"><a href="#快速入门" class="headerlink" title="快速入门"></a>快速入门</h2><p>开发第一个入门的机器人例子。</p>
+<p>myfirstchatbot.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"># -*- coding: utf-8 -*-</div><div class="line">from chatterbot import ChatBot</div><div class="line">from chatterbot.trainers import ChatterBotCorpusTrainer</div><div class="line"></div><div class="line">chatbot = ChatBot(&quot;ChineseChatbot1&quot;)</div><div class="line">chatbot.set_trainer(ChatterBotCorpusTrainer)</div><div class="line">chatbot.train(&quot;chatterbot.corpus.chinese&quot;)</div><div class="line"></div><div class="line">question = &apos;早上好&apos;</div><div class="line">response = chatbot.get_response(question)</div><div class="line">print(question)</div><div class="line">print(response)</div><div class="line">print(&quot;###########################################&quot;)</div><div class="line">question = &quot;很高兴认识你&quot;</div><div class="line">print(question)</div><div class="line">print(chatbot.get_response(question))</div><div class="line">print(&quot;###########################################&quot;)</div><div class="line">question = &quot;嗨，最近如何?&quot;</div><div class="line">print(question)</div><div class="line">print(chatbot.get_response(question))</div><div class="line">print(&quot;###########################################&quot;)</div><div class="line">question = &quot;复杂优于晦涩&quot;</div><div class="line">print(question)</div><div class="line">print(chatbot.get_response(question))</div><div class="line">print(&quot;###########################################&quot;)</div><div class="line">question = &quot;面对模棱两可，拒绝猜测的诱惑.&quot;</div><div class="line">print(question)</div><div class="line">print(chatbot.get_response(question))</div><div class="line">print(&quot;###########################################&quot;)</div><div class="line">question = &quot;生命、宇宙以及世间万物的终极答案是什么?&quot;</div><div class="line">print(question)</div><div class="line">print(chatbot.get_response(question))</div><div class="line">print(&quot;###########################################&quot;)</div></pre></td></tr></table></figure>
+<p>运行 python3 myfirstchatbot.py, 结果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">conversations.yml Training: [####################] 100%</div><div class="line">greetings.yml Training: [####################] 100%</div><div class="line">trivia.yml Training: [####################] 100%</div><div class="line">早上好</div><div class="line">很高兴认识你</div><div class="line">###########################################</div><div class="line">很高兴认识你</div><div class="line">谢谢你。你也一样.</div><div class="line">###########################################</div><div class="line">嗨，最近如何?</div><div class="line">挺好</div><div class="line">###########################################</div><div class="line">复杂优于晦涩</div><div class="line">简单优于复杂.</div><div class="line">###########################################</div><div class="line">面对模棱两可，拒绝猜测的诱惑.</div><div class="line">你似乎很熟悉Python之禅</div><div class="line">###########################################</div><div class="line">生命、宇宙以及世间万物的终极答案是什么?</div><div class="line">你想了解哪方面?</div><div class="line">###########################################</div></pre></td></tr></table></figure>
+<p>需要注意的是：</p>
+<ol>
+<li>中文支持需要使用Python3，中文语料库使用chatterbot.corpus.chinese。</li>
+<li>Chatterbot默认情况下会学习每一次输入，可以通过chatbot = ChatBot(“…”, read_only=True)设置成只读模式。</li>
+</ol>
+<h2 id="API接口"><a href="#API接口" class="headerlink" title="API接口"></a>API接口</h2><p>把聊天机器人封装为api服务，这样它的使用场合就不受限制了，能服务于任何http client。</p>
+<p>另一个原因是，微信接入脚本是python2的，而中文聊天机器人脚本基于python3。</p>
+<h3 id="创建API服务"><a href="#创建API服务" class="headerlink" title="创建API服务"></a>创建API服务</h3><p>使用hug作为API服务的框架，<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">安装依赖：pip3 install hug</div></pre></td></tr></table></figure></p>
+<p>创建bot_api.py:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">#!/usr/bin/env python</div><div class="line"># coding: utf-8</div><div class="line"></div><div class="line">from chatterbot import ChatBot</div><div class="line">from chatterbot.trainers import ChatterBotCorpusTrainer</div><div class="line">import hug</div><div class="line"></div><div class="line"></div><div class="line">weixinchatbot = ChatBot(&quot;weixinchatbot&quot;)</div><div class="line">weixinchatbot.set_trainer(ChatterBotCorpusTrainer)</div><div class="line"># 使用中文语料库训练它</div><div class="line">weixinchatbot.train(&quot;chatterbot.corpus.chinese&quot;)  # 语料库</div><div class="line"></div><div class="line"></div><div class="line">@hug.get()</div><div class="line">def get_response(user_input):</div><div class="line">    response = weixinchatbot.get_response(user_input).text</div><div class="line">    return &#123;&quot;response&quot;:response&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="启动API服务"><a href="#启动API服务" class="headerlink" title="启动API服务"></a>启动API服务</h3><p>运行hug -f bot_api.py：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">xiningwang@ubuntu:~/ChatterBot/examples$ hug -f bot_api.py</div><div class="line">conversations.yml Training: [####################] 100%</div><div class="line">greetings.yml Training: [####################] 100%</div><div class="line">trivia.yml Training: [####################] 100%</div><div class="line"></div><div class="line">/#######################################################################\</div><div class="line">          `.----``..-------..``.----.</div><div class="line">         :/:::::--:---------:--::::://.</div><div class="line">        .+::::----##/-/oo+:-##----:::://</div><div class="line">        `//::-------/oosoo-------::://.       ##    ##  ##    ##    #####</div><div class="line">          .-:------./++o/o-.------::-`   ```  ##    ##  ##    ##  ##</div><div class="line">             `----.-./+o+:..----.     `.:///. ########  ##    ## ##</div><div class="line">   ```        `----.-::::::------  `.-:::://. ##    ##  ##    ## ##   ####</div><div class="line">  ://::--.``` -:``...-----...` `:--::::::-.`  ##    ##  ##   ##   ##    ##</div><div class="line">  :/:::::::::-:-     `````      .:::::-.`     ##    ##    ####     ######</div><div class="line">   ``.--:::::::.                .:::.`</div><div class="line">         ``..::.                .::         EMBRACE THE APIs OF THE FUTURE</div><div class="line">             ::-                .:-</div><div class="line">             -::`               ::-                   VERSION 2.3.1</div><div class="line">             `::-              -::`</div><div class="line">              -::-`           -::-</div><div class="line">\########################################################################/</div><div class="line"></div><div class="line"> Copyright (C) 2016 Timothy Edmund Crosley</div><div class="line"> Under the MIT License</div><div class="line"></div><div class="line"></div><div class="line">Serving on port 8000...</div></pre></td></tr></table></figure></p>
+<h3 id="API服务调用"><a href="#API服务调用" class="headerlink" title="API服务调用"></a>API服务调用</h3><p><img src="/images/chatbot-api-chrome.png" alt=""></p>
+<h2 id="接入微信"><a href="#接入微信" class="headerlink" title="接入微信"></a>接入微信</h2><p>基于wxBot项目，使得用代码与微信交互，这样一来使聊天过程（input/output）可编程，可以让聊天机器人接管我们的聊天。</p>
+<p>wxBot脚本到本地：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">wget https://raw.githubusercontent.com/liuwons/wxBot/master/wxbot.py</div></pre></td></tr></table></figure></p>
+<p>创建wechat_bot.py:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">#!/usr/bin/env python</div><div class="line"># coding: utf-8</div><div class="line"></div><div class="line">from wxbot import WXBot</div><div class="line">import requests</div><div class="line">bot_api=&quot;http://127.0.0.1:8000/get_response&quot;</div><div class="line"></div><div class="line">class MyWXBot(WXBot):</div><div class="line">    def handle_msg_all(self, msg):</div><div class="line">        if msg[&apos;msg_type_id&apos;] == 4 and msg[&apos;content&apos;][&apos;type&apos;] == 0:</div><div class="line">            user_input = msg[&quot;content&quot;][&quot;data&quot;]</div><div class="line">            payload=&#123;&quot;user_input&quot;:user_input&#125;</div><div class="line">            response = requests.get(bot_api,params=payload).json()[&quot;response&quot;]</div><div class="line">            #print(type(response)) # unicode</div><div class="line">            self.send_msg_by_uid(response, msg[&apos;user&apos;][&apos;id&apos;])</div><div class="line"></div><div class="line">def main():</div><div class="line">    bot = MyWXBot()</div><div class="line">    bot.DEBUG = True</div><div class="line">    bot.conf[&apos;qr&apos;] = &apos;png&apos;</div><div class="line">    bot.run()</div><div class="line"></div><div class="line">if __name__ == &apos;__main__&apos;:</div><div class="line">    main()</div></pre></td></tr></table></figure></p>
+<p>安装依赖：pip install requests pyqrcode pypng Pillow</p>
+<p>开始运行(使用python2)：python wechat_bot.py</p>
+<p>之后扫码登录即可</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Xi Ning Wang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://osswangxining.github.io/chatterbot/" title="构建自己的聊天机器人（及如何接入微信）">https://osswangxining.github.io/chatterbot/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/IoT/" rel="tag"># IoT</a>
+          
+            <a href="/tags/人工智能/" rel="tag"># 人工智能</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/ai-nlu/" rel="next" title="IoT - 人工智能">
+                <i class="fa fa-chevron-left"></i> IoT - 人工智能
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/sklearn-classifier/" rel="prev" title="在使用sklearn时如何选择合适的分类器">
+                在使用sklearn时如何选择合适的分类器 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/bio.png"
+                alt="Xi Ning Wang" />
+            
+              <p class="site-author-name" itemprop="name">Xi Ning Wang</p>
+              <p class="site-description motion-element" itemprop="description">专注于分布式高性能技术架构、容器|K8S、IoT云平台，支持语言：Java(script) | Python | Golang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/osswangxining" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:osswangxining@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://plus.google.com/osswangxining" target="_blank" title="Google">
+                      
+                        <i class="fa fa-fw fa-google"></i>Google</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/osswangxining" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://istio.io" title="Istio" target="_blank">Istio</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://grpc.io/" title="gRPC" target="_blank">gRPC</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Chatbot的开发框架"><span class="nav-number">1.</span> <span class="nav-text">Chatbot的开发框架</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#环境搭建"><span class="nav-number">2.</span> <span class="nav-text">环境搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Python3"><span class="nav-number">2.1.</span> <span class="nav-text">Python3</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Installing-ChatterBot-from-source"><span class="nav-number">2.2.</span> <span class="nav-text">Installing ChatterBot from source</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Checking-the-version-of-ChatterBot-that-you-have-installed"><span class="nav-number">2.3.</span> <span class="nav-text">Checking the version of ChatterBot that you have installed</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#快速入门"><span class="nav-number">3.</span> <span class="nav-text">快速入门</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#API接口"><span class="nav-number">4.</span> <span class="nav-text">API接口</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建API服务"><span class="nav-number">4.1.</span> <span class="nav-text">创建API服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动API服务"><span class="nav-number">4.2.</span> <span class="nav-text">启动API服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#API服务调用"><span class="nav-number">4.3.</span> <span class="nav-text">API服务调用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#接入微信"><span class="nav-number">5.</span> <span class="nav-text">接入微信</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xi Ning Wang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=5.1.4"></script>
+
+
+</body>
+</html>

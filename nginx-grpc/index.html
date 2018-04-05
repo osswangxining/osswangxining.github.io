@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Kubernetes,container,容器,微服务,代理," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="图片来自https://pixabay.com Nginx支持gRPC服务集群(蹭热点)2018年3月17日，NGINIX官方宣布在nginx 1.13.10中将会支持gRPC，这一宣告表示了NGINX已完成对gRPC的原生支持。众所周知，gRPC已经是新一代微服务的事实标准RPC框架。对于实现来说，可以用服务框架等手段来做到负载均衡，但业界其实还没有非常成熟的针对gRPC的反向代理软件。NGIN">
+<meta name="keywords" content="Kubernetes,container,容器,微服务,代理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Service Mesh利器：NGINX+gRPC">
+<meta property="og:url" content="https://osswangxining.github.io/nginx-grpc/index.html">
+<meta property="og:site_name" content="Technical Blog">
+<meta property="og:description" content="图片来自https://pixabay.com Nginx支持gRPC服务集群(蹭热点)2018年3月17日，NGINIX官方宣布在nginx 1.13.10中将会支持gRPC，这一宣告表示了NGINX已完成对gRPC的原生支持。众所周知，gRPC已经是新一代微服务的事实标准RPC框架。对于实现来说，可以用服务框架等手段来做到负载均衡，但业界其实还没有非常成熟的针对gRPC的反向代理软件。NGIN">
+<meta property="og:image" content="https://raw.githubusercontent.com/osswangxining/myimages/master/wire-mesh-1117741_1920.jpg">
+<meta property="og:image" content="https://cdn-1.wp.nginx.com/wp-content/uploads/2018/03/grpc-unproxied-cleartext.png">
+<meta property="og:image" content="https://cdn-1.wp.nginx.com/wp-content/uploads/2018/03/grpc-nginx-cleartext.png">
+<meta property="og:image" content="https://cdn-1.wp.nginx.com/wp-content/uploads/2018/03/grpc-nginx-routing.png">
+<meta property="og:updated_time" content="2018-04-05T08:58:11.416Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Service Mesh利器：NGINX+gRPC">
+<meta name="twitter:description" content="图片来自https://pixabay.com Nginx支持gRPC服务集群(蹭热点)2018年3月17日，NGINIX官方宣布在nginx 1.13.10中将会支持gRPC，这一宣告表示了NGINX已完成对gRPC的原生支持。众所周知，gRPC已经是新一代微服务的事实标准RPC框架。对于实现来说，可以用服务框架等手段来做到负载均衡，但业界其实还没有非常成熟的针对gRPC的反向代理软件。NGIN">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/osswangxining/myimages/master/wire-mesh-1117741_1920.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://osswangxining.github.io/nginx-grpc/"/>
+
+
+
+
+
+  <title>Service Mesh利器：NGINX+gRPC | Technical Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Technical Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Welcome to my world! 有问题请osswangxining（at）163.com</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://osswangxining.github.io/nginx-grpc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/bio.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Service Mesh利器：NGINX+gRPC</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-24T08:36:25+00:00">
+                2018-03-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式&云计算</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/微服务/" itemprop="url" rel="index">
+                    <span itemprop="name">微服务</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="https://raw.githubusercontent.com/osswangxining/myimages/master/wire-mesh-1117741_1920.jpg" alt=""><br>图片来自<a href="https://pixabay.com" target="_blank" rel="external">https://pixabay.com</a></p>
+<h2 id="Nginx支持gRPC服务集群"><a href="#Nginx支持gRPC服务集群" class="headerlink" title="Nginx支持gRPC服务集群"></a>Nginx支持gRPC服务集群</h2><p>(蹭热点)2018年3月17日，NGINIX官方宣布在nginx 1.13.10中将会支持gRPC，这一宣告表示了NGINX已完成对gRPC的原生支持。众所周知，gRPC已经是新一代微服务的事实标准RPC框架。对于实现来说，可以用服务框架等手段来做到负载均衡，但业界其实还没有非常成熟的针对gRPC的反向代理软件。<br>NGINIX作为老牌负载均衡软件对gRPC进行了支持，之前已经可以代理gRPC的TCP连接，新版本之后，还可以终止、检查和跟踪 gRPC 的方法调用：</p>
+<ul>
+<li>发布 gRPC 服务，然后使用 NGINX 应用 HTTP/2 TLS 加密、速率限制、基于 IP 的访问控制列表和日志记录；</li>
+<li>通过单个端点发布多个 gRPC 服务，使用 NGINX 检查并跟踪每个内部服务的调用；</li>
+<li>使用 Round Robin, Least Connections 或其他方法在集群分配调用，对 gRPC 服务集群进行负载均衡；<a id="more"></a>
+<h2 id="gRPC-RPC服务"><a href="#gRPC-RPC服务" class="headerlink" title="gRPC RPC服务"></a>gRPC RPC服务</h2>gRPC是一种远程过程调用协议，用于客户端和服务器应用程序之间的通信, 具有紧凑（节省空间）和可跨多种语言移植的特点，并且支持请求响应和流式交互。 由于其广泛的语言支持和简单的面向用户的设计，该协议越来越受欢迎，其中包括服务网格实现。<br><img src="https://cdn-1.wp.nginx.com/wp-content/uploads/2018/03/grpc-unproxied-cleartext.png" alt="一个简单的基于 gRPC 的应用程序"></li>
+</ul>
+<p>gRPC 通过 HTTP / 2 传输，无论是明文还是 TLS 加密。 gRPC 调用被实现为具有高效编码主体的 HTTP POST 请求（协议缓冲区是标准编码）。 gRPC 响应使用类似的编码体，并在响应结束时使用 HTTP trailers 发送状态码。<br>按照设计，gRPC 协议不能通过 HTTP 传输。 gRPC 协议规定使用 HTTP / 2，是为了利用 HTTP / 2 连接的复用和流式传输功能。</p>
+<h2 id="gRPC-Spring-Boot-Starter"><a href="#gRPC-Spring-Boot-Starter" class="headerlink" title="gRPC Spring Boot Starter"></a>gRPC Spring Boot Starter</h2><p><a href="https://github.com/osswangxining/grpc-spring-boot-starter" target="_blank" rel="external">grpc-spring-boot-starter</a> 是本人实现的一个整合gRPC服务框架的Spring Boot Starter，以便于使用 Spring Boot 的应用进行自动配置，内嵌 gRPC server。<br>@TODO: 目前只是实现了server端的autoconfigure，client端其实是类似的实现，读者可以自行尝试。</p>
+<p>启动gRPC Spring Boot Starter - sample server：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"> ===================================================</div><div class="line"> :: gRPC Spring Boot Starter - sample server :: 1.0</div><div class="line"> ===================================================</div><div class="line"> ......</div><div class="line"> ......</div><div class="line"> 21:59:53.175 [main] INFO  o.github.io.grpc.GRpcServerRunner - Starting gRPC Server ...</div><div class="line">21:59:53.211 [main] INFO  o.github.io.grpc.GRpcServerRunner - <span class="string">'osswangxining.github.io.grpc.sample.CalculatorService'</span> service has been registered.</div><div class="line">21:59:53.215 [main] INFO  o.github.io.grpc.GRpcServerRunner - <span class="string">'osswangxining.github.io.grpc.sample.GreeterService'</span> service has been registered.</div><div class="line">21:59:53.320 [main] INFO  o.github.io.grpc.GRpcServerRunner - gRPC Server started, listening on port 6565.</div><div class="line">21:59:53.322 [main] INFO  o.g.io.grpc.sample.SampleApplication - Started SampleApplication <span class="keyword">in</span> 1.759 seconds (JVM running <span class="keyword">for</span> 3.121)</div></pre></td></tr></table></figure></p>
+<p>可以看到，gRPC Server启动，监听端口6565。</p>
+<p>原始的client调用方式如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> osswangxining.github.io.grpc;</div><div class="line"></div><div class="line"><span class="keyword">import</span> java.util.concurrent.ExecutionException;</div><div class="line"><span class="keyword">import</span> java.util.concurrent.TimeUnit;</div><div class="line"></div><div class="line"><span class="keyword">import</span> com.google.common.util.concurrent.ListenableFuture;</div><div class="line"></div><div class="line"><span class="keyword">import</span> io.grpc.ManagedChannel;</div><div class="line"><span class="keyword">import</span> io.grpc.ManagedChannelBuilder;</div><div class="line"><span class="keyword">import</span> io.grpc.examples.CalculatorGrpc;</div><div class="line"><span class="keyword">import</span> io.grpc.examples.CalculatorGrpc.CalculatorBlockingStub;</div><div class="line"><span class="keyword">import</span> io.grpc.examples.CalculatorGrpc.CalculatorFutureStub;</div><div class="line"><span class="keyword">import</span> io.grpc.examples.CalculatorGrpc.CalculatorStub;</div><div class="line"><span class="keyword">import</span> io.grpc.examples.CalculatorOuterClass.CalculatorRequest;</div><div class="line"><span class="keyword">import</span> io.grpc.examples.CalculatorOuterClass.CalculatorRequest.OperationType;</div><div class="line"><span class="keyword">import</span> io.grpc.examples.CalculatorOuterClass.CalculatorResponse;</div><div class="line"><span class="keyword">import</span> io.grpc.stub.StreamObserver;</div><div class="line"><span class="keyword">import</span> lombok.extern.slf4j.Slf4j;</div><div class="line"></div><div class="line"><span class="meta">@Slf</span>4j</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CalculatorServiceClient</span> </span>&#123;</div><div class="line">	<span class="keyword">private</span> <span class="keyword">final</span> ManagedChannel channel;</div><div class="line">	<span class="keyword">private</span> <span class="keyword">final</span> CalculatorBlockingStub newBlockingStub;</div><div class="line">	<span class="keyword">private</span> <span class="keyword">final</span> CalculatorFutureStub newFutureStub;</div><div class="line">	<span class="keyword">private</span> <span class="keyword">final</span> CalculatorStub newStub;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="title">CalculatorServiceClient</span><span class="params">(String host, <span class="keyword">int</span> port)</span> </span>&#123;</div><div class="line">		<span class="keyword">this</span>(ManagedChannelBuilder.forAddress(host, port).usePlaintext(<span class="keyword">true</span>));</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="title">CalculatorServiceClient</span><span class="params">(ManagedChannelBuilder&lt;?&gt; channelBuilder)</span> </span>&#123;</div><div class="line">		channel = channelBuilder.build();</div><div class="line">		newBlockingStub = CalculatorGrpc.newBlockingStub(channel);</div><div class="line">		newFutureStub = CalculatorGrpc.newFutureStub(channel);</div><div class="line">		newStub = CalculatorGrpc.newStub(channel);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shutdown</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</div><div class="line">		channel.shutdown().awaitTermination(<span class="number">5</span>, TimeUnit.SECONDS);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> CalculatorResponse <span class="title">blockingCalculate</span><span class="params">(<span class="keyword">double</span> num1, <span class="keyword">double</span> num2, OperationType operationType)</span> </span>&#123;</div><div class="line">		CalculatorRequest request = CalculatorRequest.newBuilder().setNumber1(num1).setNumber2(num2)</div><div class="line">				.setOperation(operationType).build();</div><div class="line">		<span class="keyword">return</span> newBlockingStub.calculate(request);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> ListenableFuture&lt;CalculatorResponse&gt; <span class="title">futureCalculate</span><span class="params">(<span class="keyword">double</span> num1, <span class="keyword">double</span> num2, OperationType operationType)</span> </span>&#123;</div><div class="line">		CalculatorRequest request = CalculatorRequest.newBuilder().setNumber1(num1).setNumber2(num2)</div><div class="line">				.setOperation(operationType).build();</div><div class="line">		<span class="keyword">return</span> newFutureStub.calculate(request);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">calculate</span><span class="params">(<span class="keyword">double</span> num1, <span class="keyword">double</span> num2, OperationType operationType)</span> </span>&#123;</div><div class="line">		CalculatorRequest request = CalculatorRequest.newBuilder().setNumber1(num1).setNumber2(num2)</div><div class="line">				.setOperation(operationType).build();</div><div class="line">		newStub.calculate(request, <span class="keyword">new</span> StreamObserver&lt;CalculatorResponse&gt;() &#123;</div><div class="line"></div><div class="line">			<span class="meta">@Override</span></div><div class="line">			<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCompleted</span><span class="params">()</span> </span>&#123;</div><div class="line">				log.info(<span class="string">"onCompleted"</span>);</div><div class="line">			&#125;</div><div class="line"></div><div class="line">			<span class="meta">@Override</span></div><div class="line">			<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onError</span><span class="params">(Throwable t)</span> </span>&#123;</div><div class="line">				log.info(<span class="string">"onError:"</span> + t.getMessage());</div><div class="line">			&#125;</div><div class="line"></div><div class="line">			<span class="meta">@Override</span></div><div class="line">			<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onNext</span><span class="params">(CalculatorResponse response)</span> </span>&#123;</div><div class="line">				log.info(<span class="string">"onNext:"</span> + response.getResult());</div><div class="line">			&#125;</div><div class="line"></div><div class="line">		&#125;);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException, ExecutionException </span>&#123;</div><div class="line">		CalculatorServiceClient client = <span class="keyword">new</span> CalculatorServiceClient(<span class="string">"localhost"</span>, <span class="number">6565</span>);</div><div class="line">		<span class="keyword">double</span> num1 = <span class="number">1.2</span>;</div><div class="line">		<span class="keyword">double</span> num2 = <span class="number">2.3</span>;</div><div class="line">		OperationType operationType = OperationType.ADD;</div><div class="line"></div><div class="line">		CalculatorResponse response = client.blockingCalculate(num1, num2, operationType);</div><div class="line">		log.info(<span class="string">"blockingCalculate(&#123;&#125;, &#123;&#125;, &#123;&#125;):&#123;&#125;"</span>, num1, num2, operationType, response.getResult());</div><div class="line"></div><div class="line">		ListenableFuture&lt;CalculatorResponse&gt; futureCalculate = client.futureCalculate(num1, num2, operationType);</div><div class="line">		log.info(<span class="string">"futureCalculate(&#123;&#125;, &#123;&#125;, &#123;&#125;):&#123;&#125;"</span>, num1, num2, operationType, futureCalculate.get().getResult());</div><div class="line"></div><div class="line">		client.calculate(num1, num2, operationType);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>注意，IP地址和端口为”localhost”、6565。示例执行结果如下：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">22:06:33.997 [main] INFO  o.g.io.grpc.CalculatorServiceClient - blockingCalculate(1.2, 2.3, ADD):3.5</div><div class="line">22:06:34.006 [main] INFO  o.g.io.grpc.CalculatorServiceClient - futureCalculate(1.2, 2.3, ADD):3.5</div></pre></td></tr></table></figure></p>
+<h2 id="使用NGINX代理gRPC-服务"><a href="#使用NGINX代理gRPC-服务" class="headerlink" title="使用NGINX代理gRPC 服务"></a>使用NGINX代理gRPC 服务</h2><p><img src="https://cdn-1.wp.nginx.com/wp-content/uploads/2018/03/grpc-nginx-cleartext.png" alt="NGINX proxying gRPC traffic"></p>
+<p>在客户端和服务器应用程序之间插入 NGINX，为服务器应用程序提供了一个稳定可靠的网关。</p>
+<h3 id="使用Docker容器搭建NGINX-Server"><a href="#使用Docker容器搭建NGINX-Server" class="headerlink" title="使用Docker容器搭建NGINX Server"></a>使用Docker容器搭建NGINX Server</h3><p>使用NGINX官方提供的docker image搭建server：<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">$ docker pull nginx:1.13.10</div><div class="line">1.13.10: Pulling from library/nginx</div><div class="line">2a72cbf407d6: Pull complete</div><div class="line">fefa2faca81f: Pull complete</div><div class="line">080aeede8114: Pull complete</div><div class="line">Digest: sha256:c4ee0ecb376636258447e1d8effb56c09c75fe7acf756bf7c13efadf38aa0aca</div><div class="line">Status: Downloaded newer image <span class="keyword">for</span> nginx:1.13.10</div></pre></td></tr></table></figure></p>
+<h3 id="NGINX-gRPC配置"><a href="#NGINX-gRPC配置" class="headerlink" title="NGINX gRPC配置"></a>NGINX gRPC配置</h3><p>NGINX 使用 HTTP 服务器监听 gRPC 流量，并使用 grpc_pass 指令代理流量。 为 NGINX 创建以下代理配置，在端口 80 上侦听未加密的 gRPC 流量并将请求转发到端口6565上的服务器：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="section">server</span> &#123;</div><div class="line">    <span class="attribute">listen</span>  <span class="number">80</span>     http2;</div><div class="line"></div><div class="line">    <span class="attribute">access_log</span> /var/log/nginx/access.log main;</div><div class="line"></div><div class="line">    <span class="attribute">location</span> / &#123;</div><div class="line">        <span class="comment"># Replace with the address and port of your gRPC server</span></div><div class="line">        <span class="comment"># The 'grpc://' prefix is optional; unencrypted gRPC is the default</span></div><div class="line">        <span class="attribute">grpc_pass</span> grpc://192.168.1.3:6565;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="启动NGINX容器"><a href="#启动NGINX容器" class="headerlink" title="启动NGINX容器"></a>启动NGINX容器</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run --name mynginx4grpc -p 80:80 -v /Users/xiningwang/tmp4myworkspace:/etc/nginx/conf.d:ro <span class="_">-d</span> nginx:1.13.10</div></pre></td></tr></table></figure>
+<p>其中，上述NGINX配置文件位于 /Users/xiningwang/tmp4myworkspace目录下。</p>
+<h2 id="修改gRPC客户端"><a href="#修改gRPC客户端" class="headerlink" title="修改gRPC客户端"></a>修改gRPC客户端</h2><p>将gRPC客户端的代码修改为相应的IP地址(如果container是在本地，则可以设为localhost)与端口80，如下:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">CalculatorServiceClient client = <span class="keyword">new</span> CalculatorServiceClient(<span class="string">"localhost"</span>, <span class="number">80</span>);</div></pre></td></tr></table></figure></p>
+<p>当运行修改后的客户端时，您会看到与之前相同的响应，但事务将由 NGINX 终止并转发。<br>具体可以在NGINX配置的访问日志中看到它们：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$ docker logs mynginx4grpc</div><div class="line">172.17.0.1 - - [24/Mar/2018:14:26:46 +0000] &quot;POST /Calculator/Calculate HTTP/2.0&quot; 200 14 &quot;-&quot; &quot;grpc-java-netty/1.10.0&quot; &quot;-&quot;</div><div class="line">172.17.0.1 - - [24/Mar/2018:14:26:46 +0000] &quot;POST /Calculator/Calculate HTTP/2.0&quot; 200 14 &quot;-&quot; &quot;grpc-java-netty/1.10.0&quot; &quot;-&quot;</div><div class="line">172.17.0.1 - - [24/Mar/2018:14:26:46 +0000] &quot;POST /Calculator/Calculate HTTP/2.0&quot; 200 14 &quot;-&quot; &quot;grpc-java-netty/1.10.0&quot; &quot;-&quot;</div><div class="line">172.17.0.1 - - [24/Mar/2018:14:27:15 +0000] &quot;POST /Calculator/Calculate HTTP/2.0&quot; 200 14 &quot;-&quot; &quot;grpc-java-netty/1.10.0&quot; &quot;-&quot;</div><div class="line">172.17.0.1 - - [24/Mar/2018:14:27:15 +0000] &quot;POST /Calculator/Calculate HTTP/2.0&quot; 200 14 &quot;-&quot; &quot;grpc-java-netty/1.10.0&quot; &quot;-&quot;</div></pre></td></tr></table></figure></p>
+<h2 id="NGINX其他关于gRPC的支持"><a href="#NGINX其他关于gRPC的支持" class="headerlink" title="NGINX其他关于gRPC的支持"></a>NGINX其他关于gRPC的支持</h2><p>关于加密 gRPC 流量，在 NGINX 配置中，需要更改用于将 gRPC 流量代理到上游服务器的协议：grpcs。</p>
+<p><img src="https://cdn-1.wp.nginx.com/wp-content/uploads/2018/03/grpc-nginx-routing.png" alt="路由 gRPC 流量"></p>
+<p>如果有多个 gRPC 服务，每个服务都由不同的服务器应用程序实现。使用 NGINX，您可以识别服务和方法，然后使用位置指令路由流量。 可能你已经推断出每个 gRPC 请求的 URL 是从 proto 规范中的包，服务和方法名称派生的。 如下：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="class"><span class="keyword">service</span> <span class="title">Calculator</span> </span>&#123;</div><div class="line">  <span class="comment">// calculate</span></div><div class="line">  <span class="function"><span class="keyword">rpc</span> Calculate(CalculatorRequest) <span class="keyword">returns</span> (CalculatorResponse) &#123;&#125;</span></div><div class="line">&#125;</div><div class="line"></div><div class="line">....</div><div class="line">"POST /Calculator/Calculate HTTP/2.0" 200</div><div class="line">....</div></pre></td></tr></table></figure>
+<p>因此，使用 NGINX 路由流量非常简单：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="attribute">upstream</span> grpcservers &#123;</div><div class="line">    <span class="attribute">server</span> <span class="number">192.168.1.3:6565</span>;</div><div class="line">    <span class="attribute">server</span> <span class="number">192.168.1.4:6565</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="attribute">location</span> /Calculator/Calculate &#123;</div><div class="line">    <span class="attribute">grpc_pass</span> grpc://grpcservers;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="attribute">location</span> /Greeter/SayHello &#123;</div><div class="line">    <span class="attribute">grpc_pass</span> grpc://192.168.1.4:6565;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Xi Ning Wang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://osswangxining.github.io/nginx-grpc/" title="Service Mesh利器：NGINX+gRPC">https://osswangxining.github.io/nginx-grpc/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kubernetes/" rel="tag"># Kubernetes</a>
+          
+            <a href="/tags/container/" rel="tag"># container</a>
+          
+            <a href="/tags/容器/" rel="tag"># 容器</a>
+          
+            <a href="/tags/微服务/" rel="tag"># 微服务</a>
+          
+            <a href="/tags/代理/" rel="tag"># 代理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/writing-custom-terraform-provider/" rel="next" title="写一个Terraform Provider">
+                <i class="fa fa-chevron-left"></i> 写一个Terraform Provider
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blockchain-gettingstarted/" rel="prev" title="在Ubuntu16.04上构建第一个fabric网络">
+                在Ubuntu16.04上构建第一个fabric网络 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/bio.png"
+                alt="Xi Ning Wang" />
+            
+              <p class="site-author-name" itemprop="name">Xi Ning Wang</p>
+              <p class="site-description motion-element" itemprop="description">专注于分布式高性能技术架构、容器|K8S、IoT云平台，支持语言：Java(script) | Python | Golang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/osswangxining" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:osswangxining@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://plus.google.com/osswangxining" target="_blank" title="Google">
+                      
+                        <i class="fa fa-fw fa-google"></i>Google</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/osswangxining" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://istio.io" title="Istio" target="_blank">Istio</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://grpc.io/" title="gRPC" target="_blank">gRPC</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx支持gRPC服务集群"><span class="nav-number">1.</span> <span class="nav-text">Nginx支持gRPC服务集群</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gRPC-RPC服务"><span class="nav-number">2.</span> <span class="nav-text">gRPC RPC服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gRPC-Spring-Boot-Starter"><span class="nav-number">3.</span> <span class="nav-text">gRPC Spring Boot Starter</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用NGINX代理gRPC-服务"><span class="nav-number">4.</span> <span class="nav-text">使用NGINX代理gRPC 服务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用Docker容器搭建NGINX-Server"><span class="nav-number">4.1.</span> <span class="nav-text">使用Docker容器搭建NGINX Server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NGINX-gRPC配置"><span class="nav-number">4.2.</span> <span class="nav-text">NGINX gRPC配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动NGINX容器"><span class="nav-number">4.3.</span> <span class="nav-text">启动NGINX容器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修改gRPC客户端"><span class="nav-number">5.</span> <span class="nav-text">修改gRPC客户端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NGINX其他关于gRPC的支持"><span class="nav-number">6.</span> <span class="nav-text">NGINX其他关于gRPC的支持</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xi Ning Wang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=5.1.4"></script>
+
+
+</body>
+</html>

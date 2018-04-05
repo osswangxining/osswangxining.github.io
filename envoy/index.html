@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Kubernetes,container,容器,微服务,代理," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="图片来自https://pixabay.com Envoy是什么？Envoy 是一个面向服务架构的L7代理和通信总线而设计的，这个项目诞生是出于以下目标：  对于应用程序而言，网络应该是透明的，当发生网络和应用程序故障时，能够很容易定位出问题的根源。">
+<meta name="keywords" content="Kubernetes,container,容器,微服务,代理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="巧用Envoy+Docker打造轻量级Sidecar代理">
+<meta property="og:url" content="https://osswangxining.github.io/envoy/index.html">
+<meta property="og:site_name" content="Technical Blog">
+<meta property="og:description" content="图片来自https://pixabay.com Envoy是什么？Envoy 是一个面向服务架构的L7代理和通信总线而设计的，这个项目诞生是出于以下目标：  对于应用程序而言，网络应该是透明的，当发生网络和应用程序故障时，能够很容易定位出问题的根源。">
+<meta property="og:image" content="https://raw.githubusercontent.com/osswangxining/myimages/master/shape-2622299_1920.jpg">
+<meta property="og:image" content="https://osswangxining.github.io/images/envoy-front-proxy-topology.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/envoy-front-proxy-config-files.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/envoy_examples_front-proxy_front-envoy_yaml-envoy_examples_zipkin-tracing_front-envoy-zipkin_yaml.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/envoy-zipkin-service1-service2.png">
+<meta property="og:updated_time" content="2018-04-05T08:58:11.416Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="巧用Envoy+Docker打造轻量级Sidecar代理">
+<meta name="twitter:description" content="图片来自https://pixabay.com Envoy是什么？Envoy 是一个面向服务架构的L7代理和通信总线而设计的，这个项目诞生是出于以下目标：  对于应用程序而言，网络应该是透明的，当发生网络和应用程序故障时，能够很容易定位出问题的根源。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/osswangxining/myimages/master/shape-2622299_1920.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://osswangxining.github.io/envoy/"/>
+
+
+
+
+
+  <title>巧用Envoy+Docker打造轻量级Sidecar代理 | Technical Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Technical Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Welcome to my world! 有问题请osswangxining（at）163.com</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://osswangxining.github.io/envoy/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/bio.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">巧用Envoy+Docker打造轻量级Sidecar代理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-04T08:36:25+00:00">
+                2018-02-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式&云计算</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/微服务/" itemprop="url" rel="index">
+                    <span itemprop="name">微服务</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="https://raw.githubusercontent.com/osswangxining/myimages/master/shape-2622299_1920.jpg" alt=""><br>图片来自<a href="https://pixabay.com" target="_blank" rel="external">https://pixabay.com</a></p>
+<h3 id="Envoy是什么？"><a href="#Envoy是什么？" class="headerlink" title="Envoy是什么？"></a>Envoy是什么？</h3><p>Envoy 是一个面向服务架构的L7代理和通信总线而设计的，这个项目诞生是出于以下目标：</p>
+<blockquote>
+<p>对于应用程序而言，网络应该是透明的，当发生网络和应用程序故障时，能够很容易定位出问题的根源。</p>
+</blockquote>
+<a id="more"></a>
+<p>Envoy 试图通过提供以下高级特性：</p>
+<ul>
+<li><p><strong>外置进程架构</strong>：Envoy是一个独立的进程，与应用程序一起运行。所有的Envoy形成一个对应用透明的通信网格，每个应用程序通过本地发送和接受消息，并不感知网络拓扑结构。这个外置进程的架构相比传统的基于library库服务通信，有两个优势；</p>
+<ul>
+<li>Envoy可以与任何语言开发的应用一起工作。Java, C++, Go, PHP, Python等都可以基于Envoy部署成一个服务网格，在面向服务的架构体系中，使用多语言开发应用越来越普遍，Envoy填补了这一空白。</li>
+<li>任何参与面向服务的大型架构里工作的人都知道，部署升级library是非常令人痛苦的，而现在可以在整个基础设施上快速升级Envoy。</li>
+</ul>
+</li>
+<li><p><strong>基于新C++11编码</strong>：Envoy是基于C++11编写的，之所以这样选择，是因为我们认为，Envoy这样的体系结构组件能够快速有效的开发出来。而现代应用程序开发者已经很难在云环境部署和使用它；通常会选择性能不高，但是能够快速提升开发效率的PHP、Python、Ruby、Scala等语言，并且能够解决复杂的外部环境依赖。并不像本地开发代码那样使用如C、C++能够提供高效的性能。</p>
+</li>
+<li><p><strong>L3/L4过滤器</strong>：Envoy其核心是一个L3/L4网络代理，能够作为一个可编程过滤器实现不同TCP代理任务，插入到主服务当中。通过编写过滤器来支持各种任务，如原始TCP代理、HTTP代理、TLS客户端证书身份验证等。</p>
+</li>
+<li><p><strong>HTTP L7过滤器</strong>：在现代应用架构中，HTTP是非常关键的部件，Envoy支持一个额外的HTTP L7过滤层。HTTP过滤器作为一个插件，插入到HTTP链接管理子系统中，从而执行不同的任务，如缓冲，速率限制，路由/转发，嗅探Amazon的DynamoDB等等。</p>
+</li>
+<li><p><strong>支持HTTP/2</strong>：在HTTP模式下，Envoy支持HTTP/1.1、HTTP/2，并且支持HTTP/1.1、HTTP/2双向代理。这意味着HTTP/1.1和HTTP/2，在客户机和目标服务器的任何组合都可以桥接。建议在服务间的配置使用时，Envoy之间采用HTTP/2来创建持久网络连接，这样请求和响应可以被多路复用。Envoy并不支持被淘汰SPDY协议。</p>
+</li>
+<li><p><strong>HTTP L7路由</strong>：在HTTP模式下运行时，Envoy支持根据content type、runtime values等，基于path的路由和重定向。当服务构建到服务网格时，Envoy为前端/边缘代理，这个功能是非常有用的。</p>
+</li>
+<li><p><strong>支持gRPC</strong>：gRPC是一个来自谷歌的RPC框架，使用HTTP/2作为底层的多路传输。HTTP/2承载的gRPC请求和应答，都可以使用Envoy的路由和LB能力。所以两个系统非常互补。</p>
+</li>
+<li><p><strong>支持MongoDB L7</strong>：现代Web应用程序中，MongoDB是一个非常流行的数据库应用，Envoy支持获取统计和连接记录等信息。</p>
+</li>
+<li><p><strong>支持DynamoDB L7</strong>：DynamoDB是亚马逊托管的NoSQL Key/Value存储。Envoy支持获取统计和连接等信息。</p>
+</li>
+<li><p><strong>服务发现</strong>：服务发现是面向服务体系架构的重要组成部分。Envoy支持多种服务发现方法，包括异步DNS解析和通过REST调用服务发现(Service discovery)服务。</p>
+</li>
+<li><p><strong>健康检查</strong>：构建Envoy网格的推荐方法，是将服务发现视为一个最终一致的方法。Envoy含有一个健康检查子系统，它可以对上游服务集群进行主动的健康检查。然后，Envoy联合服务发现、健康检查信息来判定健康的LB对象。Envoy作为一个外置健康检查子系统，也支持被动健康检查。</p>
+</li>
+<li><p><strong>高级LB</strong>：在分布式系统中，不同组件之间LB也是一个复杂的问题。Envoy是一个独立的代理进程，不是一个lib库，所以他能够在一个地方实现高级LB，并且能够被任何应用程序访问。目前，包括自动重试、断路器，全局限速，阻隔请求，异常检测。将来还会支持按计划进行请求速率控制。</p>
+</li>
+<li><p><strong>前端代理</strong>：虽然Envoy作为服务间的通信系统而设计，但是（调试，管理、服务发现、LB算法等）同样可以适用于前端，Envoy提供足够的特性，能够作为绝大多数Web应用的前端代理，包括TLS、HTTP/1.1、HTTP/2，以及HTTP L7路由。</p>
+</li>
+<li><p><strong>极好的可观察性</strong>：如上所述，Envoy目标是使得网络更加透明。而然，无论是网络层还是应用层，都可能会出现问题。Envoy包括对所有子系统，提供了可靠的统计能力。目前只支持statsd以及兼容的统计库，虽然支持另一种并不复杂。还可以通过管理端口查看统计信息，Envoy还支持第三方的分布式跟踪机制。</p>
+</li>
+<li><p><strong>动态配置</strong>：Envoy提供分层的动态配置API，用户可以使用这些API构建复杂的集中管理部署。</p>
+</li>
+<li><p><strong>生态集成</strong>：Envoy将作为一个独立的sidecar与相关微服务部署在同一个Kubernetes的pod上,并提供一系列的属性给Mixer.Mixer以此作为依据执行策略,并发送到监控系统.这种sidecar代理模型不需要改变任何服务本身的逻辑,并能增加一系列的功能.</p>
+</li>
+</ul>
+<h2 id="Envoy-Front-Proxy示例"><a href="#Envoy-Front-Proxy示例" class="headerlink" title="Envoy Front Proxy示例"></a>Envoy Front Proxy示例</h2><p>下面是一个基于Envoy+Docker构造的Front Proxy的示例。下面是docker-compose部署拓扑，其中这些容器所依赖的虚拟网络为envoymesh。</p>
+<p>所有的请求都会被接入到Front Proxy，这个Front Proxy扮演了位于整个envoymesh网络前端的反向代理。其中这个Front Proxy容器的端口80被映射到所在宿主机的端口8000。</p>
+<p><img src="/images/envoy-front-proxy-topology.png" alt="Envoy Front Proxy Arch"></p>
+<h3 id="可选-安装Docker环境"><a href="#可选-安装Docker环境" class="headerlink" title="(可选)安装Docker环境"></a>(可选)安装Docker环境</h3><p>确保docker, docker-compose以及docker-machine可用，建议使用最新的稳定版本。</p>
+<blockquote>
+<p>最便捷的安装方式可以参考 <a href="https://www.docker.com/products/docker-toolbox" target="_blank" rel="external">https://www.docker.com/products/docker-toolbox</a></p>
+</blockquote>
+<h3 id="创建Docker-Machine"><a href="#创建Docker-Machine" class="headerlink" title="创建Docker Machine"></a>创建Docker Machine</h3><p>通过使用命令 <em>docker-machine</em> 创建用于运行docker容器的环境：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ docker-machine create --driver virtualbox default</div><div class="line">$ eval $(docker-machine env default)</div></pre></td></tr></table></figure></p>
+<h3 id="克隆Envoy代码库"><a href="#克隆Envoy代码库" class="headerlink" title="克隆Envoy代码库"></a>克隆Envoy代码库</h3><p>Envoy代码库中包含了我们所需的例子源码，直接通过git命令可以克隆其代码库：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git clone https://github.com/envoyproxy/envoy.git</div></pre></td></tr></table></figure></p>
+<h3 id="使用docker-compose启动容器"><a href="#使用docker-compose启动容器" class="headerlink" title="使用docker-compose启动容器"></a>使用docker-compose启动容器</h3><p>切换到Envoy安装根目录下的examples/front-proxy，可以看到里面包含了所需的主docker-compose.yml、Envoy配置文件以及相应的Dockerfile文件、脚本文件等。</p>
+<p><img src="/images/envoy-front-proxy-config-files.png" alt=""></p>
+<p>其中，docker-compose.yml内容如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line">version: &apos;2&apos;</div><div class="line">services:</div><div class="line"></div><div class="line">  front-envoy:</div><div class="line">    build:</div><div class="line">      context: ../</div><div class="line">      dockerfile: front-proxy/Dockerfile-frontenvoy</div><div class="line">    volumes:</div><div class="line">      - ./front-envoy.yaml:/etc/front-envoy.yaml</div><div class="line">    networks:</div><div class="line">      - envoymesh</div><div class="line">    expose:</div><div class="line">      - &quot;80&quot;</div><div class="line">      - &quot;8001&quot;</div><div class="line">    ports:</div><div class="line">      - &quot;8000:80&quot;</div><div class="line">      - &quot;8001:8001&quot;</div><div class="line"></div><div class="line">  service1:</div><div class="line">    build:</div><div class="line">      context: .</div><div class="line">      dockerfile: Dockerfile-service</div><div class="line">    volumes:</div><div class="line">      - ./service-envoy.yaml:/etc/service-envoy.yaml</div><div class="line">    networks:</div><div class="line">      envoymesh:</div><div class="line">        aliases:</div><div class="line">          - service1</div><div class="line">    environment:</div><div class="line">      - SERVICE_NAME=1</div><div class="line">    expose:</div><div class="line">      - &quot;80&quot;</div><div class="line"></div><div class="line">  service2:</div><div class="line">    build:</div><div class="line">      context: .</div><div class="line">      dockerfile: Dockerfile-service</div><div class="line">    volumes:</div><div class="line">      - ./service-envoy.yaml:/etc/service-envoy.yaml</div><div class="line">    networks:</div><div class="line">      envoymesh:</div><div class="line">        aliases:</div><div class="line">          - service2</div><div class="line">    environment:</div><div class="line">      - SERVICE_NAME=2</div><div class="line">    expose:</div><div class="line">      - &quot;80&quot;</div><div class="line"></div><div class="line">networks:</div><div class="line">  envoymesh: &#123;&#125;</div></pre></td></tr></table></figure></p>
+<p>通过该docker-compose.yml文件可以很清晰地看到，会有3个容器被创建，它们分别对应服务 <em>front-envoy</em>、<em>service1</em> 以及 <em>service2</em> 。</p>
+<p>其中，服务 <em>front-envoy</em> 的Dockerfile文件为Dockerfile-frontenvoy，基于envoyproxy/envoy最新的镜像文件，并安装了curl，最后启动了envoy代理，参数文件为front-envoy.yaml（后面会相信解释），服务集群名称定为front-proxying。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">FROM envoyproxy/envoy:latest</div><div class="line"></div><div class="line">RUN apt-get update &amp;&amp; apt-get -q install -y \</div><div class="line">    curl</div><div class="line">CMD /usr/local/bin/envoy -c /etc/front-envoy.yaml --service-cluster front-proxy</div></pre></td></tr></table></figure>
+<p>服务 <em>service1</em> 与 <em>service2</em> 使用了相同的Dockerfile（如下），基于envoyproxy/envoy-alpine的最新镜像，并依次安装了python3、Flask以及requests等。<br>并把脚本service.py及start_service.sh分别复制到了容器目录/code及/usr/local/bin/下，而且给/usr/local/bin/start_service.sh添加了执行权限并启动。</p>
+<p>Dockerfile文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">FROM envoyproxy/envoy-alpine:latest</div><div class="line"></div><div class="line">RUN apk update &amp;&amp; apk add python3 bash</div><div class="line">RUN python3 --version &amp;&amp; pip3 --version</div><div class="line">RUN pip3 install -q Flask==0.11.1 requests==2.18.4</div><div class="line">RUN mkdir /code</div><div class="line">ADD ./service.py /code</div><div class="line">ADD ./start_service.sh /usr/local/bin/start_service.sh</div><div class="line">RUN chmod u+x /usr/local/bin/start_service.sh</div><div class="line">ENTRYPOINT /usr/local/bin/start_service.sh</div></pre></td></tr></table></figure></p>
+<p>Python脚本service.py：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">from flask import Flask</div><div class="line">from flask import request</div><div class="line">import socket</div><div class="line">import os</div><div class="line">import sys</div><div class="line">import requests</div><div class="line"></div><div class="line">app = Flask(__name__)</div><div class="line"></div><div class="line">TRACE_HEADERS_TO_PROPAGATE = [</div><div class="line">    &apos;X-Ot-Span-Context&apos;,</div><div class="line">    &apos;X-Request-Id&apos;,</div><div class="line">    &apos;X-B3-TraceId&apos;,</div><div class="line">    &apos;X-B3-SpanId&apos;,</div><div class="line">    &apos;X-B3-ParentSpanId&apos;,</div><div class="line">    &apos;X-B3-Sampled&apos;,</div><div class="line">    &apos;X-B3-Flags&apos;</div><div class="line">]</div><div class="line"></div><div class="line">@app.route(&apos;/service/&lt;service_number&gt;&apos;)</div><div class="line">def hello(service_number):</div><div class="line">    return (&apos;Hello from behind Envoy (service &#123;&#125;)! hostname: &#123;&#125; resolved&apos;</div><div class="line">            &apos;hostname: &#123;&#125;\n&apos;.format(os.environ[&apos;SERVICE_NAME&apos;],</div><div class="line">                                    socket.gethostname(),</div><div class="line">                                    socket.gethostbyname(socket.gethostname())))</div><div class="line"></div><div class="line">@app.route(&apos;/trace/&lt;service_number&gt;&apos;)</div><div class="line">def trace(service_number):</div><div class="line">    headers = &#123;&#125;</div><div class="line">    # call service 2 from service 1</div><div class="line">    if int(os.environ[&apos;SERVICE_NAME&apos;]) == 1 :</div><div class="line">        for header in TRACE_HEADERS_TO_PROPAGATE:</div><div class="line">            if header in request.headers:</div><div class="line">                headers[header] = request.headers[header]</div><div class="line">        ret = requests.get(&quot;http://localhost:9000/trace/2&quot;, headers=headers)</div><div class="line">    return (&apos;Hello from behind Envoy (service &#123;&#125;)! hostname: &#123;&#125; resolved&apos;</div><div class="line">            &apos;hostname: &#123;&#125;\n&apos;.format(os.environ[&apos;SERVICE_NAME&apos;],</div><div class="line">                                    socket.gethostname(),</div><div class="line">                                    socket.gethostbyname(socket.gethostname())))</div><div class="line"></div><div class="line">if __name__ == &quot;__main__&quot;:</div><div class="line">    app.run(host=&apos;127.0.0.1&apos;, port=8080, debug=True)</div></pre></td></tr></table></figure></p>
+<p>启动服务脚本start_service.sh，注意的是最后一行启动了envoy代理，参数文件为service-envoy.yaml（后面会相信解释），服务集群名称定为service${SERVICE_NAME}。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">#!/usr/bin/env bash</div><div class="line">python3 /code/service.py &amp;</div><div class="line">envoy -c /etc/service-envoy.yaml --service-cluster service$&#123;SERVICE_NAME&#125;</div></pre></td></tr></table></figure></p>
+<p>虚拟网络envoymesh会被创建用于支持上述3个容器。</p>
+<p>通过docker-compose命令启动容器，过程如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">$ pwd</div><div class="line">/Users/xiningwang/localgit/envoy/examples/front-proxy</div><div class="line">$ docker-compose up --build -d</div><div class="line">$ docker-compose ps</div><div class="line">Name                        Command               State                      Ports</div><div class="line">----------------------------------------------------------------------------------------------------------------</div><div class="line">frontproxy_front-envoy_1   /bin/sh -c /usr/local/bin/ ...   Up      0.0.0.0:8000-&gt;80/tcp, 0.0.0.0:8001-&gt;8001/tcp</div><div class="line">frontproxy_service1_1      /bin/sh -c /usr/local/bin/ ...   Up      80/tcp</div><div class="line">frontproxy_service2_1      /bin/sh -c /usr/local/bin/ ...   Up      80/tcp</div></pre></td></tr></table></figure>
+<h2 id="路由及负载均衡规则解析"><a href="#路由及负载均衡规则解析" class="headerlink" title="路由及负载均衡规则解析"></a>路由及负载均衡规则解析</h2><h3 id="envoy配置文件"><a href="#envoy配置文件" class="headerlink" title="envoy配置文件"></a>envoy配置文件</h3><p>front-envoy.yaml文件如下定义：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div></pre></td><td class="code"><pre><div class="line">static_resources:</div><div class="line">  listeners:</div><div class="line">  - address:</div><div class="line">      socket_address:</div><div class="line">        address: 0.0.0.0</div><div class="line">        port_value: 80</div><div class="line">    filter_chains:</div><div class="line">    - filters:</div><div class="line">      - name: envoy.http_connection_manager</div><div class="line">        config:</div><div class="line">          codec_type: auto</div><div class="line">          stat_prefix: ingress_http</div><div class="line">          route_config:</div><div class="line">            name: local_route</div><div class="line">            virtual_hosts:</div><div class="line">            - name: backend</div><div class="line">              domains:</div><div class="line">              - &quot;*&quot;</div><div class="line">              routes:</div><div class="line">              - match:</div><div class="line">                  prefix: &quot;/service/1&quot;</div><div class="line">                route:</div><div class="line">                  cluster: service1</div><div class="line">              - match:</div><div class="line">                  prefix: &quot;/service/2&quot;</div><div class="line">                route:</div><div class="line">                  cluster: service2</div><div class="line">          http_filters:</div><div class="line">          - name: envoy.router</div><div class="line">            config: &#123;&#125;</div><div class="line">  clusters:</div><div class="line">  - name: service1</div><div class="line">    connect_timeout: 0.25s</div><div class="line">    type: strict_dns</div><div class="line">    lb_policy: round_robin</div><div class="line">    http2_protocol_options: &#123;&#125;</div><div class="line">    hosts:</div><div class="line">    - socket_address:</div><div class="line">        address: service1</div><div class="line">        port_value: 80</div><div class="line">  - name: service2</div><div class="line">    connect_timeout: 0.25s</div><div class="line">    type: strict_dns</div><div class="line">    lb_policy: round_robin</div><div class="line">    http2_protocol_options: &#123;&#125;</div><div class="line">    hosts:</div><div class="line">    - socket_address:</div><div class="line">        address: service2</div><div class="line">        port_value: 80</div><div class="line">admin:</div><div class="line">  access_log_path: &quot;/dev/null&quot;</div><div class="line">  address:</div><div class="line">    socket_address:</div><div class="line">      address: 0.0.0.0</div><div class="line">      port_value: 8001</div></pre></td></tr></table></figure></p>
+<p>service-envoy.yaml文件如下定义：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">static_resources:</div><div class="line">  listeners:</div><div class="line">  - address:</div><div class="line">      socket_address:</div><div class="line">        address: 0.0.0.0</div><div class="line">        port_value: 80</div><div class="line">    filter_chains:</div><div class="line">    - filters:</div><div class="line">      - name: envoy.http_connection_manager</div><div class="line">        config:</div><div class="line">          codec_type: auto</div><div class="line">          stat_prefix: ingress_http</div><div class="line">          route_config:</div><div class="line">            name: local_route</div><div class="line">            virtual_hosts:</div><div class="line">            - name: service</div><div class="line">              domains:</div><div class="line">              - &quot;*&quot;</div><div class="line">              routes:</div><div class="line">              - match:</div><div class="line">                  prefix: &quot;/service&quot;</div><div class="line">                route:</div><div class="line">                  cluster: local_service</div><div class="line">          http_filters:</div><div class="line">          - name: envoy.router</div><div class="line">            config: &#123;&#125;</div><div class="line">  clusters:</div><div class="line">  - name: local_service</div><div class="line">    connect_timeout: 0.25s</div><div class="line">    type: strict_dns</div><div class="line">    lb_policy: round_robin</div><div class="line">    hosts:</div><div class="line">    - socket_address:</div><div class="line">        address: 127.0.0.1</div><div class="line">        port_value: 8080</div><div class="line">admin:</div><div class="line">  access_log_path: &quot;/dev/null&quot;</div><div class="line">  address:</div><div class="line">    socket_address:</div><div class="line">      address: 0.0.0.0</div><div class="line">      port_value: 8081</div></pre></td></tr></table></figure></p>
+<h3 id="测试Envoy的路由能力"><a href="#测试Envoy的路由能力" class="headerlink" title="测试Envoy的路由能力"></a>测试Envoy的路由能力</h3><p>测试service1：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">Xis-MacBook-Pro:front-proxy xiningwang$ curl -v $(docker-machine ip default):8000/service/1</div><div class="line">*   Trying 192.168.99.101...</div><div class="line">* TCP_NODELAY set</div><div class="line">* Connected to 192.168.99.101 (192.168.99.101) port 8000 (#0)</div><div class="line">&gt; GET /service/1 HTTP/1.1</div><div class="line">&gt; Host: 192.168.99.101:8000</div><div class="line">&gt; User-Agent: curl/7.54.0</div><div class="line">&gt; Accept: */*</div><div class="line">&gt;</div><div class="line">&lt; HTTP/1.1 200 OK</div><div class="line">&lt; content-type: text/html; charset=utf-8</div><div class="line">&lt; content-length: 89</div><div class="line">&lt; server: envoy</div><div class="line">&lt; date: Sun, 04 Feb 2018 09:16:07 GMT</div><div class="line">&lt; x-envoy-upstream-service-time: 2</div><div class="line">&lt;</div><div class="line">Hello from behind Envoy (service 1)! hostname: 326cdcbf4dcf resolvedhostname: 172.18.0.3</div><div class="line">* Connection #0 to host 192.168.99.101 left intact</div></pre></td></tr></table></figure></p>
+<p>测试service2:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">Xis-MacBook-Pro:front-proxy xiningwang$ curl -v $(docker-machine ip default):8000/service/2</div><div class="line">*   Trying 192.168.99.101...</div><div class="line">* TCP_NODELAY set</div><div class="line">* Connected to 192.168.99.101 (192.168.99.101) port 8000 (#0)</div><div class="line">&gt; GET /service/2 HTTP/1.1</div><div class="line">&gt; Host: 192.168.99.101:8000</div><div class="line">&gt; User-Agent: curl/7.54.0</div><div class="line">&gt; Accept: */*</div><div class="line">&gt;</div><div class="line">&lt; HTTP/1.1 200 OK</div><div class="line">&lt; content-type: text/html; charset=utf-8</div><div class="line">&lt; content-length: 89</div><div class="line">&lt; server: envoy</div><div class="line">&lt; date: Sun, 04 Feb 2018 09:17:47 GMT</div><div class="line">&lt; x-envoy-upstream-service-time: 3</div><div class="line">&lt;</div><div class="line">Hello from behind Envoy (service 2)! hostname: 6abdb62aa858 resolvedhostname: 172.18.0.2</div><div class="line">* Connection #0 to host 192.168.99.101 left intact</div></pre></td></tr></table></figure></p>
+<p>可以看到，不同的请求路径会被准确地路由到后端的不同服务上。这种路由能力正是Envoy所擅长提供的，而是是以一种非常灵活的配置方式来提供可变的路由匹配路径。<br>本例子中，front-envoy.yaml文件中包括了如下的路由匹配规则：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&gt; - match:</div><div class="line">&gt;    prefix: &quot;/service/1&quot;</div><div class="line">&gt;  route:</div><div class="line">&gt;    cluster: service1</div><div class="line">&gt; - match:</div><div class="line">&gt;    prefix: &quot;/service/2&quot;</div><div class="line">&gt;  route:</div><div class="line">&gt;    cluster: service2</div></pre></td></tr></table></figure></p>
+<h3 id="测试Envoy的负载均衡能力"><a href="#测试Envoy的负载均衡能力" class="headerlink" title="测试Envoy的负载均衡能力"></a>测试Envoy的负载均衡能力</h3><p>针对service1进行扩容，增加到3个container：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">$ docker-compose up --scale service1=3</div><div class="line">$ docker-compose ps</div><div class="line">          Name                        Command               State                      Ports</div><div class="line">----------------------------------------------------------------------------------------------------------------</div><div class="line">frontproxy_front-envoy_1   /bin/sh -c /usr/local/bin/ ...   Up      0.0.0.0:8000-&gt;80/tcp, 0.0.0.0:8001-&gt;8001/tcp</div><div class="line">frontproxy_service1_1      /bin/sh -c /usr/local/bin/ ...   Up      80/tcp</div><div class="line">frontproxy_service1_2      /bin/sh -c /usr/local/bin/ ...   Up      80/tcp</div><div class="line">frontproxy_service1_3      /bin/sh -c /usr/local/bin/ ...   Up      80/tcp</div><div class="line">frontproxy_service2_1      /bin/sh -c /usr/local/bin/ ...   Up      80/tcp</div><div class="line"></div><div class="line"></div><div class="line">$ docker ps</div><div class="line">CONTAINER ID        IMAGE                    COMMAND                  CREATED              STATUS              PORTS                                          NAMES</div><div class="line">06f3c0d14b1a        frontproxy_service1      &quot;/bin/sh -c /usr/loc…&quot;   About a minute ago   Up About a minute   80/tcp                                         frontproxy_service1_2</div><div class="line">658f44d72f00        frontproxy_service1      &quot;/bin/sh -c /usr/loc…&quot;   About a minute ago   Up About a minute   80/tcp                                         frontproxy_service1_3</div><div class="line">326cdcbf4dcf        frontproxy_service1      &quot;/bin/sh -c /usr/loc…&quot;   3 hours ago          Up 3 hours          80/tcp                                         frontproxy_service1_1</div><div class="line">b8bbdc349469        frontproxy_front-envoy   &quot;/bin/sh -c &apos;/usr/lo…&quot;   3 hours ago          Up 3 hours          0.0.0.0:8001-&gt;8001/tcp, 0.0.0.0:8000-&gt;80/tcp   frontproxy_front-envoy_1</div><div class="line">6abdb62aa858        frontproxy_service2      &quot;/bin/sh -c /usr/loc…&quot;   3 hours ago          Up 3 hours          80/tcp                                         frontproxy_service2_1</div></pre></td></tr></table></figure></p>
+<p>连续访问多次service1，会看到3个不同的容器会被轮询调用：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div></pre></td><td class="code"><pre><div class="line">Xis-MacBook-Pro:front-proxy xiningwang$ curl -v $(docker-machine ip default):8000/service/1</div><div class="line">*   Trying 192.168.99.101...</div><div class="line">* TCP_NODELAY set</div><div class="line">* Connected to 192.168.99.101 (192.168.99.101) port 8000 (#0)</div><div class="line">&gt; GET /service/1 HTTP/1.1</div><div class="line">&gt; Host: 192.168.99.101:8000</div><div class="line">&gt; User-Agent: curl/7.54.0</div><div class="line">&gt; Accept: */*</div><div class="line">&gt;</div><div class="line">&lt; HTTP/1.1 200 OK</div><div class="line">&lt; content-type: text/html; charset=utf-8</div><div class="line">&lt; content-length: 89</div><div class="line">&lt; server: envoy</div><div class="line">&lt; date: Sun, 04 Feb 2018 10:05:18 GMT</div><div class="line">&lt; x-envoy-upstream-service-time: 4</div><div class="line">&lt;</div><div class="line">Hello from behind Envoy (service 1)! hostname: 658f44d72f00 resolvedhostname: 172.18.0.5</div><div class="line">* Connection #0 to host 192.168.99.101 left intact</div><div class="line">Xis-MacBook-Pro:front-proxy xiningwang$ curl -v $(docker-machine ip default):8000/service/1</div><div class="line">*   Trying 192.168.99.101...</div><div class="line">* TCP_NODELAY set</div><div class="line">* Connected to 192.168.99.101 (192.168.99.101) port 8000 (#0)</div><div class="line">&gt; GET /service/1 HTTP/1.1</div><div class="line">&gt; Host: 192.168.99.101:8000</div><div class="line">&gt; User-Agent: curl/7.54.0</div><div class="line">&gt; Accept: */*</div><div class="line">&gt;</div><div class="line">&lt; HTTP/1.1 200 OK</div><div class="line">&lt; content-type: text/html; charset=utf-8</div><div class="line">&lt; content-length: 89</div><div class="line">&lt; server: envoy</div><div class="line">&lt; date: Sun, 04 Feb 2018 10:05:22 GMT</div><div class="line">&lt; x-envoy-upstream-service-time: 3</div><div class="line">&lt;</div><div class="line">Hello from behind Envoy (service 1)! hostname: 06f3c0d14b1a resolvedhostname: 172.18.0.6</div><div class="line">* Connection #0 to host 192.168.99.101 left intact</div><div class="line">Xis-MacBook-Pro:front-proxy xiningwang$</div><div class="line">Xis-MacBook-Pro:front-proxy xiningwang$ curl -v $(docker-machine ip default):8000/service/1</div><div class="line">*   Trying 192.168.99.101...</div><div class="line">* TCP_NODELAY set</div><div class="line">* Connected to 192.168.99.101 (192.168.99.101) port 8000 (#0)</div><div class="line">&gt; GET /service/1 HTTP/1.1</div><div class="line">&gt; Host: 192.168.99.101:8000</div><div class="line">&gt; User-Agent: curl/7.54.0</div><div class="line">&gt; Accept: */*</div><div class="line">&gt;</div><div class="line">&lt; HTTP/1.1 200 OK</div><div class="line">&lt; content-type: text/html; charset=utf-8</div><div class="line">&lt; content-length: 89</div><div class="line">&lt; server: envoy</div><div class="line">&lt; date: Sun, 04 Feb 2018 10:05:26 GMT</div><div class="line">&lt; x-envoy-upstream-service-time: 2</div><div class="line">&lt;</div><div class="line">Hello from behind Envoy (service 1)! hostname: 326cdcbf4dcf resolvedhostname: 172.18.0.3</div><div class="line">* Connection #0 to host 192.168.99.101 left intact</div></pre></td></tr></table></figure></p>
+<p>可以看到，多次请求会被路由到后端的不同容器上。这种负载均衡能力正是Envoy所擅长提供的，而是是以一种非常灵活的配置方式来提供可变的路由匹配路径。<br>本例子中，front-envoy.yaml文件中包括了如下的负载均衡规则：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">clusters:</div><div class="line"> - name: service1</div><div class="line">   connect_timeout: 0.25s</div><div class="line">   type: strict_dns</div><div class="line">   lb_policy: round_robin</div><div class="line">   http2_protocol_options: &#123;&#125;</div><div class="line">   hosts:</div><div class="line">   - socket_address:</div><div class="line">       address: service1</div><div class="line">       port_value: 80</div></pre></td></tr></table></figure></p>
+<h2 id="Envoy的请求跟踪能力解析"><a href="#Envoy的请求跟踪能力解析" class="headerlink" title="Envoy的请求跟踪能力解析"></a>Envoy的请求跟踪能力解析</h2><h3 id="添加zipkin服务"><a href="#添加zipkin服务" class="headerlink" title="添加zipkin服务"></a>添加zipkin服务</h3><p>为了启用Zipkin请求跟踪能力，需要在docker-compose.yml文件中添加zipkin服务，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">version: &apos;2&apos;</div><div class="line">services:</div><div class="line"></div><div class="line">  front-envoy:</div><div class="line">    ....</div><div class="line"></div><div class="line">  service1:</div><div class="line">    ....</div><div class="line"></div><div class="line">  service2:</div><div class="line">    ....</div><div class="line"></div><div class="line">  zipkin:</div><div class="line">    image: openzipkin/zipkin</div><div class="line">    networks:</div><div class="line">      envoymesh:</div><div class="line">        aliases:</div><div class="line">          - zipkin</div><div class="line">    expose:</div><div class="line">      - &quot;9411&quot;</div><div class="line">    ports:</div><div class="line">      - &quot;9411:9411&quot;</div><div class="line"></div><div class="line">networks:</div><div class="line">  envoymesh: &#123;&#125;</div></pre></td></tr></table></figure>
+<p>在front-proxy.yaml文件中需要启用tracing能力，包括启用生成请求ID、zipkin服务及配置envoy的跟踪项等；注意的一点是对于front-proxy容器来说，operation_name应当设置为egress；而对service1|service2容器来说，operation_name应当设置为ingress。</p>
+<p><img src="/images/envoy_examples_front-proxy_front-envoy_yaml-envoy_examples_zipkin-tracing_front-envoy-zipkin_yaml.png" alt="front-proxy"></p>
+<p>具体如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">static_resources:</div><div class="line">  listeners:</div><div class="line">  - address:</div><div class="line">      socket_address:</div><div class="line">        address: 0.0.0.0</div><div class="line">        port_value: 80</div><div class="line">    filter_chains:</div><div class="line">    - filters:</div><div class="line">      - name: envoy.http_connection_manager</div><div class="line">        config:</div><div class="line">          generate_request_id: true</div><div class="line">          tracing:</div><div class="line">            operation_name: egress</div><div class="line"></div><div class="line">....</div><div class="line">- name: zipkin</div><div class="line">    connect_timeout: 1s</div><div class="line">    type: strict_dns</div><div class="line">    lb_policy: round_robin</div><div class="line">    hosts:</div><div class="line">    - socket_address:</div><div class="line">        address: zipkin</div><div class="line">        port_value: 9411</div><div class="line">tracing:</div><div class="line">  http:</div><div class="line">    name: envoy.zipkin</div><div class="line">    config:</div><div class="line">      collector_cluster: zipkin</div><div class="line">      collector_endpoint: &quot;/api/v1/spans&quot;</div></pre></td></tr></table></figure></p>
+<h3 id="可视化zipkin服务"><a href="#可视化zipkin服务" class="headerlink" title="可视化zipkin服务"></a>可视化zipkin服务</h3><p>zipkin提供了一个默认的UI界面，用于展示服务调用之间的跟踪路径。</p>
+<p><img src="/images/envoy-zipkin-service1-service2.png" alt="zipkin"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Xi Ning Wang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://osswangxining.github.io/envoy/" title="巧用Envoy+Docker打造轻量级Sidecar代理">https://osswangxining.github.io/envoy/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kubernetes/" rel="tag"># Kubernetes</a>
+          
+            <a href="/tags/container/" rel="tag"># container</a>
+          
+            <a href="/tags/容器/" rel="tag"># 容器</a>
+          
+            <a href="/tags/微服务/" rel="tag"># 微服务</a>
+          
+            <a href="/tags/代理/" rel="tag"># 代理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/istio2/" rel="next" title="Istio">
+                <i class="fa fa-chevron-left"></i> Istio
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/writing-custom-terraform-provider/" rel="prev" title="写一个Terraform Provider">
+                写一个Terraform Provider <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/bio.png"
+                alt="Xi Ning Wang" />
+            
+              <p class="site-author-name" itemprop="name">Xi Ning Wang</p>
+              <p class="site-description motion-element" itemprop="description">专注于分布式高性能技术架构、容器|K8S、IoT云平台，支持语言：Java(script) | Python | Golang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/osswangxining" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:osswangxining@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://plus.google.com/osswangxining" target="_blank" title="Google">
+                      
+                        <i class="fa fa-fw fa-google"></i>Google</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/osswangxining" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://istio.io" title="Istio" target="_blank">Istio</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://grpc.io/" title="gRPC" target="_blank">gRPC</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Envoy是什么？"><span class="nav-number">1.</span> <span class="nav-text">Envoy是什么？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Envoy-Front-Proxy示例"><span class="nav-number"></span> <span class="nav-text">Envoy Front Proxy示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#可选-安装Docker环境"><span class="nav-number">1.</span> <span class="nav-text">(可选)安装Docker环境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建Docker-Machine"><span class="nav-number">2.</span> <span class="nav-text">创建Docker Machine</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#克隆Envoy代码库"><span class="nav-number">3.</span> <span class="nav-text">克隆Envoy代码库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用docker-compose启动容器"><span class="nav-number">4.</span> <span class="nav-text">使用docker-compose启动容器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#路由及负载均衡规则解析"><span class="nav-number"></span> <span class="nav-text">路由及负载均衡规则解析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#envoy配置文件"><span class="nav-number">1.</span> <span class="nav-text">envoy配置文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试Envoy的路由能力"><span class="nav-number">2.</span> <span class="nav-text">测试Envoy的路由能力</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试Envoy的负载均衡能力"><span class="nav-number">3.</span> <span class="nav-text">测试Envoy的负载均衡能力</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Envoy的请求跟踪能力解析"><span class="nav-number"></span> <span class="nav-text">Envoy的请求跟踪能力解析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#添加zipkin服务"><span class="nav-number">1.</span> <span class="nav-text">添加zipkin服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可视化zipkin服务"><span class="nav-number">2.</span> <span class="nav-text">可视化zipkin服务</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xi Ning Wang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=5.1.4"></script>
+
+
+</body>
+</html>

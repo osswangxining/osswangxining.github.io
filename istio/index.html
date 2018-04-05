@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Kubernetes,container,容器,微服务,PaaS," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="概述Istio是一个用于连接/管理以及安全化微服务的开放平台, 提供了一种简单的方式用于创建微服务网络,并提供负载均衡/服务间认证/监控等能力,关键的是并不需要修改服务本身. 主要提供以下功能:  Traffic Management: 控制服务之间调用的流量和API调用; Observability: 获取服务之间的依赖,以及服务调用的流量走向; Policy Enforcement: 控制服务">
+<meta name="keywords" content="Kubernetes,container,容器,微服务,PaaS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Istio">
+<meta property="og:url" content="https://osswangxining.github.io/istio/index.html">
+<meta property="og:site_name" content="Technical Blog">
+<meta property="og:description" content="概述Istio是一个用于连接/管理以及安全化微服务的开放平台, 提供了一种简单的方式用于创建微服务网络,并提供负载均衡/服务间认证/监控等能力,关键的是并不需要修改服务本身. 主要提供以下功能:  Traffic Management: 控制服务之间调用的流量和API调用; Observability: 获取服务之间的依赖,以及服务调用的流量走向; Policy Enforcement: 控制服务">
+<meta property="og:image" content="https://osswangxining.github.io/images/istio-arch.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/TrafficManagementOverview-2.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/ManagerAdapters.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/Istio_Auth.png">
+<meta property="og:updated_time" content="2018-04-05T08:58:11.416Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Istio">
+<meta name="twitter:description" content="概述Istio是一个用于连接/管理以及安全化微服务的开放平台, 提供了一种简单的方式用于创建微服务网络,并提供负载均衡/服务间认证/监控等能力,关键的是并不需要修改服务本身. 主要提供以下功能:  Traffic Management: 控制服务之间调用的流量和API调用; Observability: 获取服务之间的依赖,以及服务调用的流量走向; Policy Enforcement: 控制服务">
+<meta name="twitter:image" content="https://osswangxining.github.io/images/istio-arch.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://osswangxining.github.io/istio/"/>
+
+
+
+
+
+  <title>Istio | Technical Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Technical Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Welcome to my world! 有问题请osswangxining（at）163.com</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://osswangxining.github.io/istio/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/bio.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Istio</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-27T12:46:25+00:00">
+                2017-05-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式&云计算</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/微服务/" itemprop="url" rel="index">
+                    <span itemprop="name">微服务</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Istio是一个用于连接/管理以及安全化微服务的开放平台, 提供了一种简单的方式用于创建微服务网络,并提供负载均衡/服务间认证/监控等能力,关键的是并不需要修改服务本身. 主要提供以下功能:</p>
+<ul>
+<li>Traffic Management: 控制服务之间调用的流量和API调用;</li>
+<li>Observability: 获取服务之间的依赖,以及服务调用的流量走向;</li>
+<li>Policy Enforcement: 控制服务的访问策略,不需要改动服务本身;</li>
+<li>Service Identity and Security: 服务身份与安全相关的功能;</li>
+</ul>
+<h2 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h2><p>Istio从架构上看,主要分为2个部分,即:</p>
+<ul>
+<li>控制面板: 管理代理,用于支持流量路由/运行时执行策略等;</li>
+<li>数据面板: 由一系列的智能代理(Envoy)构成,用于仲裁和控制服务之间的网络交互;</li>
+</ul>
+<p><img src="/images/istio-arch.png" alt="Istio Arch"><br><a id="more"></a></p>
+<h3 id="Envoy"><a href="#Envoy" class="headerlink" title="Envoy"></a>Envoy</h3><p>Built-in features:</p>
+<ul>
+<li>dynamic service discovery,</li>
+<li>load balancing,</li>
+<li>TLS termination,</li>
+<li>HTTP/2 &amp; gRPC proxying,</li>
+<li>circuit breakers,</li>
+<li>health checks,</li>
+<li>staged rollouts with %-based traffic split,</li>
+<li>fault injection,</li>
+<li>rich metrics</li>
+</ul>
+<p>Envoy将作为一个独立的sidecar与相关微服务部署在同一个Kubernetes的pod上,并提供一系列的属性给Mixer.Mixer以此作为依据执行策略,并发送到监控系统.</p>
+<p>这种sidecar代理模型不需要改变任何服务本身的逻辑,并能增加一系列的功能.</p>
+<h3 id="Mixer"><a href="#Mixer" class="headerlink" title="Mixer"></a>Mixer</h3><p>Mixer负责执行访问控制与使用的策略,并从Envoy收集数据.提供了一个plugin,可以扩展支持多种host环境和backend.</p>
+<h3 id="Istio-Manager"><a href="#Istio-Manager" class="headerlink" title="Istio-Manager"></a>Istio-Manager</h3><p>用户与Istio之间的接口, 收集并验证配置信息并发送给其他组件.作为流量管理的核心附件, Istio-Manager管理所有配置的Envoy代理实例,并提供如下流量管理方式:<br><img src="/images/TrafficManagementOverview-2.png" alt=""></p>
+<p><img src="/images/ManagerAdapters.png" alt=""></p>
+<h3 id="Istio-Auth"><a href="#Istio-Auth" class="headerlink" title="Istio-Auth"></a>Istio-Auth</h3><p>提供服务间以及用户之间的认证,确保不需要修改服务code的前提下增强服务之间的安全性. 主要包括以下3个组件:</p>
+<ul>
+<li>身份识别<ul>
+<li>当Istio运行在Kubernetes时,Auth会使用Kubernetes提供的服务账号来识别运行服务的主体是谁.</li>
+</ul>
+</li>
+<li>key管理<ul>
+<li>Auth提供了一个CA自动化生成和管理key和证书.</li>
+</ul>
+</li>
+<li>通讯安全<ul>
+<li>服务间的通讯通过Envoy在客户端和服务端提供tunnel来保证服务调用的安全.</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/Istio_Auth.png" alt=""></p>
+<h2 id="分布式跟踪"><a href="#分布式跟踪" class="headerlink" title="分布式跟踪"></a>分布式跟踪</h2><p>Istio的分布式跟踪是基于Twitter开源的<a href="zipkin/">zipkin</a>分布式跟踪系统,理论模型来自于Google Dapper 论文.</p>
+<h3 id="启动zipkin"><a href="#启动zipkin" class="headerlink" title="启动zipkin"></a>启动zipkin</h3><p>安装Istio时会启动zipkin addon,当然也可以使用如下命令启动:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">kubectl apply -f install/kubernetes/addons/zipkin.yaml</div></pre></td></tr></table></figure></p>
+<h3 id="访问zipkin"><a href="#访问zipkin" class="headerlink" title="访问zipkin"></a>访问zipkin</h3><p>访问zipkin dashboard: <a href="http://localhost:9411" target="_blank" rel="external">http://localhost:9411</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">kubectl port-forward $(kubectl get pod -l app=zipkin -o jsonpath=&apos;&#123;.items[0].metadata.name&#125;&apos;) 9411:9411</div></pre></td></tr></table></figure></p>
+<h3 id="在服务中enable-trace"><a href="#在服务中enable-trace" class="headerlink" title="在服务中enable trace"></a>在服务中enable trace</h3><p>服务本身实现需要做一定的改动,即从最初始的HTTP请求中获取以下header并传递给其他的请求:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">x-request-id</div><div class="line">x-b3-traceid</div><div class="line">x-b3-spanid</div><div class="line">x-b3-parentspanid</div><div class="line">x-b3-sampled</div><div class="line">x-b3-flags</div><div class="line">x-ot-span-context</div></pre></td></tr></table></figure></p>
+<h2 id="启用Ingress"><a href="#启用Ingress" class="headerlink" title="启用Ingress"></a>启用Ingress</h2><p>在Kubernetes环境下, Istio使用了内置的Ingress来暴露服务,目前支持HTTP和HTTPS两种方式. 具体的Ingress,参见<a href="/kubernetes-ingress/">Kubernetes Ingress</a>.</p>
+<h3 id="配置HTTP服务"><a href="#配置HTTP服务" class="headerlink" title="配置HTTP服务"></a>配置HTTP服务</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">cat &lt;&lt;EOF | kubectl create -f -</div><div class="line">apiVersion: extensions/v1beta1</div><div class="line">kind: Ingress</div><div class="line">metadata:</div><div class="line">  name: simple-ingress</div><div class="line">  annotations:</div><div class="line">    kubernetes.io/ingress.class: istio</div><div class="line">spec:</div><div class="line">  rules:</div><div class="line">  - http:</div><div class="line">      paths:</div><div class="line">      - path: /headers</div><div class="line">        backend:</div><div class="line">          serviceName: httpbin</div><div class="line">          servicePort: 8000</div><div class="line">      - path: /delay/.*</div><div class="line">        backend:</div><div class="line">          serviceName: httpbin</div><div class="line">          servicePort: 8000</div><div class="line">EOF</div></pre></td></tr></table></figure>
+<h3 id="配置HTTPS服务"><a href="#配置HTTPS服务" class="headerlink" title="配置HTTPS服务"></a>配置HTTPS服务</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">cat &lt;&lt;EOF | kubectl create -f -</div><div class="line">apiVersion: extensions/v1beta1</div><div class="line">kind: Ingress</div><div class="line">metadata:</div><div class="line">  name: secured-ingress</div><div class="line">  annotations:</div><div class="line">    kubernetes.io/ingress.class: istio</div><div class="line">spec:</div><div class="line">  tls:</div><div class="line">    - secretName: ingress-secret</div><div class="line">  rules:</div><div class="line">  - http:</div><div class="line">      paths:</div><div class="line">      - path: /ip</div><div class="line">        backend:</div><div class="line">          serviceName: httpbin</div><div class="line">          servicePort: 8000</div><div class="line">EOF</div></pre></td></tr></table></figure>
+<h2 id="启用Egress"><a href="#启用Egress" class="headerlink" title="启用Egress"></a>启用Egress</h2><p>默认情况下,Istio中的服务是无法访问cluster之外的服务的,这是因为pod中的iptable设置为所有的对外请求都指向sidecar proxy. 而为了能访问外部服务, Istio提供了两种方式来解决这个问题.</p>
+<h3 id="配置外部服务"><a href="#配置外部服务" class="headerlink" title="配置外部服务"></a>配置外部服务</h3><p>注册一个HTTP和HTTPS服务, 如下:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">cat &lt;&lt;EOF | kubectl create -f -</div><div class="line">apiVersion: v1</div><div class="line">kind: Service</div><div class="line">metadata:</div><div class="line"> name: externalbin</div><div class="line">spec:</div><div class="line"> type: ExternalName</div><div class="line"> externalName: httpbin.org</div><div class="line"> ports:</div><div class="line"> - port: 80</div><div class="line">   # important to set protocol name</div><div class="line">   name: http</div><div class="line">EOF</div></pre></td></tr></table></figure></p>
+<p>或者<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">cat &lt;&lt;EOF | kubectl create -f -</div><div class="line">apiVersion: v1</div><div class="line">kind: Service</div><div class="line">metadata:</div><div class="line"> name: securegoogle</div><div class="line">spec:</div><div class="line"> type: ExternalName</div><div class="line"> externalName: www.google.com</div><div class="line"> ports:</div><div class="line"> - port: 443</div><div class="line">   # important to set protocol name</div><div class="line">   name: https</div><div class="line">EOF</div></pre></td></tr></table></figure></p>
+<p>其中, metadata.name 就是内部服务所需要访问的外部服务的名称, spec.externalName则是外部服务的DNS名称.</p>
+<p>执行如下命令可以尝试访问外部服务,<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">export SOURCE_POD=$(kubectl get pod -l app=sleep -o jsonpath=&#123;.items..metadata.name&#125;)</div><div class="line">kubectl exec -it $SOURCE_POD -c sleep bash</div><div class="line">curl http://externalbin/headers</div><div class="line">curl http://securegoogle:443</div></pre></td></tr></table></figure></p>
+<h3 id="直接访问外部服务"><a href="#直接访问外部服务" class="headerlink" title="直接访问外部服务"></a>直接访问外部服务</h3><p>Istio Egress目前只支持访问HTTP/HTTPS请求,而为了支持其他协议请求(如mqtt, mongo等), 就需要配置服务的Envoy sidecar来避免截取外部请求.<br>最简单的方式是使用参数–includeIPRanges来指定内部cluster服务所使用的IP范围.</p>
+<blockquote>
+<p>Note: 不同的cloud provider所支持的IP范围和获取方式不尽相同.</p>
+</blockquote>
+<p>例如, minikube支持如下:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">kubectl apply -f &lt;(istioctl kube-inject -f samples/apps/sleep/sleep.yaml --includeIPRanges=10.0.0.1/24)</div></pre></td></tr></table></figure></p>
+<h2 id="配置请求路由"><a href="#配置请求路由" class="headerlink" title="配置请求路由"></a>配置请求路由</h2><p>默认配置下,Istio会将所有的请求路由到同一个服务的所有版本上.此外,Istio提供了根据请求内容的路由规则,如下规则描述了所有的请求都会指向服务的版本v1:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line">type: route-rule</div><div class="line">name: ratings-default</div><div class="line">namespace: default</div><div class="line">spec:</div><div class="line">  destination: ratings.default.svc.cluster.local</div><div class="line">  precedence: 1</div><div class="line">  route:</div><div class="line">  - tags:</div><div class="line">      version: v1</div><div class="line">    weight: 100</div><div class="line">---</div><div class="line">type: route-rule</div><div class="line">name: reviews-default</div><div class="line">namespace: default</div><div class="line">spec:</div><div class="line">  destination: reviews.default.svc.cluster.local</div><div class="line">  precedence: 1</div><div class="line">  route:</div><div class="line">  - tags:</div><div class="line">      version: v1</div><div class="line">    weight: 100</div><div class="line">---</div><div class="line">type: route-rule</div><div class="line">name: details-default</div><div class="line">namespace: default</div><div class="line">spec:</div><div class="line">  destination: details.default.svc.cluster.local</div><div class="line">  precedence: 1</div><div class="line">  route:</div><div class="line">  - tags:</div><div class="line">      version: v1</div><div class="line">    weight: 100</div><div class="line">---</div><div class="line">type: route-rule</div><div class="line">name: productpage-default</div><div class="line">namespace: default</div><div class="line">spec:</div><div class="line">  destination: productpage.default.svc.cluster.local</div><div class="line">  precedence: 1</div><div class="line">  route:</div><div class="line">  - tags:</div><div class="line">      version: v1</div><div class="line">    weight: 100</div><div class="line">---</div></pre></td></tr></table></figure></p>
+<p>如果需要将某些请求指向其他版本的服务,如根据请求的cookie进行路由:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">destination: reviews.default.svc.cluster.local</div><div class="line">match:</div><div class="line">  httpHeaders:</div><div class="line">    cookie:</div><div class="line">      regex: ^(.*?;)?(user=jason)(;.*)?$</div><div class="line">precedence: 2</div><div class="line">route:</div><div class="line">- tags:</div><div class="line">    version: v2</div></pre></td></tr></table></figure></p>
+<p>其他具体的规则,参见: <a href="https://istio.io/docs/reference/config/traffic-rules/routing-rules.html#routerule" target="_blank" rel="external">https://istio.io/docs/reference/config/traffic-rules/routing-rules.html#routerule</a></p>
+<h2 id="错误注入"><a href="#错误注入" class="headerlink" title="错误注入"></a>错误注入</h2><p>Istio提供2种错误类型可以注入到请求中:</p>
+<ul>
+<li>delays: 属于时序故障,模拟网络延迟或者上游服务负载过重等;</li>
+<li>aborts: 属于崩溃故障,模拟上游服务出现故障;一般返回HTTP Error Code或者TCP连接错误代码;</li>
+</ul>
+<p>故障注入规则描述如下例子所述:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">destination: ratings.default.svc.cluster.local</div><div class="line">httpFault:</div><div class="line">  delay:</div><div class="line">    fixedDelay: 7s</div><div class="line">    percent: 100</div><div class="line">match:</div><div class="line">  httpHeaders:</div><div class="line">    cookie:</div><div class="line">      regex: &quot;^(.*?;)?(user=jason)(;.*)?$&quot;</div><div class="line">precedence: 2</div><div class="line">route:</div><div class="line"> - tags:</div><div class="line">    version: v1</div></pre></td></tr></table></figure>
+<h2 id="设置请求超时"><a href="#设置请求超时" class="headerlink" title="设置请求超时"></a>设置请求超时</h2><p>HTTP请求超时可以通过在路由规则中设置字段httpReqTimeout实现.<br>具体例子如下:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">cat &lt;&lt;EOF | istioctl replace</div><div class="line">type: route-rule</div><div class="line">name: reviews-default</div><div class="line">spec:</div><div class="line">  destination: reviews.default.svc.cluster.local</div><div class="line">  route:</div><div class="line">  - tags:</div><div class="line">      version: v2</div><div class="line">  httpReqTimeout:</div><div class="line">    simpleTimeout:</div><div class="line">      timeout: 1s</div><div class="line">EOF</div></pre></td></tr></table></figure></p>
+<h2 id="限流"><a href="#限流" class="headerlink" title="限流"></a>限流</h2><p>在Istio的mixer中配置限流规则,如下ratelimit.yaml:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">rules:</div><div class="line">- selector: source.labels[&quot;app&quot;]==&quot;reviews&quot; &amp;&amp; source.labels[&quot;version&quot;] == &quot;v3&quot;  </div><div class="line">- aspects:</div><div class="line">  - kind: quotas</div><div class="line">    params:</div><div class="line">      quotas:</div><div class="line">      - descriptorName: RequestCount</div><div class="line">        maxAmount: 5000</div><div class="line">        expiration: 5s</div><div class="line">        labels:</div><div class="line">          label1: target.service</div></pre></td></tr></table></figure></p>
+<p>如果target.service=rating, 那么计数器的key则为:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$aspect_id;RequestCount;maxAmount=5000;expiration=5s;label1=ratings</div></pre></td></tr></table></figure></p>
+<p>执行如下命令可以使得rating服务的请求控制在每5秒5000次(限定在reviews v3服务在调用时生效):<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">istioctl mixer rule create global ratings.default.svc.cluster.local -f ratelimit.yaml</div></pre></td></tr></table></figure></p>
+<h2 id="简单的访问控制"><a href="#简单的访问控制" class="headerlink" title="简单的访问控制"></a>简单的访问控制</h2><p>Istio可以通过设置规则实现简单的访问控制.</p>
+<h3 id="使用denials属性"><a href="#使用denials属性" class="headerlink" title="使用denials属性"></a>使用denials属性</h3><p>例如:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">rules:</div><div class="line">- aspects:</div><div class="line">  - kind: denials</div><div class="line">  selector: source.labels[&quot;app&quot;]==&quot;reviews&quot; &amp;&amp; source.labels[&quot;version&quot;] == &quot;v3&quot;</div></pre></td></tr></table></figure></p>
+<p>执行如下命令可以使rating服务拒绝来自reviews v3服务的任何请求.</p>
+<p>istioctl mixer rule create global ratings.default.svc.cluster.local -f samples/apps/bookinfo/mixer-rule-ratings-denial.yaml</p>
+<h3 id="使用黑白名单"><a href="#使用黑白名单" class="headerlink" title="使用黑白名单"></a>使用黑白名单</h3><p>使用黑白名单之前需要先定义一个adapter,如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">- name: versionList</div><div class="line">  impl: genericListChecker</div><div class="line">  params:</div><div class="line">    listEntries: [&quot;v1&quot;, &quot;v2&quot;]</div></pre></td></tr></table></figure>
+<p>启用白名单时blacklist设置为false,反之为true.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">rules:</div><div class="line">  aspects:</div><div class="line">  - kind: lists</div><div class="line">    adapter: versionList</div><div class="line">    params:</div><div class="line">      blacklist: false</div><div class="line">      checkExpression: source.labels[&quot;version&quot;]</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Xi Ning Wang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://osswangxining.github.io/istio/" title="Istio">https://osswangxining.github.io/istio/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kubernetes/" rel="tag"># Kubernetes</a>
+          
+            <a href="/tags/container/" rel="tag"># container</a>
+          
+            <a href="/tags/容器/" rel="tag"># 容器</a>
+          
+            <a href="/tags/微服务/" rel="tag"># 微服务</a>
+          
+            <a href="/tags/PaaS/" rel="tag"># PaaS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/kubernetes-deployment/" rel="next" title="容器集群、网络连接、自动化部署">
+                <i class="fa fa-chevron-left"></i> 容器集群、网络连接、自动化部署
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/hono/" rel="prev" title="IoT Platform">
+                IoT Platform <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/bio.png"
+                alt="Xi Ning Wang" />
+            
+              <p class="site-author-name" itemprop="name">Xi Ning Wang</p>
+              <p class="site-description motion-element" itemprop="description">专注于分布式高性能技术架构、容器|K8S、IoT云平台，支持语言：Java(script) | Python | Golang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/osswangxining" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:osswangxining@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://plus.google.com/osswangxining" target="_blank" title="Google">
+                      
+                        <i class="fa fa-fw fa-google"></i>Google</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/osswangxining" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://istio.io" title="Istio" target="_blank">Istio</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://grpc.io/" title="gRPC" target="_blank">gRPC</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#架构"><span class="nav-number">2.</span> <span class="nav-text">架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Envoy"><span class="nav-number">2.1.</span> <span class="nav-text">Envoy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mixer"><span class="nav-number">2.2.</span> <span class="nav-text">Mixer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Istio-Manager"><span class="nav-number">2.3.</span> <span class="nav-text">Istio-Manager</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Istio-Auth"><span class="nav-number">2.4.</span> <span class="nav-text">Istio-Auth</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式跟踪"><span class="nav-number">3.</span> <span class="nav-text">分布式跟踪</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#启动zipkin"><span class="nav-number">3.1.</span> <span class="nav-text">启动zipkin</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#访问zipkin"><span class="nav-number">3.2.</span> <span class="nav-text">访问zipkin</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在服务中enable-trace"><span class="nav-number">3.3.</span> <span class="nav-text">在服务中enable trace</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启用Ingress"><span class="nav-number">4.</span> <span class="nav-text">启用Ingress</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置HTTP服务"><span class="nav-number">4.1.</span> <span class="nav-text">配置HTTP服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置HTTPS服务"><span class="nav-number">4.2.</span> <span class="nav-text">配置HTTPS服务</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启用Egress"><span class="nav-number">5.</span> <span class="nav-text">启用Egress</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置外部服务"><span class="nav-number">5.1.</span> <span class="nav-text">配置外部服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#直接访问外部服务"><span class="nav-number">5.2.</span> <span class="nav-text">直接访问外部服务</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置请求路由"><span class="nav-number">6.</span> <span class="nav-text">配置请求路由</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#错误注入"><span class="nav-number">7.</span> <span class="nav-text">错误注入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#设置请求超时"><span class="nav-number">8.</span> <span class="nav-text">设置请求超时</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#限流"><span class="nav-number">9.</span> <span class="nav-text">限流</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#简单的访问控制"><span class="nav-number">10.</span> <span class="nav-text">简单的访问控制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用denials属性"><span class="nav-number">10.1.</span> <span class="nav-text">使用denials属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用黑白名单"><span class="nav-number">10.2.</span> <span class="nav-text">使用黑白名单</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xi Ning Wang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=5.1.4"></script>
+
+
+</body>
+</html>

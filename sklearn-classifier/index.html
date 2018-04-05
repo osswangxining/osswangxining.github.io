@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="人工智能,机器学习," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="选择合适的机器学习算法All models are wrong, but some models are useful. — George Box (Box and Draper 1987) 根据No free lunch theorem，在机器学习中，不存在一个在各方面都最好的模型/算法，因为每一个模型都或多或少地对数据分布有先验的统计假设。取所有可能的数据分布的平均，每个模型的表现都一样好（或">
+<meta name="keywords" content="人工智能,机器学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在使用sklearn时如何选择合适的分类器">
+<meta property="og:url" content="https://osswangxining.github.io/sklearn-classifier/index.html">
+<meta property="og:site_name" content="Technical Blog">
+<meta property="og:description" content="选择合适的机器学习算法All models are wrong, but some models are useful. — George Box (Box and Draper 1987) 根据No free lunch theorem，在机器学习中，不存在一个在各方面都最好的模型/算法，因为每一个模型都或多或少地对数据分布有先验的统计假设。取所有可能的数据分布的平均，每个模型的表现都一样好（或">
+<meta property="og:image" content="https://raw.githubusercontent.com/scikit-learn/scikit-learn/master/doc/images/ml_map.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/sklearn-classifier-sample.png">
+<meta property="og:updated_time" content="2018-04-05T08:58:11.416Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在使用sklearn时如何选择合适的分类器">
+<meta name="twitter:description" content="选择合适的机器学习算法All models are wrong, but some models are useful. — George Box (Box and Draper 1987) 根据No free lunch theorem，在机器学习中，不存在一个在各方面都最好的模型/算法，因为每一个模型都或多或少地对数据分布有先验的统计假设。取所有可能的数据分布的平均，每个模型的表现都一样好（或">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/scikit-learn/scikit-learn/master/doc/images/ml_map.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://osswangxining.github.io/sklearn-classifier/"/>
+
+
+
+
+
+  <title>在使用sklearn时如何选择合适的分类器 | Technical Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Technical Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Welcome to my world! 有问题请osswangxining（at）163.com</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://osswangxining.github.io/sklearn-classifier/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/bio.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">在使用sklearn时如何选择合适的分类器</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-17T02:46:25+00:00">
+                2017-09-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/AI/" itemprop="url" rel="index">
+                    <span itemprop="name">AI</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/AI/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="选择合适的机器学习算法"><a href="#选择合适的机器学习算法" class="headerlink" title="选择合适的机器学习算法"></a>选择合适的机器学习算法</h2><p>All models are wrong, but some models are useful. — George Box (Box and Draper 1987)</p>
+<p>根据No free lunch theorem，在机器学习中，不存在一个在各方面都最好的模型/算法，因为每一个模型都或多或少地对数据分布有先验的统计假设。取所有可能的数据分布的平均，每个模型的表现都一样好（或者一样糟糕）。因此，我们需要针对具体的问题，找到最好的机器学习算法。</p>
+<p><img src="https://raw.githubusercontent.com/scikit-learn/scikit-learn/master/doc/images/ml_map.png" alt=""></p>
+<p>下面是可能的效果图：<br><img src="/images/sklearn-classifier-sample.png" alt=""><br><a id="more"></a></p>
+<h2 id="数据分析（Exploratory-Data-Analysis）"><a href="#数据分析（Exploratory-Data-Analysis）" class="headerlink" title="数据分析（Exploratory Data Analysis）"></a>数据分析（Exploratory Data Analysis）</h2><p>在选择具体的算法之前，最好对数据中每一个特征的模式和产生原理有一定的了解：</p>
+<ul>
+<li>特征是连续的（real-valued）还是离散的（discrete）？</li>
+<li>如果特征是连续的，它的直方图（histogram）长什么样？它的mean和variance是如何分布的？</li>
+<li>如果特征是离散的，不同的特征值之间是否存在某种顺序关系？例如，豆瓣上从1星到5星的打分，虽然是离散数据，但有一个从低到高的顺序。如果某个特征是“地址”，则不太可能存在一个明确的顺序。</li>
+<li>特征数据是如何被采集的？</li>
+</ul>
+<h2 id="特征工程（Feature-Engineering）"><a href="#特征工程（Feature-Engineering）" class="headerlink" title="特征工程（Feature Engineering）"></a>特征工程（Feature Engineering）</h2><p>特征工程（根据现有的特征，制造出新的、有价值的特征）决定了机器学习能力的上限，各种算法不过是在逼近这个上限而已。不同的机器学习算法一般会有其对应的不同的特征工程。在实践中，特征工程、调整算法参数这两个步骤常常往复进行。</p>
+<h2 id="由简至繁：具体算法的选择"><a href="#由简至繁：具体算法的选择" class="headerlink" title="由简至繁：具体算法的选择"></a>由简至繁：具体算法的选择</h2><p>sklearn包括了众多机器学习算法。为了简化问题，在此只讨论几大类常见的分类器、回归器。至于算法的原理，sklearn的文档中往往有每个算法的参考文献，机器学习的课本也都有所涉及。</p>
+<h3 id="General-Linear-Models"><a href="#General-Linear-Models" class="headerlink" title="General Linear Models"></a>General Linear Models</h3><p>最开始建立模型时，我个人一般会选择high bias, low variance的线性模型。线性模型的优点包括计算量小、速度快、不太占内存、不容易过拟合。</p>
+<p>常用线性回归器的有Ridge（含有L2正则化的线性回归）和Lasso（含有L1正则化的线性回归，自带特征选择，可以获得sparse coefficients）。同时，如果对于超参数没有什么特别细致的要求，那么可以使用sklearn提供的RidgeCV和LassoCV，自动通过高效的交叉验证来确定超参数的值。</p>
+<p>假如针对同一个数据集X（m samples <em> n features），需要预测的y值不止一个（m samples </em> n targets），则可以使用multitask的模型。</p>
+<p>线性分类器中，最好用的是LogisticRegression和相应的LogisticRegressionCV。</p>
+<p>SGDClassifier和SGDRegressor可以用于极大的数据集。然而，如果数据集过大的话，最好从数据中取样，然后和小数据一样分析建模，未必一开始就要在整个数据集上跑算法。</p>
+<h3 id="Ensemble-Methods"><a href="#Ensemble-Methods" class="headerlink" title="Ensemble Methods"></a>Ensemble Methods</h3><p>ensemble能够极大提升各种算法，尤其是决策树的表现。在实际应用中，单独决策树几乎不会被使用。Bagging（如RandomForest）通过在数据的不同部分训练一群high variance算法来降低算法们整体的variance；boosting通过依次建立high bias算法来提升整体的variance。</p>
+<p>最常用的ensemble算法是RandomForest和GradientBoosting。不过，在sklearn之外还有更优秀的gradient boosting算法库：XGBoost和LightGBM。</p>
+<p>BaggingClassifier和VotingClassifier可以作为第二层的meta classifier/regressor，将第一层的算法（如xgboost）作为base estimator，进一步做成bagging或者stacking。</p>
+<h3 id="支持向量机（SVM）"><a href="#支持向量机（SVM）" class="headerlink" title="支持向量机（SVM）"></a>支持向量机（SVM）</h3><p>SVM相关的知识可以参考Andrew Ng教授在Coursera上的CS229（有能力的可以去看youtube或者网易公开课上的原版CS229）。svm的API文档很完善，当一个调包侠也没有太大困难。不过在大多数的数据挖掘竞赛（如kaggle）中，SVM的表现往往不如xgboost。</p>
+<h3 id="神经网络（Neural-Network）"><a href="#神经网络（Neural-Network）" class="headerlink" title="神经网络（Neural Network）"></a>神经网络（Neural Network）</h3><p>相比业内顶尖的神经网络库（如TensorFlow和Theano），sklearn的神经网络显得比较简单。个人而言，如果要使用神经网络进行分类/回归，我一般会使用keras或者pytorch。</p>
+<h2 id="附上sklearn库之各分类算法简单应用"><a href="#附上sklearn库之各分类算法简单应用" class="headerlink" title="附上sklearn库之各分类算法简单应用"></a>附上sklearn库之各分类算法简单应用</h2><h3 id="KNN"><a href="#KNN" class="headerlink" title="KNN"></a>KNN</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">from sklearn.neighbors import KNeighborsClassifier</div><div class="line">import numpy as np</div><div class="line"></div><div class="line"></div><div class="line">def KNN(X,y,XX)：#X,y 分别为训练数据集的数据和标签，XX为测试数据</div><div class="line">    model = KNeighborsClassifier(n_neighbors=10)#默认为5</div><div class="line">    model.fit(X,y)</div><div class="line"></div><div class="line">    predicted = model.predict(XX)</div><div class="line">    return predicted</div></pre></td></tr></table></figure>
+<h3 id="SVM"><a href="#SVM" class="headerlink" title="SVM"></a>SVM</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">from sklearn.svm import SVC</div><div class="line"></div><div class="line">def SVM(X,y,XX):</div><div class="line"></div><div class="line">    model = SVC(c=5.0)</div><div class="line">    model.fit(X,y)</div><div class="line"></div><div class="line">    predicted = model.predict(XX)</div><div class="line">    return predicted</div></pre></td></tr></table></figure>
+<h3 id="SVM-Classifier-using-cross-validation"><a href="#SVM-Classifier-using-cross-validation" class="headerlink" title="SVM Classifier using cross validation"></a>SVM Classifier using cross validation</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">def svm_cross_validation(train_x, train_y):    </div><div class="line">    from sklearn.grid_search import GridSearchCV    </div><div class="line">    from sklearn.svm import SVC    </div><div class="line">    model = SVC(kernel=&apos;rbf&apos;, probability=True)    </div><div class="line">    param_grid = &#123;&apos;C&apos;: [1e-3, 1e-2, 1e-1, 1, 10, 100, 1000], &apos;gamma&apos;: [0.001, 0.0001]&#125;    </div><div class="line">    grid_search = GridSearchCV(model, param_grid, n_jobs = 1, verbose=1)    </div><div class="line">    grid_search.fit(train_x, train_y)    </div><div class="line">    best_parameters = grid_search.best_estimator_.get_params()    </div><div class="line">    for para, val in list(best_parameters.items()):    </div><div class="line">        print(para, val)    </div><div class="line">    model = SVC(kernel=&apos;rbf&apos;, C=best_parameters[&apos;C&apos;], gamma=best_parameters[&apos;gamma&apos;], probability=True)    </div><div class="line">    model.fit(train_x, train_y)    </div><div class="line">    return model</div></pre></td></tr></table></figure>
+<h3 id="LR"><a href="#LR" class="headerlink" title="LR"></a>LR</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">from sklearn.linear_model import LogisticRegression</div><div class="line"></div><div class="line">def LR(X,y，XX):</div><div class="line"></div><div class="line">    model = LogisticRegression()</div><div class="line">    model.fit(X,y)</div><div class="line"></div><div class="line">    predicted = model.predict(XX)</div><div class="line">    return predicted</div></pre></td></tr></table></figure>
+<h3 id="决策树（CART）"><a href="#决策树（CART）" class="headerlink" title="决策树（CART）"></a>决策树（CART）</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">from sklearn.tree import DecisionTreeClassifier</div><div class="line"></div><div class="line">def CTRA(X,y,XX):</div><div class="line">    model = DecisionTreeClassifier()</div><div class="line">    model.fit(X,y)</div><div class="line"></div><div class="line">    predicted = model.predict(XX)</div><div class="line">    return predicted</div></pre></td></tr></table></figure>
+<h3 id="随机森林"><a href="#随机森林" class="headerlink" title="随机森林"></a>随机森林</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">from sklearn.ensemble import RandomForestClassifier</div><div class="line"></div><div class="line">def CTRA(X,y,XX):</div><div class="line">    model = RandomForestClassifier()</div><div class="line">    model.fit(X,y)</div><div class="line"></div><div class="line">    predicted = model.predict(XX)</div><div class="line">    return predicted</div></pre></td></tr></table></figure>
+<h3 id="GBDT"><a href="#GBDT" class="headerlink" title="GBDT"></a>GBDT</h3><p>(Gradient Boosting Decision Tree)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">from sklearn.ensemble import GradientBoostingClassifier   </div><div class="line"></div><div class="line">def CTRA(X,y,XX):</div><div class="line">    model = GradientBoostingClassifier()</div><div class="line">    model.fit(X,y)</div><div class="line"></div><div class="line">    predicted = model.predict(XX)</div><div class="line">    return predicted</div></pre></td></tr></table></figure></p>
+<h3 id="朴素贝叶斯"><a href="#朴素贝叶斯" class="headerlink" title="朴素贝叶斯"></a>朴素贝叶斯</h3><p>一个是基于高斯分布求概率，一个是基于多项式分布求概率，一个是基于伯努利分布求概率。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">from sklearn.naive_bayes import GaussianNB</div><div class="line">from sklearn.naive_bayes import MultinomialNB</div><div class="line">from sklearn.naive_bayes import BernoulliNB</div><div class="line"></div><div class="line">def GNB(X,y,XX):</div><div class="line">    model =GaussianNB()</div><div class="line">    model.fit(X,y)</div><div class="line"></div><div class="line">    predicted = model.predict(XX)</div><div class="line">    return predicted</div><div class="line"></div><div class="line">def MNB(X,y,XX):</div><div class="line">    model = MultinomialNB()</div><div class="line">    model.fit(X,y)</div><div class="line"></div><div class="line">    predicted = model.predict(XX</div><div class="line">    return predicted</div><div class="line"></div><div class="line">def BNB(X,y,XX):</div><div class="line">    model = BernoulliNB()</div><div class="line">    model.fit(X,y)</div><div class="line"></div><div class="line">    predicted = model.predict(XX</div><div class="line">    return predicted</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Xi Ning Wang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://osswangxining.github.io/sklearn-classifier/" title="在使用sklearn时如何选择合适的分类器">https://osswangxining.github.io/sklearn-classifier/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/人工智能/" rel="tag"># 人工智能</a>
+          
+            <a href="/tags/机器学习/" rel="tag"># 机器学习</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/chatterbot/" rel="next" title="构建自己的聊天机器人（及如何接入微信）">
+                <i class="fa fa-chevron-left"></i> 构建自己的聊天机器人（及如何接入微信）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/chatterbot-iot/" rel="prev" title="Applying Chatbots to the Internet of Things">
+                Applying Chatbots to the Internet of Things <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/bio.png"
+                alt="Xi Ning Wang" />
+            
+              <p class="site-author-name" itemprop="name">Xi Ning Wang</p>
+              <p class="site-description motion-element" itemprop="description">专注于分布式高性能技术架构、容器|K8S、IoT云平台，支持语言：Java(script) | Python | Golang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/osswangxining" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:osswangxining@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://plus.google.com/osswangxining" target="_blank" title="Google">
+                      
+                        <i class="fa fa-fw fa-google"></i>Google</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/osswangxining" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://istio.io" title="Istio" target="_blank">Istio</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://grpc.io/" title="gRPC" target="_blank">gRPC</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#选择合适的机器学习算法"><span class="nav-number">1.</span> <span class="nav-text">选择合适的机器学习算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据分析（Exploratory-Data-Analysis）"><span class="nav-number">2.</span> <span class="nav-text">数据分析（Exploratory Data Analysis）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#特征工程（Feature-Engineering）"><span class="nav-number">3.</span> <span class="nav-text">特征工程（Feature Engineering）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#由简至繁：具体算法的选择"><span class="nav-number">4.</span> <span class="nav-text">由简至繁：具体算法的选择</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#General-Linear-Models"><span class="nav-number">4.1.</span> <span class="nav-text">General Linear Models</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ensemble-Methods"><span class="nav-number">4.2.</span> <span class="nav-text">Ensemble Methods</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#支持向量机（SVM）"><span class="nav-number">4.3.</span> <span class="nav-text">支持向量机（SVM）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#神经网络（Neural-Network）"><span class="nav-number">4.4.</span> <span class="nav-text">神经网络（Neural Network）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#附上sklearn库之各分类算法简单应用"><span class="nav-number">5.</span> <span class="nav-text">附上sklearn库之各分类算法简单应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#KNN"><span class="nav-number">5.1.</span> <span class="nav-text">KNN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SVM"><span class="nav-number">5.2.</span> <span class="nav-text">SVM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SVM-Classifier-using-cross-validation"><span class="nav-number">5.3.</span> <span class="nav-text">SVM Classifier using cross validation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LR"><span class="nav-number">5.4.</span> <span class="nav-text">LR</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#决策树（CART）"><span class="nav-number">5.5.</span> <span class="nav-text">决策树（CART）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#随机森林"><span class="nav-number">5.6.</span> <span class="nav-text">随机森林</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GBDT"><span class="nav-number">5.7.</span> <span class="nav-text">GBDT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#朴素贝叶斯"><span class="nav-number">5.8.</span> <span class="nav-text">朴素贝叶斯</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xi Ning Wang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=5.1.4"></script>
+
+
+</body>
+</html>

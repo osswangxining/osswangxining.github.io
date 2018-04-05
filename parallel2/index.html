@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="分布式,Java并发编程," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Callable、Future和FutureTask无论是直接继承Thread，还是实现Runnable接口来创建线程，在执行完任务之后都无法获取执行结果。而自从Java 1.5开始，就提供了Callable和Future，通过它们可以在任务执行完毕之后得到任务执行结果。">
+<meta name="keywords" content="分布式,Java并发编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java并发编程(2)- Callable、Future和FutureTask | CountDownLatch、CyclicBarrier和Semaphore">
+<meta property="og:url" content="https://osswangxining.github.io/parallel2/index.html">
+<meta property="og:site_name" content="Technical Blog">
+<meta property="og:description" content="Callable、Future和FutureTask无论是直接继承Thread，还是实现Runnable接口来创建线程，在执行完任务之后都无法获取执行结果。而自从Java 1.5开始，就提供了Callable和Future，通过它们可以在任务执行完毕之后得到任务执行结果。">
+<meta property="og:updated_time" content="2018-04-05T08:58:11.416Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java并发编程(2)- Callable、Future和FutureTask | CountDownLatch、CyclicBarrier和Semaphore">
+<meta name="twitter:description" content="Callable、Future和FutureTask无论是直接继承Thread，还是实现Runnable接口来创建线程，在执行完任务之后都无法获取执行结果。而自从Java 1.5开始，就提供了Callable和Future，通过它们可以在任务执行完毕之后得到任务执行结果。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://osswangxining.github.io/parallel2/"/>
+
+
+
+
+
+  <title>Java并发编程(2)- Callable、Future和FutureTask | CountDownLatch、CyclicBarrier和Semaphore | Technical Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Technical Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Welcome to my world! 有问题请osswangxining（at）163.com</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://osswangxining.github.io/parallel2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/bio.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java并发编程(2)- Callable、Future和FutureTask | CountDownLatch、CyclicBarrier和Semaphore</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-01-11T12:46:25+00:00">
+                2016-01-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式&云计算</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/Java并发编程/" itemprop="url" rel="index">
+                    <span itemprop="name">Java并发编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Callable、Future和FutureTask"><a href="#Callable、Future和FutureTask" class="headerlink" title="Callable、Future和FutureTask"></a>Callable、Future和FutureTask</h1><p>无论是直接继承Thread，还是实现Runnable接口来创建线程，在执行完任务之后都无法获取执行结果。而自从Java 1.5开始，就提供了Callable和Future，通过它们可以在任务执行完毕之后得到任务执行结果。<br><a id="more"></a></p>
+<h2 id="Callable"><a href="#Callable" class="headerlink" title="Callable"></a>Callable</h2><p>Callable位于java.util.concurrent包下，它也是一个接口，在它里面也只声明了一个方法call();<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">public interface Callable&lt;V&gt; &#123;</div><div class="line">    /**</div><div class="line">     * Computes a result, or throws an exception if unable to do so.</div><div class="line">     *</div><div class="line">     * @return computed result</div><div class="line">     * @throws Exception if unable to compute a result</div><div class="line">     */</div><div class="line">    V call() throws Exception;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>一般情况下Callable是配合ExecutorService来使用的，在ExecutorService接口中声明了若干个submit方法的重载版本：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;T&gt; Future&lt;T&gt; submit(Callable&lt;T&gt; task);</div></pre></td></tr></table></figure></p>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">import java.util.concurrent.Callable;</div><div class="line"></div><div class="line">public class Task implements Callable&lt;Integer&gt; &#123;</div><div class="line"></div><div class="line">  @Override</div><div class="line">  public Integer call() throws Exception &#123;</div><div class="line">    System.out.println(&quot;This is the task from Sub-Task....&quot;);</div><div class="line">    Thread.sleep(2000);</div><div class="line">    int sum = 0;</div><div class="line">    for(int i=0;i&lt;100;i++)</div><div class="line">        sum += i;</div><div class="line">    return sum;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="Future"><a href="#Future" class="headerlink" title="Future"></a>Future</h2><p>Future就是对于具体的Runnable或者Callable任务的执行结果进行取消、查询是否完成、获取结果。必要时可以通过get方法获取执行结果，该方法会阻塞直到任务返回结果。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div></pre></td><td class="code"><pre><div class="line">public interface Future&lt;V&gt; &#123;</div><div class="line"></div><div class="line">    /**</div><div class="line">     * Attempts to cancel execution of this task.  This attempt will</div><div class="line">     * fail if the task has already completed, has already been cancelled,</div><div class="line">     * or could not be cancelled for some other reason. If successful,</div><div class="line">     * and this task has not started when &#123;@code cancel&#125; is called,</div><div class="line">     * this task should never run.  If the task has already started,</div><div class="line">     * then the &#123;@code mayInterruptIfRunning&#125; parameter determines</div><div class="line">     * whether the thread executing this task should be interrupted in</div><div class="line">     * an attempt to stop the task.</div><div class="line">     *</div><div class="line">     * &lt;p&gt;After this method returns, subsequent calls to &#123;@link #isDone&#125; will</div><div class="line">     * always return &#123;@code true&#125;.  Subsequent calls to &#123;@link #isCancelled&#125;</div><div class="line">     * will always return &#123;@code true&#125; if this method returned &#123;@code true&#125;.</div><div class="line">     *</div><div class="line">     * @param mayInterruptIfRunning &#123;@code true&#125; if the thread executing this</div><div class="line">     * task should be interrupted; otherwise, in-progress tasks are allowed</div><div class="line">     * to complete</div><div class="line">     * @return &#123;@code false&#125; if the task could not be cancelled,</div><div class="line">     * typically because it has already completed normally;</div><div class="line">     * &#123;@code true&#125; otherwise</div><div class="line">     */</div><div class="line">    boolean cancel(boolean mayInterruptIfRunning);</div><div class="line"></div><div class="line">    /**</div><div class="line">     * Returns &#123;@code true&#125; if this task was cancelled before it completed</div><div class="line">     * normally.</div><div class="line">     *</div><div class="line">     * @return &#123;@code true&#125; if this task was cancelled before it completed</div><div class="line">     */</div><div class="line">    boolean isCancelled();</div><div class="line"></div><div class="line">    /**</div><div class="line">     * Returns &#123;@code true&#125; if this task completed.</div><div class="line">     *</div><div class="line">     * Completion may be due to normal termination, an exception, or</div><div class="line">     * cancellation -- in all of these cases, this method will return</div><div class="line">     * &#123;@code true&#125;.</div><div class="line">     *</div><div class="line">     * @return &#123;@code true&#125; if this task completed</div><div class="line">     */</div><div class="line">    boolean isDone();</div><div class="line"></div><div class="line">    /**</div><div class="line">     * Waits if necessary for the computation to complete, and then</div><div class="line">     * retrieves its result.</div><div class="line">     *</div><div class="line">     * @return the computed result</div><div class="line">     * @throws CancellationException if the computation was cancelled</div><div class="line">     * @throws ExecutionException if the computation threw an</div><div class="line">     * exception</div><div class="line">     * @throws InterruptedException if the current thread was interrupted</div><div class="line">     * while waiting</div><div class="line">     */</div><div class="line">    V get() throws InterruptedException, ExecutionException;</div><div class="line"></div><div class="line">    /**</div><div class="line">     * Waits if necessary for at most the given time for the computation</div><div class="line">     * to complete, and then retrieves its result, if available.</div><div class="line">     *</div><div class="line">     * @param timeout the maximum time to wait</div><div class="line">     * @param unit the time unit of the timeout argument</div><div class="line">     * @return the computed result</div><div class="line">     * @throws CancellationException if the computation was cancelled</div><div class="line">     * @throws ExecutionException if the computation threw an</div><div class="line">     * exception</div><div class="line">     * @throws InterruptedException if the current thread was interrupted</div><div class="line">     * while waiting</div><div class="line">     * @throws TimeoutException if the wait timed out</div><div class="line">     */</div><div class="line">    V get(long timeout, TimeUnit unit)</div><div class="line">        throws InterruptedException, ExecutionException, TimeoutException;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>在Future接口中声明了5个方法，下面依次解释每个方法的作用：</p>
+<ul>
+<li>cancel方法用来取消任务，如果取消任务成功则返回true，如果取消任务失败则返回false。参数mayInterruptIfRunning表示是否允许取消正在执行却没有执行完毕的任务，如果设置true，则表示可以取消正在执行过程中的任务。如果任务已经完成，则无论mayInterruptIfRunning为true还是false，此方法肯定返回false，即如果取消已经完成的任务会返回false；如果任务正在执行，若mayInterruptIfRunning设置为true，则返回true，若mayInterruptIfRunning设置为false，则返回false；如果任务还没有执行，则无论mayInterruptIfRunning为true还是false，肯定返回true。</li>
+<li>isCancelled方法表示任务是否被取消成功，如果在任务正常完成前被取消成功，则返回 true。</li>
+<li>isDone方法表示任务是否已经完成，若任务完成，则返回true；</li>
+<li>get()方法用来获取执行结果，这个方法会产生阻塞，会一直等到任务执行完毕才返回；</li>
+<li>get(long timeout, TimeUnit unit)用来获取执行结果，如果在指定时间内，还没获取到结果，就直接返回null。</li>
+</ul>
+<h3 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">import java.util.concurrent.ExecutionException;</div><div class="line">import java.util.concurrent.ExecutorService;</div><div class="line">import java.util.concurrent.Executors;</div><div class="line">import java.util.concurrent.Future;</div><div class="line"></div><div class="line">public class CallableFutureSample &#123;</div><div class="line"></div><div class="line">  public static void main(String[] args) &#123;</div><div class="line">    ExecutorService executor = Executors.newCachedThreadPool();</div><div class="line">    Task task = new Task();</div><div class="line">    Future&lt;Integer&gt; result = executor.submit(task);</div><div class="line">    executor.shutdown();</div><div class="line"></div><div class="line">    try &#123;</div><div class="line">      Thread.sleep(1000);</div><div class="line">    &#125; catch (InterruptedException e1) &#123;</div><div class="line">      e1.printStackTrace();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    System.out.println(&quot;This task is from main thread....&quot;);</div><div class="line"></div><div class="line">    try &#123;</div><div class="line">      System.out.println(&quot;task execution result from sub-task:&quot; + result.get());</div><div class="line">    &#125; catch (InterruptedException e) &#123;</div><div class="line">      e.printStackTrace();</div><div class="line">    &#125; catch (ExecutionException e) &#123;</div><div class="line">      e.printStackTrace();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    System.out.println(&quot;All tasks have been done.&quot;);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>执行结果如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">This is the task from Sub-Task....</div><div class="line">This task is from main thread....</div><div class="line">task execution result from sub-task:4950</div><div class="line">All tasks have been done.</div></pre></td></tr></table></figure></p>
+<h2 id="FutureTask"><a href="#FutureTask" class="headerlink" title="FutureTask"></a>FutureTask</h2><p>FutureTask类实现了RunnableFuture接口，RunnableFuture继承了Runnable接口和Future接口，所以FutureTask既可以作为Runnable被线程执行，又可以作为Future得到Callable的返回值。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">public class FutureTask&lt;V&gt; implements RunnableFuture&lt;V&gt; &#123;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">import java.util.concurrent.ExecutionException;</div><div class="line">import java.util.concurrent.ExecutorService;</div><div class="line">import java.util.concurrent.Executors;</div><div class="line">import java.util.concurrent.FutureTask;</div><div class="line"></div><div class="line">public class CallableFutureTaskSample &#123;</div><div class="line">  public static void main(String[] args) &#123;</div><div class="line">    ExecutorService executor = Executors.newCachedThreadPool();</div><div class="line">    Task task = new Task();</div><div class="line">    FutureTask&lt;Integer&gt; futureTask = new FutureTask&lt;Integer&gt;(task);</div><div class="line">    executor.submit(futureTask);</div><div class="line">    executor.shutdown();</div><div class="line"></div><div class="line">    try &#123;</div><div class="line">      Thread.sleep(1000);</div><div class="line">    &#125; catch (InterruptedException e1) &#123;</div><div class="line">      e1.printStackTrace();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    System.out.println(&quot;This task is from main thread....&quot;);</div><div class="line"></div><div class="line">    try &#123;</div><div class="line">      System.out.println(&quot;task execution result from sub-task:&quot; + futureTask.get());</div><div class="line">    &#125; catch (InterruptedException e) &#123;</div><div class="line">      e.printStackTrace();</div><div class="line">    &#125; catch (ExecutionException e) &#123;</div><div class="line">      e.printStackTrace();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    System.out.println(&quot;All tasks have been done.&quot;);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>执行结果如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">This is the task from Sub-Task....</div><div class="line">This task is from main thread....</div><div class="line">task execution result from sub-task:4950</div><div class="line">All tasks have been done.</div></pre></td></tr></table></figure></p>
+<h1 id="CountDownLatch、CyclicBarrier和Semaphore"><a href="#CountDownLatch、CyclicBarrier和Semaphore" class="headerlink" title="CountDownLatch、CyclicBarrier和Semaphore"></a>CountDownLatch、CyclicBarrier和Semaphore</h1><h2 id="CountDownLatch"><a href="#CountDownLatch" class="headerlink" title="CountDownLatch"></a>CountDownLatch</h2><p>CountDownLatch类位于java.util.concurrent包下，利用它可以实现类似计数器的功能。</p>
+<h3 id="示例-3"><a href="#示例-3" class="headerlink" title="示例"></a>示例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line">package parallel;</div><div class="line"></div><div class="line">import java.util.concurrent.CountDownLatch;</div><div class="line"></div><div class="line">public class CountDownLatchSample &#123;</div><div class="line">  public static void main(String[] args) &#123;</div><div class="line">    final CountDownLatch latch = new CountDownLatch(2);</div><div class="line">    new Thread() &#123;</div><div class="line">      public void run() &#123;</div><div class="line">        try &#123;</div><div class="line">          System.out.println(&quot;子线程&quot; + Thread.currentThread().getName() + &quot;正在执行&quot;);</div><div class="line">          Thread.sleep(3000);</div><div class="line">          System.out.println(&quot;子线程&quot; + Thread.currentThread().getName() + &quot;执行完毕&quot;);</div><div class="line">          latch.countDown();</div><div class="line">        &#125; catch (InterruptedException e) &#123;</div><div class="line">          e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">      &#125;;</div><div class="line">    &#125;.start();</div><div class="line"></div><div class="line">    new Thread() &#123;</div><div class="line">      public void run() &#123;</div><div class="line">        try &#123;</div><div class="line">          System.out.println(&quot;子线程&quot; + Thread.currentThread().getName() + &quot;正在执行&quot;);</div><div class="line">          Thread.sleep(3000);</div><div class="line">          System.out.println(&quot;子线程&quot; + Thread.currentThread().getName() + &quot;执行完毕&quot;);</div><div class="line">          latch.countDown();</div><div class="line">        &#125; catch (InterruptedException e) &#123;</div><div class="line">          e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">      &#125;;</div><div class="line">    &#125;.start();</div><div class="line"></div><div class="line">    try &#123;</div><div class="line">      System.out.println(&quot;等待2个子线程执行完毕...&quot;);</div><div class="line">      latch.await();</div><div class="line">      System.out.println(&quot;2个子线程已经执行完毕&quot;);</div><div class="line">      System.out.println(&quot;继续执行主线程&quot;);</div><div class="line">    &#125; catch (InterruptedException e) &#123;</div><div class="line">      e.printStackTrace();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>执行结果如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">子线程Thread-0正在执行</div><div class="line">等待2个子线程执行完毕...</div><div class="line">子线程Thread-1正在执行</div><div class="line">子线程Thread-1执行完毕</div><div class="line">子线程Thread-0执行完毕</div><div class="line">2个子线程已经执行完毕</div><div class="line">继续执行主线程</div></pre></td></tr></table></figure></p>
+<h2 id="CyclicBarrier"><a href="#CyclicBarrier" class="headerlink" title="CyclicBarrier"></a>CyclicBarrier</h2><p>通过CyclicBarrier可以实现让一组线程等待至某个状态之后再全部同时执行。CyclicBarrier类位于java.util.concurrent包下，CyclicBarrier提供2个构造器;其中：参数parties指让多少个线程或者任务等待至barrier状态；参数barrierAction为当这些线程都达到barrier状态时会执行的内容。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public CyclicBarrier(int parties, Runnable barrierAction) &#123;</div><div class="line">&#125;</div><div class="line"></div><div class="line">public CyclicBarrier(int parties) &#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="示例-4"><a href="#示例-4" class="headerlink" title="示例"></a>示例</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line">package parallel;</div><div class="line"></div><div class="line">import java.util.concurrent.BrokenBarrierException;</div><div class="line">import java.util.concurrent.CyclicBarrier;</div><div class="line"></div><div class="line">public class CyclicBarrierSample &#123;</div><div class="line"></div><div class="line">  public static void main(String[] args) &#123;</div><div class="line">    CyclicBarrier barrier = new CyclicBarrier(5, new Runnable() &#123;</div><div class="line"></div><div class="line">      @Override</div><div class="line">      public void run() &#123;</div><div class="line">        System.out.println(&quot;当前线程&quot;+Thread.currentThread().getName());  </div><div class="line">        System.out.println(&quot;当这些线程都达到barrier状态时会执行的内容.....&quot;);</div><div class="line"></div><div class="line">      &#125;</div><div class="line">    &#125;);</div><div class="line">    for (int i = 0; i &lt; 5; i++) &#123;</div><div class="line">      new Writer(barrier).start();</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  static class Writer extends Thread &#123;</div><div class="line">    private CyclicBarrier cyclicBarrier;</div><div class="line"></div><div class="line">    public Writer(CyclicBarrier cyclicBarrier) &#123;</div><div class="line">      this.cyclicBarrier = cyclicBarrier;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void run() &#123;</div><div class="line">      System.out.println(&quot;线程&quot; + Thread.currentThread().getName() + &quot;正在写入数据...&quot;);</div><div class="line">      try &#123;</div><div class="line">        Thread.sleep(5000);</div><div class="line">        System.out.println(&quot;线程&quot; + Thread.currentThread().getName() + &quot;写入数据完毕，等待其他线程写入完毕&quot;);</div><div class="line">        cyclicBarrier.await();</div><div class="line">      &#125; catch (InterruptedException e) &#123;</div><div class="line">        e.printStackTrace();</div><div class="line">      &#125; catch (BrokenBarrierException e) &#123;</div><div class="line">        e.printStackTrace();</div><div class="line">      &#125;</div><div class="line">      System.out.println(&quot;所有线程写入完毕，继续处理其他任务...&quot;);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>执行结果如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">线程Thread-0正在写入数据...</div><div class="line">线程Thread-4正在写入数据...</div><div class="line">线程Thread-3正在写入数据...</div><div class="line">线程Thread-1正在写入数据...</div><div class="line">线程Thread-2正在写入数据...</div><div class="line">线程Thread-3写入数据完毕，等待其他线程写入完毕</div><div class="line">线程Thread-4写入数据完毕，等待其他线程写入完毕</div><div class="line">线程Thread-2写入数据完毕，等待其他线程写入完毕</div><div class="line">线程Thread-1写入数据完毕，等待其他线程写入完毕</div><div class="line">线程Thread-0写入数据完毕，等待其他线程写入完毕</div><div class="line">当前线程Thread-1</div><div class="line">当这些线程都达到barrier状态时会执行的内容.....</div><div class="line">所有线程写入完毕，继续处理其他任务...</div><div class="line">所有线程写入完毕，继续处理其他任务...</div><div class="line">所有线程写入完毕，继续处理其他任务...</div><div class="line">所有线程写入完毕，继续处理其他任务...</div><div class="line">所有线程写入完毕，继续处理其他任务...</div></pre></td></tr></table></figure></p>
+<h2 id="Semaphore"><a href="#Semaphore" class="headerlink" title="Semaphore"></a>Semaphore</h2><p>Semaphore信号量可以控同时访问的线程个数，通过 acquire() 获取一个许可，如果没有就等待，而 release() 释放一个许可。　　Semaphore类位于java.util.concurrent包下，它提供了2个构造器：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">public Semaphore(int permits) &#123;          //参数permits表示许可数目，即同时可以允许多少线程进行访问</div><div class="line">    sync = new NonfairSync(permits);</div><div class="line">&#125;</div><div class="line">public Semaphore(int permits, boolean fair) &#123;    //这个多了一个参数fair表示是否是公平的，即等待时间越久的越先获取许可</div><div class="line">    sync = (fair)? new FairSync(permits) : new NonfairSync(permits);</div><div class="line">&#125;</div><div class="line"></div><div class="line">public void acquire() throws InterruptedException &#123;  &#125;     //获取一个许可</div><div class="line">public void acquire(int permits) throws InterruptedException &#123; &#125;    //获取permits个许可</div><div class="line">public void release() &#123; &#125;          //释放一个许可</div><div class="line">public void release(int permits) &#123; &#125;    //释放permits个许可</div><div class="line"></div><div class="line">public boolean tryAcquire() &#123; &#125;;    //尝试获取一个许可，若获取成功，则立即返回true，若获取失败，则立即返回false</div><div class="line">public boolean tryAcquire(long timeout, TimeUnit unit) throws InterruptedException &#123; &#125;;  //尝试获取一个许可，若在指定的时间内获取成功，则立即返回true，否则则立即返回false</div><div class="line">public boolean tryAcquire(int permits) &#123; &#125;; //尝试获取permits个许可，若获取成功，则立即返回true，若获取失败，则立即返回false</div><div class="line">public boolean tryAcquire(int permits, long timeout, TimeUnit unit) throws InterruptedException &#123; &#125;; //尝试获取permits个许可，若在指定的时间内获取成功，则立即返回true，否则则立即返回false</div></pre></td></tr></table></figure></p>
+<h3 id="示例-5"><a href="#示例-5" class="headerlink" title="示例"></a>示例</h3><p>一间可以容纳N人的房间，如果人不满就可以进去，如果人满了，就要等待有人出来。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">import java.util.concurrent.Semaphore;</div><div class="line"></div><div class="line">public class SemaphoreSample &#123;</div><div class="line"></div><div class="line">  public static void main(String[] args) &#123;</div><div class="line">    int CountOfRooms = 10;</div><div class="line">    int CountOfPersons = 15;</div><div class="line">    Semaphore semaphore = new Semaphore(CountOfRooms);</div><div class="line">    for (int i = 0; i &lt; CountOfPersons; i++) &#123;</div><div class="line">      new Person(i, semaphore).start();</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  static class Person extends Thread &#123;</div><div class="line">    private int num;</div><div class="line">    private Semaphore semaphore;</div><div class="line"></div><div class="line">    public Person(int num, Semaphore semaphore) &#123;</div><div class="line">      this.num = num;</div><div class="line">      this.semaphore = semaphore;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void run() &#123;</div><div class="line">      try &#123;</div><div class="line">        semaphore.acquire();</div><div class="line">        System.out.println(&quot;Person - &quot; + this.num + &quot;使用了Room...&quot;);</div><div class="line">        Thread.sleep(2000);</div><div class="line">        System.out.println(&quot;Person - &quot; + this.num + &quot;退出了Room&quot;);</div><div class="line">        semaphore.release();</div><div class="line">      &#125; catch (InterruptedException e) &#123;</div><div class="line">        e.printStackTrace();</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>执行结果如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">Person - 0使用了Room...</div><div class="line">Person - 4使用了Room...</div><div class="line">Person - 3使用了Room...</div><div class="line">Person - 1使用了Room...</div><div class="line">Person - 2使用了Room...</div><div class="line">Person - 6使用了Room...</div><div class="line">Person - 5使用了Room...</div><div class="line">Person - 7使用了Room...</div><div class="line">Person - 8使用了Room...</div><div class="line">Person - 9使用了Room...</div><div class="line">Person - 0退出了Room</div><div class="line">Person - 7退出了Room</div><div class="line">Person - 1退出了Room</div><div class="line">Person - 11使用了Room...</div><div class="line">Person - 2退出了Room</div><div class="line">Person - 6退出了Room</div><div class="line">Person - 5退出了Room</div><div class="line">Person - 8退出了Room</div><div class="line">Person - 4退出了Room</div><div class="line">Person - 3退出了Room</div><div class="line">Person - 14使用了Room...</div><div class="line">Person - 13使用了Room...</div><div class="line">Person - 12使用了Room...</div><div class="line">Person - 10使用了Room...</div><div class="line">Person - 9退出了Room</div><div class="line">Person - 11退出了Room</div><div class="line">Person - 10退出了Room</div><div class="line">Person - 12退出了Room</div><div class="line">Person - 14退出了Room</div><div class="line">Person - 13退出了Room</div></pre></td></tr></table></figure></p>
+<h1 id="线程间协作"><a href="#线程间协作" class="headerlink" title="线程间协作"></a>线程间协作</h1><p>线程之间的协作最经典的就是生产者-消费者模型。</p>
+<p>使用Object的wait()和notify()实现：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div></pre></td><td class="code"><pre><div class="line">package parallel;</div><div class="line"></div><div class="line">import java.util.PriorityQueue;</div><div class="line"></div><div class="line">public class ProducerConsumerSample &#123;</div><div class="line">  private int queueSize = 10;</div><div class="line">  private PriorityQueue&lt;Integer&gt; queue = new PriorityQueue&lt;Integer&gt;(queueSize);</div><div class="line"></div><div class="line">  public static void main(String[] args) &#123;</div><div class="line">    ProducerConsumerSample sample = new ProducerConsumerSample();</div><div class="line">    Producer producer = sample.new Producer();</div><div class="line">    Consumer consumer = sample.new Consumer();</div><div class="line"></div><div class="line">    producer.start();</div><div class="line">    consumer.start();</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  class Consumer extends Thread &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void run() &#123;</div><div class="line">      while (true) &#123;</div><div class="line">        synchronized (queue) &#123;</div><div class="line">          while (queue.size() == 0) &#123;</div><div class="line">            try &#123;</div><div class="line">              System.out.println(&quot;队列空，等待数据&quot;);</div><div class="line">              queue.wait();</div><div class="line">            &#125; catch (InterruptedException e) &#123;</div><div class="line">              e.printStackTrace();</div><div class="line">              queue.notify();</div><div class="line">            &#125;</div><div class="line">          &#125;</div><div class="line">          queue.poll(); // 每次移走队首元素</div><div class="line">          queue.notify();</div><div class="line">          System.out.println(&quot;从队列取走一个元素，队列剩余&quot; + queue.size() + &quot;个元素&quot;);</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  class Producer extends Thread&#123;</div><div class="line">    @Override</div><div class="line">    public void run() &#123;</div><div class="line">      while(true)&#123;</div><div class="line">        synchronized (queue) &#123;</div><div class="line">            while(queue.size() == queueSize)&#123;</div><div class="line">                try &#123;</div><div class="line">                    System.out.println(&quot;队列满，等待有空余空间&quot;);</div><div class="line">                    queue.wait();</div><div class="line">                &#125; catch (InterruptedException e) &#123;</div><div class="line">                    e.printStackTrace();</div><div class="line">                    queue.notify();</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            queue.offer(1);        //每次插入一个元素</div><div class="line">            queue.notify();</div><div class="line">            System.out.println(&quot;向队列取中插入一个元素，队列剩余空间：&quot;+(queueSize-queue.size()));</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Condition是在java 1.5中才出现的，它用来替代传统的Object的wait()、notify()实现线程间的协作，相比使用Object的wait()、notify()，使用Condition1的await()、signal()这种方式实现线程间协作更加安全和高效。</p>
+<ul>
+<li>Condition是个接口，基本的方法就是await()和signal()方法;</li>
+<li>Condition依赖于Lock接口，生成一个Condition的基本代码是lock.newCondition();</li>
+<li>调用Condition的await()和signal()方法，都必须在lock保护之内，就是说必须在lock.lock()和lock.unlock之间才可以使用;</li>
+</ul>
+<p>　　- Conditon中的await()对应Object的wait()；<br>　　- Condition中的signal()对应Object的notify()；<br>　　- Condition中的signalAll()对应Object的notifyAll()。</p>
+<p>使用Condition实现:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div></pre></td><td class="code"><pre><div class="line">package parallel;</div><div class="line"></div><div class="line">import java.util.PriorityQueue;</div><div class="line">import java.util.concurrent.locks.Condition;</div><div class="line">import java.util.concurrent.locks.Lock;</div><div class="line">import java.util.concurrent.locks.ReentrantLock;</div><div class="line"></div><div class="line">public class ProducerConsumerConditionSample2 &#123;</div><div class="line">  private int queueSize = 10;</div><div class="line">  private PriorityQueue&lt;Integer&gt; queue = new PriorityQueue&lt;Integer&gt;(queueSize);</div><div class="line">  private Lock lock = new ReentrantLock();</div><div class="line">  private Condition notFull = lock.newCondition();</div><div class="line">  private Condition notEmpty = lock.newCondition();</div><div class="line"></div><div class="line">  public static void main(String[] args) &#123;</div><div class="line">    ProducerConsumerConditionSample2 sample = new ProducerConsumerConditionSample2();</div><div class="line">    Producer producer = sample.new Producer();</div><div class="line">    Consumer consumer = sample.new Consumer();</div><div class="line"></div><div class="line">    producer.start();</div><div class="line">    consumer.start();</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  class Consumer extends Thread &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void run() &#123;</div><div class="line">      while (true) &#123;</div><div class="line">        lock.lock();</div><div class="line">        try &#123;</div><div class="line">          while (queue.size() == 0) &#123;</div><div class="line">            try &#123;</div><div class="line">              System.out.println(&quot;队列空，等待数据&quot;);</div><div class="line">              notEmpty.await();</div><div class="line">            &#125; catch (InterruptedException e) &#123;</div><div class="line">              e.printStackTrace();</div><div class="line">            &#125;</div><div class="line">          &#125;</div><div class="line">          queue.poll(); // 每次移走队首元素</div><div class="line">          notFull.signal();</div><div class="line">          System.out.println(&quot;从队列取走一个元素，队列剩余&quot; + queue.size() + &quot;个元素&quot;);</div><div class="line">        &#125; finally &#123;</div><div class="line">          lock.unlock();</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  class Producer extends Thread &#123;</div><div class="line">    @Override</div><div class="line">    public void run() &#123;</div><div class="line">      while (true) &#123;</div><div class="line">        lock.lock();</div><div class="line">        try &#123;</div><div class="line">          while (queue.size() == queueSize) &#123;</div><div class="line">            try &#123;</div><div class="line">              System.out.println(&quot;队列满，等待有空余空间&quot;);</div><div class="line">              notFull.await();</div><div class="line">            &#125; catch (InterruptedException e) &#123;</div><div class="line">              e.printStackTrace();</div><div class="line">            &#125;</div><div class="line">          &#125;</div><div class="line">          queue.offer(1); // 每次插入一个元素</div><div class="line">          notEmpty.signal();</div><div class="line">          System.out.println(&quot;向队列取中插入一个元素，队列剩余空间：&quot; + (queueSize - queue.size()));</div><div class="line">        &#125; finally &#123;</div><div class="line">          lock.unlock();</div><div class="line">        &#125;</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Xi Ning Wang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://osswangxining.github.io/parallel2/" title="Java并发编程(2)- Callable、Future和FutureTask | CountDownLatch、CyclicBarrier和Semaphore">https://osswangxining.github.io/parallel2/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/分布式/" rel="tag"># 分布式</a>
+          
+            <a href="/tags/Java并发编程/" rel="tag"># Java并发编程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/parallel1/" rel="prev" title="Java并发编程(1) - 同步/并发容器">
+                Java并发编程(1) - 同步/并发容器 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/bio.png"
+                alt="Xi Ning Wang" />
+            
+              <p class="site-author-name" itemprop="name">Xi Ning Wang</p>
+              <p class="site-description motion-element" itemprop="description">专注于分布式高性能技术架构、容器|K8S、IoT云平台，支持语言：Java(script) | Python | Golang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/osswangxining" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:osswangxining@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://plus.google.com/osswangxining" target="_blank" title="Google">
+                      
+                        <i class="fa fa-fw fa-google"></i>Google</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/osswangxining" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://istio.io" title="Istio" target="_blank">Istio</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://grpc.io/" title="gRPC" target="_blank">gRPC</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Callable、Future和FutureTask"><span class="nav-number">1.</span> <span class="nav-text">Callable、Future和FutureTask</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Callable"><span class="nav-number">1.1.</span> <span class="nav-text">Callable</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#示例"><span class="nav-number">1.1.1.</span> <span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Future"><span class="nav-number">1.2.</span> <span class="nav-text">Future</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#示例-1"><span class="nav-number">1.2.1.</span> <span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FutureTask"><span class="nav-number">1.3.</span> <span class="nav-text">FutureTask</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#示例-2"><span class="nav-number">1.3.1.</span> <span class="nav-text">示例</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CountDownLatch、CyclicBarrier和Semaphore"><span class="nav-number">2.</span> <span class="nav-text">CountDownLatch、CyclicBarrier和Semaphore</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#CountDownLatch"><span class="nav-number">2.1.</span> <span class="nav-text">CountDownLatch</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#示例-3"><span class="nav-number">2.1.1.</span> <span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CyclicBarrier"><span class="nav-number">2.2.</span> <span class="nav-text">CyclicBarrier</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#示例-4"><span class="nav-number">2.2.1.</span> <span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Semaphore"><span class="nav-number">2.3.</span> <span class="nav-text">Semaphore</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#示例-5"><span class="nav-number">2.3.1.</span> <span class="nav-text">示例</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#线程间协作"><span class="nav-number">3.</span> <span class="nav-text">线程间协作</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xi Ning Wang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=5.1.4"></script>
+
+
+</body>
+</html>

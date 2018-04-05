@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="分布式,架构设计," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="分布式配置管理 Consul | etcd Archaius动态管理 Kubernetes ConfigMap Kubernetes Secrets  配置的集中管理：采用consul的KV，将所有微服务的application.properties中的配置内容存入consul。 配置的动态管理：采用archaius，将consul上的配置信息读到spring的PropertySource和arc">
+<meta name="keywords" content="分布式,架构设计">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式系统架构设计">
+<meta property="og:url" content="https://osswangxining.github.io/README/index.html">
+<meta property="og:site_name" content="Technical Blog">
+<meta property="og:description" content="分布式配置管理 Consul | etcd Archaius动态管理 Kubernetes ConfigMap Kubernetes Secrets  配置的集中管理：采用consul的KV，将所有微服务的application.properties中的配置内容存入consul。 配置的动态管理：采用archaius，将consul上的配置信息读到spring的PropertySource和arc">
+<meta property="og:image" content="https://osswangxining.github.io/images/spring-config-server-client-bus.png">
+<meta property="og:updated_time" content="2018-04-05T08:58:11.412Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="分布式系统架构设计">
+<meta name="twitter:description" content="分布式配置管理 Consul | etcd Archaius动态管理 Kubernetes ConfigMap Kubernetes Secrets  配置的集中管理：采用consul的KV，将所有微服务的application.properties中的配置内容存入consul。 配置的动态管理：采用archaius，将consul上的配置信息读到spring的PropertySource和arc">
+<meta name="twitter:image" content="https://osswangxining.github.io/images/spring-config-server-client-bus.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://osswangxining.github.io/README/"/>
+
+
+
+
+
+  <title>分布式系统架构设计 | Technical Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Technical Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Welcome to my world! 有问题请osswangxining（at）163.com</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://osswangxining.github.io/README/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/bio.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">分布式系统架构设计</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-01T12:46:25+00:00">
+                2017-05-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式&云计算</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/分布式技术架构/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式技术架构</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="分布式配置管理"><a href="#分布式配置管理" class="headerlink" title="分布式配置管理"></a>分布式配置管理</h2><ul>
+<li><a href="/consul">Consul</a> | etcd</li>
+<li><a href="/archaius">Archaius动态管理</a></li>
+<li><a href="/kubernetes-configmap/">Kubernetes ConfigMap</a></li>
+<li><a href="/kubernetes-secrets/">Kubernetes Secrets</a></li>
+</ul>
+<p>配置的集中管理：采用consul的KV，将所有微服务的application.properties中的配置内容存入consul。</p>
+<p>配置的动态管理：采用archaius，将consul上的配置信息读到spring的PropertySource和archaius的PollResult中，当修改了配置信息后，经常改变的值通过DynamicFactory来获取，不经常改变的值可以通过其他方式获取. 大部分情况下，修改了consul上的配置信息后，相应的项目不需要重启，也会读到最新的值。<br><a id="more"></a></p>
+<h3 id="Spring-Cloud-Config"><a href="#Spring-Cloud-Config" class="headerlink" title="Spring Cloud Config"></a>Spring Cloud Config</h3><ul>
+<li>集中管理的需求：一个使用微服务架构的应用系统可能会包括成百上千个微服务，因此集中管理很有必要</li>
+<li>不同环境不同配置：例如数据源在不同的环境（开发，测试，生产）是不同的</li>
+<li>运行期间可以动态调整。例如根据各个微服务的负载状况，动态调整数据源连接池大小或者熔断阀值，并且调整时不停止微服务</li>
+<li>配置修改后可以自动更新</li>
+</ul>
+<p>Spring Cloud Config主要是为了分布式系统的外部配置提供了服务器端和客户端的支持，只要包括Config Server和Config Client两部分。由于Config Server和Config Client都实现了对Spring Environment和PropertySource抽象的映射，因此Spring Cloud Config很适合spring应用程序。</p>
+<ul>
+<li>Config Server: 是一个看横向扩展的，集中式的配置服务器，它用于集中管理应用程序各个环境下配置，默认使用Git存储配置内容。</li>
+<li>Config Client: 是一个Config Server的客户端，用于操作存储在Config Server上的配置属性，所有微服务都指向Config Server,启动的时候会请求它获取所需要的配置属性，然后缓存这些属性以提高性能。</li>
+</ul>
+<p>尽管使用/refresh 端点手动刷新配置，但是如果所有微服务节点的配置都需要手动去刷新的话，那必然是一个繁琐的工作，并且随着系统的不断扩张，会变得越来越难以维护。因此，实现配置的自动刷新是很有必要的，本节我们讨论使用Spring Cloud Bus实现配置的自动刷新。<br>Spring Cloud Bus提供了批量刷新配置的机制，它使用轻量级的消息代理（例如RabbitMQ、Kafka等）连接分布式系统的节点，这样就可以通过Spring Cloud Bus广播配置的变化或者其他的管理指令。<br><img src="/images/spring-config-server-client-bus.png" alt=""></p>
+<p>具体操作如下：</p>
+<ol>
+<li><p>启动RabiitMQ:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run -d -p 5671:5671 -p 5672:5672 -p 4369:4369 -p 25672:25672  --hostname my-rabbit --name myrabbit rabbitmq</div></pre></td></tr></table></figure>
+</li>
+<li><p>git clone spring-cloud-config, 我们使用了1.4.1.BUILD-SNAPSHOT；</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cd spring-cloud-config</div><div class="line">./mvnw install</div></pre></td></tr></table></figure>
+</li>
+<li><p>启动config server</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cd spring-cloud-config-server/</div><div class="line">../mvnw spring-boot:run</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>查看运行结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line">curl localhost:8888/foo/development |  python -m json.tool</div><div class="line">  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current</div><div class="line">                                 Dload  Upload   Total   Spent    Left  Speed</div><div class="line">100   708    0   708    0     0   1114      0 --:--:-- --:--:-- --:--:--  1114</div><div class="line">&#123;</div><div class="line">    &quot;label&quot;: null,</div><div class="line">    &quot;name&quot;: &quot;foo&quot;,</div><div class="line">    &quot;profiles&quot;: [</div><div class="line">        &quot;development&quot;</div><div class="line">    ],</div><div class="line">    &quot;propertySources&quot;: [</div><div class="line">        &#123;</div><div class="line">            &quot;name&quot;: &quot;https://github.com/spring-cloud-samples/config-repo/foo-development.properties&quot;,</div><div class="line">            &quot;source&quot;: &#123;</div><div class="line">                &quot;bar&quot;: &quot;spam&quot;,</div><div class="line">                &quot;foo&quot;: &quot;from foo development&quot;</div><div class="line">            &#125;</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">            &quot;name&quot;: &quot;https://github.com/spring-cloud-samples/config-repo/foo.properties&quot;,</div><div class="line">            &quot;source&quot;: &#123;</div><div class="line">                &quot;democonfigclient.message&quot;: &quot;hello spring io&quot;,</div><div class="line">                &quot;foo&quot;: &quot;from foo props&quot;</div><div class="line">            &#125;</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">            &quot;name&quot;: &quot;https://github.com/spring-cloud-samples/config-repo/application.yml&quot;,</div><div class="line">            &quot;source&quot;: &#123;</div><div class="line">                &quot;eureka.client.serviceUrl.defaultZone&quot;: &quot;http://localhost:8761/eureka/&quot;,</div><div class="line">                &quot;foo&quot;: &quot;baz&quot;,</div><div class="line">                &quot;info.description&quot;: &quot;Spring Cloud Samples&quot;,</div><div class="line">                &quot;info.url&quot;: &quot;https://github.com/spring-cloud-samples&quot;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    ],</div><div class="line">    &quot;state&quot;: null,</div><div class="line">    &quot;version&quot;: &quot;a611374438e75aa1b9808908c57833480944e1a8&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<ol>
+<li><p>运行spring-cloud-config-sample</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cd spring-cloud-config-sample</div><div class="line">../mvnw spring-boot:run</div></pre></td></tr></table></figure>
+<p>查看运行结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl localhost:8080/configprops</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>如果出现如下信息，则是需要修改security配置。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    &quot;timestamp&quot;: 1514452991317,</div><div class="line">    &quot;status&quot;: 401,</div><div class="line">    &quot;error&quot;: &quot;Unauthorized&quot;,</div><div class="line">    &quot;message&quot;: &quot;Full authentication is required to access this resource.&quot;,</div><div class="line">    &quot;path&quot;: &quot;/bus/refresh&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>在config client/server的yml文件添加：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">management:</div><div class="line">  context_path: /admin</div><div class="line">  security:</div><div class="line">    enabled: false</div></pre></td></tr></table></figure></p>
+<ol>
+<li>curl -X POST localhost:8888/admin/bus/refresh<br>一旦/bus/refresh被触发，config server会执行如下逻辑:<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">17:39:18.101  INFO 48866 --- [nio-8888-exec-9] s.c.a.AnnotationConfigApplicationContext : Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@5e4125d3: startup date [Thu Dec 28 17:39:18 CST 2017]; root of context hierarchy</div><div class="line">17:39:18.108  INFO 48866 --- [nio-8888-exec-9] o.s.c.c.s.e.NativeEnvironmentRepository  : Adding property source: file:/var/folders/zp/kmj0tf897hndh27m457zkzv40000gn/T/config-repo-4824252633476331455/bar.properties</div><div class="line">17:39:18.108  INFO 48866 --- [nio-8888-exec-9] o.s.c.c.s.e.NativeEnvironmentRepository  : Adding property source: file:/var/folders/zp/kmj0tf897hndh27m457zkzv40000gn/T/config-repo-4824252633476331455/application.yml</div><div class="line">17:39:18.108  INFO 48866 --- [nio-8888-exec-9] s.c.a.AnnotationConfigApplicationContext : Closing org.springframework.context.annotation.AnnotationConfigApplicationContext@5e4125d3: startup date [Thu Dec 28 17:39:18 CST 2017]; root of context hierarchy</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="服务注册与发现"><a href="#服务注册与发现" class="headerlink" title="服务注册与发现"></a>服务注册与发现</h2><ul>
+<li><a href="/consul/">Consul</a></li>
+<li>Eureka | Zookeeper | etcd <a href="/servicediscovery">对比</a></li>
+<li><a href="/kubernetes/#service">Kubernetes Service</a></li>
+</ul>
+<h2 id="分布式锁"><a href="#分布式锁" class="headerlink" title="分布式锁"></a>分布式锁</h2><ul>
+<li><a href="/distributed-lock/">分布式锁</a></li>
+</ul>
+<h2 id="负载平衡"><a href="#负载平衡" class="headerlink" title="负载平衡"></a>负载平衡</h2><ul>
+<li>Netflix Ribbon（Spring Cloud）</li>
+<li><p><a href="/kubernetes/#service">Kubernetes Service</a></p>
+<p><a href="/consul/">Client Side Load Balancing</a></p>
+</li>
+</ul>
+<h2 id="API网关与智能路由"><a href="#API网关与智能路由" class="headerlink" title="API网关与智能路由"></a>API网关与智能路由</h2><ul>
+<li>Netflix Zuul（SpringCloud）</li>
+<li><a href="/kubernetes/#service">Kubernetes Service</a></li>
+<li><p><a href="/kubernetes-ingress/">Kubernetes Ingress</a></p>
+<p><a href="/gateway/">Gateway</a></p>
+</li>
+</ul>
+<h2 id="分布式服务弹性与容错"><a href="#分布式服务弹性与容错" class="headerlink" title="分布式服务弹性与容错"></a>分布式服务弹性与容错</h2><ul>
+<li>弹性服务</li>
+<li>服务降级</li>
+<li>线程池/信号隔离</li>
+<li><p>快速解决依赖隔离</p>
+<p><a href="/Hystrix/">Hystrix架构设计</a></p>
+</li>
+</ul>
+<h2 id="日志管理"><a href="#日志管理" class="headerlink" title="日志管理"></a>日志管理</h2><ul>
+<li>ELK Stack（LogStash -&gt; ES -&gt; Kibana）</li>
+</ul>
+<h2 id="分布式跟踪"><a href="#分布式跟踪" class="headerlink" title="分布式跟踪"></a>分布式跟踪</h2><ul>
+<li>Zipkin</li>
+<li><p>SpringCloud Sleuth</p>
+<p><a href="/zipkin/">Zipkin</a> is a distributed tracing system. It helps gather timing data needed to troubleshoot latency problems in microservice architectures. It manages both the collection and lookup of this data. Zipkin’s design is based on the Google Dapper paper.</p>
+<p>Applications are instrumented to report timing data to Zipkin. The Zipkin UI also presents a Dependency diagram showing how many traced requests went through each application. If you are troubleshooting latency problems or errors, you can filter or sort all traces based on the application, length of trace, annotation, or timestamp. Once you select a trace, you can see the percentage of the total trace time each span takes which allows you to identify the problem application.</p>
+</li>
+</ul>
+<h2 id="监控与度量"><a href="#监控与度量" class="headerlink" title="监控与度量"></a>监控与度量</h2><ul>
+<li><p>Application/Infrastructure monitoring using StatsD + Graphite + Grafana</p>
+<p><a href="/sgg/">StatsD + Graphite + Grafana</a></p>
+</li>
+</ul>
+<h2 id="服务安全"><a href="#服务安全" class="headerlink" title="服务安全"></a>服务安全</h2><ul>
+<li>SpringCloud Security</li>
+</ul>
+<h2 id="Auto-Scaling"><a href="#Auto-Scaling" class="headerlink" title="Auto Scaling"></a>Auto Scaling</h2><ul>
+<li><a href="/kubernetes/#Autoscaling">Kubernetes Autoscaling</a></li>
+</ul>
+<h2 id="打包部署和调度部署"><a href="#打包部署和调度部署" class="headerlink" title="打包部署和调度部署"></a>打包部署和调度部署</h2><ul>
+<li>Spring Boot；</li>
+<li><a href="/kubernetes/#Deployment">Docker／Rkt、Kubernetes Scheduler&amp;Deployment</a></li>
+</ul>
+<h2 id="任务工作管理"><a href="#任务工作管理" class="headerlink" title="任务工作管理"></a>任务工作管理</h2><ul>
+<li>Spring Batch</li>
+<li><a href="/kubernetes/#Job">Kubernetes Jobs</a></li>
+</ul>
+<h2 id="分布式存储"><a href="#分布式存储" class="headerlink" title="分布式存储"></a>分布式存储</h2><h3 id="持久化-分布式文件系统"><a href="#持久化-分布式文件系统" class="headerlink" title="持久化 - 分布式文件系统"></a>持久化 - 分布式文件系统</h3><ul>
+<li><a href="/hdfs/">HDFS分布式文件系统</a></li>
+</ul>
+<h3 id="持久化-分布式数据库"><a href="#持久化-分布式数据库" class="headerlink" title="持久化 - 分布式数据库"></a>持久化 - 分布式数据库</h3><ul>
+<li>[传统关系型数据库集群,如MySQL Cluster]</li>
+<li><a href="/mongo/">Mongo</a></li>
+<li><a href="/hbase/">Cassandra,HBase</a></li>
+</ul>
+<h3 id="非持久化-分布式缓存-消息系统"><a href="#非持久化-分布式缓存-消息系统" class="headerlink" title="非持久化 - 分布式缓存/消息系统"></a>非持久化 - 分布式缓存/消息系统</h3><ul>
+<li><a href="/kafka/">Kafka</a></li>
+<li>[Redis]</li>
+</ul>
+<h2 id="分布式计算框架"><a href="#分布式计算框架" class="headerlink" title="分布式计算框架"></a>分布式计算框架</h2><ul>
+<li><a href="/yarn/">YARN分布式计算框架</a></li>
+<li><a href="/yarn-appdev/">YARN应用开发的几种方式</a></li>
+<li><a href="/running-spark-on-yarn/">Running Spark on YARN</a></li>
+<li><a href="/spark/">Spark Big Data Analytics</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Xi Ning Wang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://osswangxining.github.io/README/" title="分布式系统架构设计">https://osswangxining.github.io/README/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/分布式/" rel="tag"># 分布式</a>
+          
+            <a href="/tags/架构设计/" rel="tag"># 架构设计</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/sgg/" rel="next" title="StatsD - Graphite - Grafana">
+                <i class="fa fa-chevron-left"></i> StatsD - Graphite - Grafana
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/distributed-lock/" rel="prev" title="分布式锁">
+                分布式锁 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/bio.png"
+                alt="Xi Ning Wang" />
+            
+              <p class="site-author-name" itemprop="name">Xi Ning Wang</p>
+              <p class="site-description motion-element" itemprop="description">专注于分布式高性能技术架构、容器|K8S、IoT云平台，支持语言：Java(script) | Python | Golang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/osswangxining" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:osswangxining@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://plus.google.com/osswangxining" target="_blank" title="Google">
+                      
+                        <i class="fa fa-fw fa-google"></i>Google</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/osswangxining" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://istio.io" title="Istio" target="_blank">Istio</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://grpc.io/" title="gRPC" target="_blank">gRPC</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式配置管理"><span class="nav-number">1.</span> <span class="nav-text">分布式配置管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Spring-Cloud-Config"><span class="nav-number">1.1.</span> <span class="nav-text">Spring Cloud Config</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务注册与发现"><span class="nav-number">2.</span> <span class="nav-text">服务注册与发现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式锁"><span class="nav-number">3.</span> <span class="nav-text">分布式锁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#负载平衡"><span class="nav-number">4.</span> <span class="nav-text">负载平衡</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#API网关与智能路由"><span class="nav-number">5.</span> <span class="nav-text">API网关与智能路由</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式服务弹性与容错"><span class="nav-number">6.</span> <span class="nav-text">分布式服务弹性与容错</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#日志管理"><span class="nav-number">7.</span> <span class="nav-text">日志管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式跟踪"><span class="nav-number">8.</span> <span class="nav-text">分布式跟踪</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#监控与度量"><span class="nav-number">9.</span> <span class="nav-text">监控与度量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务安全"><span class="nav-number">10.</span> <span class="nav-text">服务安全</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Auto-Scaling"><span class="nav-number">11.</span> <span class="nav-text">Auto Scaling</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#打包部署和调度部署"><span class="nav-number">12.</span> <span class="nav-text">打包部署和调度部署</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#任务工作管理"><span class="nav-number">13.</span> <span class="nav-text">任务工作管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式存储"><span class="nav-number">14.</span> <span class="nav-text">分布式存储</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#持久化-分布式文件系统"><span class="nav-number">14.1.</span> <span class="nav-text">持久化 - 分布式文件系统</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#持久化-分布式数据库"><span class="nav-number">14.2.</span> <span class="nav-text">持久化 - 分布式数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#非持久化-分布式缓存-消息系统"><span class="nav-number">14.3.</span> <span class="nav-text">非持久化 - 分布式缓存/消息系统</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式计算框架"><span class="nav-number">15.</span> <span class="nav-text">分布式计算框架</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xi Ning Wang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=5.1.4"></script>
+
+
+</body>
+</html>

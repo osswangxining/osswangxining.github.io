@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Kubernetes,container,容器,Terraform," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="图片来自https://pixabay.com TerraformTerraform 是一个 IT 基础架构自动化编排工具，它的口号是 “Write, Plan, and create Infrastructure as Code”, 基础架构即代码。具体的说就是可以用代码来管理维护 IT 资源，并且在真正运行之前可以看到执行计划(即dryrun)。由于状态保存到文件中，因此能够离线方式查看资源情">
+<meta name="keywords" content="Kubernetes,container,容器,Terraform">
+<meta property="og:type" content="article">
+<meta property="og:title" content="写一个Terraform Provider">
+<meta property="og:url" content="https://osswangxining.github.io/writing-custom-terraform-provider/index.html">
+<meta property="og:site_name" content="Technical Blog">
+<meta property="og:description" content="图片来自https://pixabay.com TerraformTerraform 是一个 IT 基础架构自动化编排工具，它的口号是 “Write, Plan, and create Infrastructure as Code”, 基础架构即代码。具体的说就是可以用代码来管理维护 IT 资源，并且在真正运行之前可以看到执行计划(即dryrun)。由于状态保存到文件中，因此能够离线方式查看资源情">
+<meta property="og:image" content="https://raw.githubusercontent.com/osswangxining/myimages/master/devops-3148393_1920.png">
+<meta property="og:updated_time" content="2018-04-05T08:58:11.416Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="写一个Terraform Provider">
+<meta name="twitter:description" content="图片来自https://pixabay.com TerraformTerraform 是一个 IT 基础架构自动化编排工具，它的口号是 “Write, Plan, and create Infrastructure as Code”, 基础架构即代码。具体的说就是可以用代码来管理维护 IT 资源，并且在真正运行之前可以看到执行计划(即dryrun)。由于状态保存到文件中，因此能够离线方式查看资源情">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/osswangxining/myimages/master/devops-3148393_1920.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://osswangxining.github.io/writing-custom-terraform-provider/"/>
+
+
+
+
+
+  <title>写一个Terraform Provider | Technical Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Technical Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Welcome to my world! 有问题请osswangxining（at）163.com</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://osswangxining.github.io/writing-custom-terraform-provider/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/bio.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">写一个Terraform Provider</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-17T12:46:25+00:00">
+                2018-03-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式&云计算</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="https://raw.githubusercontent.com/osswangxining/myimages/master/devops-3148393_1920.png" alt=""><br>图片来自<a href="https://pixabay.com" target="_blank" rel="external">https://pixabay.com</a></p>
+<h2 id="Terraform"><a href="#Terraform" class="headerlink" title="Terraform"></a>Terraform</h2><p>Terraform 是一个 IT 基础架构自动化编排工具，它的口号是 “Write, Plan, and create Infrastructure as Code”, 基础架构即代码。具体的说就是可以用代码来管理维护 IT 资源，并且在真正运行之前可以看到执行计划(即dryrun)。由于状态保存到文件中，因此能够离线方式查看资源情况 – 当然，前提是不要在 Terraform 之外对资源进行修改。</p>
+<p>Terraform 是一个高度可扩展的工具，通过 Provider 来支持新的基础架构，譬如本文中介绍的用于支持Kafka topic管理的provider。</p>
+<h2 id="Writing-a-Terraform-provider"><a href="#Writing-a-Terraform-provider" class="headerlink" title="Writing a Terraform provider"></a>Writing a Terraform provider</h2><p>怎么编写一个定制的Terraform provider, 官方网站给出了一定的开发指导，但略感简单。本文试图从零开始整理一遍整个开发的过程以及涉及的一些关键点。</p>
+<p>一个Terraform provider最基本的两个要素就是provider本身以及所涉及到的resource。<br><a id="more"></a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">provider &quot;kafka&quot; &#123;</div><div class="line">  bootstrap_servers = [&quot;localhost:9092&quot;]</div><div class="line">&#125;</div><div class="line"></div><div class="line">resource &quot;kafka_topic&quot; &quot;my_test_topic&quot; &#123;</div><div class="line">  name               = &quot;my_test_topic&quot;</div><div class="line">  replication_factor = 1</div><div class="line">  partitions         = 1</div><div class="line"></div><div class="line">  config = &#123;</div><div class="line">    &quot;segment.ms&quot;   = &quot;4000&quot;</div><div class="line">    &quot;retention.ms&quot; = &quot;86400000&quot;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="Project-Structure"><a href="#Project-Structure" class="headerlink" title="Project Structure"></a>Project Structure</h2><p>目前官方内建了60多个Provider，你可以从中看到一个基本的Terraform provider大致会有以下几个部分组成：</p>
+<ul>
+<li>provider.go : Implement the “core” of the Provider.</li>
+<li>config.go : Configure the API client with the credentials from the Provider.</li>
+<li>resource_<resource_name>.go : Implement a specific resource handler with the CRUD functions.</resource_name></li>
+<li>import_<resource_name>.go : Make possible to import existing resources.</resource_name></li>
+<li>data<em>source</em><resource_name>.go : Used to fetch data from outside of Terraform to be used in other resources.</resource_name></li>
+</ul>
+<p>当然，这些部分也不是必须的，例如import_<resource_name>.go，data<em>source</em><resource_name>.go等在本文的例子中就没有用到。具体还是取决于你要实现的Provider逻辑本身。</resource_name></resource_name></p>
+<h2 id="The-provider"><a href="#The-provider" class="headerlink" title="The provider"></a>The provider</h2><p>实现一个Terraform provider,首先需要做的就是实现一个 <a href="https://godoc.org/github.com/hashicorp/terraform/helper/schema#Provider" target="_blank" rel="external">terraform.ResourceProvider</a></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// File : provider.go</span></div><div class="line"><span class="keyword">package</span> kafka</div><div class="line"></div><div class="line"><span class="keyword">import</span> (</div><div class="line">  <span class="string">"github.com/hashicorp/terraform/helper/schema"</span></div><div class="line">  <span class="string">"github.com/hashicorp/terraform/terraform"</span></div><div class="line">)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">Provider</span><span class="params">()</span> <span class="title">terraform</span>.<span class="title">ResourceProvider</span></span> &#123;</div><div class="line">  <span class="keyword">return</span> &amp;schema.Provider&#123;</div><div class="line">    Schema: <span class="keyword">map</span>[<span class="keyword">string</span>]*schema.Schema&#123; &#125;,</div><div class="line">    ResourcesMap: <span class="keyword">map</span>[<span class="keyword">string</span>]*schema.Resource&#123; &#125;,</div><div class="line">    ConfigureFunc: providerConfigure,</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">providerConfigure</span><span class="params">(d *schema.ResourceData)</span> <span class="params">(<span class="keyword">interface</span>&#123;&#125;, error)</span></span> &#123;</div><div class="line">  <span class="keyword">return</span> <span class="literal">nil</span>, <span class="literal">nil</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>如上述代码所示，函数Provider()会返回一个带有必要configuration的terraform.ResourceProvider：</p>
+<ul>
+<li>Schema: provider所需的参数列表，map类型；</li>
+<li>ResourcesMap：provider所管理的resource；</li>
+<li>ConfigureFunc：提供了实例化、配置客户端API调用的函数；</li>
+</ul>
+<p>相应地，我们提供了一个provider测试的如下代码：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// File : provider_test.go</span></div><div class="line"><span class="keyword">package</span> kafka</div><div class="line"></div><div class="line"><span class="keyword">import</span> (</div><div class="line">	<span class="string">"testing"</span></div><div class="line"></div><div class="line">	<span class="string">"github.com/hashicorp/terraform/helper/schema"</span></div><div class="line">	<span class="string">"github.com/hashicorp/terraform/terraform"</span></div><div class="line">)</div><div class="line"></div><div class="line"><span class="keyword">var</span> testAccProvider *schema.Provider</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> &#123;</div><div class="line">	testAccProvider = Provider().(*schema.Provider)</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestProvider</span><span class="params">(t *testing.T)</span></span> &#123;</div><div class="line">	<span class="keyword">if</span> err := Provider().(*schema.Provider).InternalValidate(); err != <span class="literal">nil</span> &#123;</div><div class="line">		t.Fatalf(<span class="string">"err: %s"</span>, err)</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestProvider_impl</span><span class="params">(t *testing.T)</span></span> &#123;</div><div class="line">	<span class="keyword">var</span> _ terraform.ResourceProvider = Provider()</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">testAccPreCheck</span><span class="params">(t *testing.T)</span></span> &#123;</div><div class="line">	<span class="comment">// We will use this function later on to make sure our test environment is valid.</span></div><div class="line">	<span class="comment">// For example, you can make sure here that some environment variables are set.</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>运行一下看看，是不是如下的结果。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:kafka xiningwang$ go test -v</div><div class="line">=== RUN   TestProvider</div><div class="line">--- PASS: TestProvider (0.00s)</div><div class="line">=== RUN   TestProvider_impl</div><div class="line">--- PASS: TestProvider_impl (0.00s)</div><div class="line">PASS</div><div class="line">ok      github.com/terraform-providers/terraform-provider-kafka/kafka   0.020s</div></pre></td></tr></table></figure>
+<h3 id="Schema"><a href="#Schema" class="headerlink" title="Schema"></a>Schema</h3><p>我们的例子中Schema定义了2个变量，分别是TypeList类型的bootstrap_servers和TypeInt类型的timeout。<br>其中，前者是required,后者则是optional.</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">Schema: <span class="keyword">map</span>[<span class="keyword">string</span>]*schema.Schema&#123;</div><div class="line">	<span class="string">"bootstrap_servers"</span>: &amp;schema.Schema&#123;</div><div class="line">		Type:        schema.TypeList,</div><div class="line">		Elem:        &amp;schema.Schema&#123;Type: schema.TypeString&#125;,</div><div class="line">		Required:    <span class="literal">true</span>,</div><div class="line">		Description: <span class="string">"The list of kafka brokers"</span>,</div><div class="line">	&#125;,</div><div class="line">	<span class="string">"timeout"</span>: &amp;schema.Schema&#123;</div><div class="line">		Type:        schema.TypeInt,</div><div class="line">		Required:    <span class="literal">false</span>,</div><div class="line">		Optional:    <span class="literal">true</span>,</div><div class="line">		Default:     <span class="number">90</span>,</div><div class="line">		Description: <span class="string">"Timeout in seconds"</span>,</div><div class="line">	&#125;,</div><div class="line">&#125;,</div></pre></td></tr></table></figure>
+<h3 id="providerConfigure"><a href="#providerConfigure" class="headerlink" title="providerConfigure"></a>providerConfigure</h3><p>接下来，就是获取Schema中定义的变量值，创建管理resource的Client API.</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">providerConfigure</span><span class="params">(d *schema.ResourceData)</span> <span class="params">(<span class="keyword">interface</span>&#123;&#125;, error)</span></span> &#123;</div><div class="line">	<span class="keyword">var</span> brokers *[]<span class="keyword">string</span></div><div class="line"></div><div class="line">	<span class="keyword">if</span> brokersRaw, ok := d.GetOk(<span class="string">"bootstrap_servers"</span>); ok &#123;</div><div class="line">		brokerI := brokersRaw.([]<span class="keyword">interface</span>&#123;&#125;)</div><div class="line">		log.Printf(<span class="string">"[DEBUG] configuring provider with Brokers of size %d"</span>, <span class="built_in">len</span>(brokerI))</div><div class="line">		b := <span class="built_in">make</span>([]<span class="keyword">string</span>, <span class="built_in">len</span>(brokerI))</div><div class="line">		<span class="keyword">for</span> i, v := <span class="keyword">range</span> brokerI &#123;</div><div class="line">			b[i] = v.(<span class="keyword">string</span>)</div><div class="line">		&#125;</div><div class="line">		log.Printf(<span class="string">"[DEBUG] b of size %d"</span>, <span class="built_in">len</span>(b))</div><div class="line">		brokers = &amp;b</div><div class="line">	&#125; <span class="keyword">else</span> &#123;</div><div class="line">		log.Printf(<span class="string">"[ERROR] something wrong? %v , "</span>, d.Get(<span class="string">"timeout"</span>))</div><div class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, fmt.Errorf(<span class="string">"brokers was not set"</span>)</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	log.Printf(<span class="string">"[DEBUG] configuring provider with Brokers @ %v"</span>, brokers)</div><div class="line">	timeout := d.Get(<span class="string">"timeout"</span>).(<span class="keyword">int</span>)</div><div class="line"></div><div class="line">	config := &amp;Config&#123;</div><div class="line">		BootstrapServers: brokers,</div><div class="line">		Timeout:          timeout,</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	log.Printf(<span class="string">"[DEBUG] Config @ %v"</span>, config)</div><div class="line"></div><div class="line">	<span class="keyword">return</span> NewClient(config)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="Resource"><a href="#Resource" class="headerlink" title="Resource"></a>Resource</h2><p>当然，Terraform Provider最精彩的部分其实是resource的CRUD逻辑，也就是这个部分要讲述的内容。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> kafka</div><div class="line"></div><div class="line"><span class="keyword">import</span> (</div><div class="line">	<span class="string">"fmt"</span></div><div class="line">	<span class="string">"log"</span></div><div class="line">	<span class="string">"time"</span></div><div class="line"></div><div class="line">	<span class="string">"github.com/hashicorp/terraform/helper/resource"</span></div><div class="line">	<span class="string">"github.com/hashicorp/terraform/helper/schema"</span></div><div class="line">)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">resourceKafkaTopic</span><span class="params">()</span> *<span class="title">schema</span>.<span class="title">Resource</span></span> &#123;</div><div class="line">	<span class="keyword">return</span> &amp;schema.Resource&#123;</div><div class="line">		Create: topicCreate,</div><div class="line">		Read:   topicRead,</div><div class="line">		Update: topicUpdate,</div><div class="line">		Delete: topicDelete,</div><div class="line">		Importer: &amp;schema.ResourceImporter&#123;</div><div class="line">			State: schema.ImportStatePassthrough,</div><div class="line">		&#125;,</div><div class="line">		CustomizeDiff: customPartitionDiff,</div><div class="line">		Schema: <span class="keyword">map</span>[<span class="keyword">string</span>]*schema.Schema&#123;</div><div class="line">			<span class="string">"name"</span>: &#123;</div><div class="line">				Type:        schema.TypeString,</div><div class="line">				Required:    <span class="literal">true</span>,</div><div class="line">				ForceNew:    <span class="literal">true</span>,</div><div class="line">				Description: <span class="string">"The name of the topic"</span>,</div><div class="line">			&#125;,</div><div class="line">			<span class="string">"partitions"</span>: &#123;</div><div class="line">				Type:        schema.TypeInt,</div><div class="line">				Required:    <span class="literal">true</span>,</div><div class="line">				Description: <span class="string">"number of partitions"</span>,</div><div class="line">			&#125;,</div><div class="line">			<span class="string">"replication_factor"</span>: &#123;</div><div class="line">				Type:        schema.TypeInt,</div><div class="line">				Required:    <span class="literal">true</span>,</div><div class="line">				ForceNew:    <span class="literal">true</span>,</div><div class="line">				Description: <span class="string">"number of replicas"</span>,</div><div class="line">			&#125;,</div><div class="line">			<span class="string">"config"</span>: &#123;</div><div class="line">				Type:        schema.TypeMap,</div><div class="line">				Optional:    <span class="literal">true</span>,</div><div class="line">				ForceNew:    <span class="literal">false</span>,</div><div class="line">				Description: <span class="string">"A map of string k/v attributes"</span>,</div><div class="line">			&#125;,</div><div class="line">		&#125;,</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中，</p>
+<ul>
+<li>里面最关键的逻辑就是CRUD部分，它会调用Kafka Go SDK API来管理topic；</li>
+<li>Schema部分使用逻辑跟上述provider中使用Schema的方式是一样的，里面定义的变量是跟你最终定义terraform tf文件的结果保持一致的。例如，我们例子中的sample文件：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">resource &quot;kafka_topic&quot; &quot;my_test_topic&quot; &#123;</div><div class="line">  name               = &quot;my_test_topic&quot;</div><div class="line">  replication_factor = 1</div><div class="line">  partitions         = 1</div><div class="line"></div><div class="line">  config = &#123;</div><div class="line">    &quot;segment.ms&quot;   = &quot;4000&quot;</div><div class="line">    &quot;retention.ms&quot; = &quot;86400000&quot;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="编译与运行"><a href="#编译与运行" class="headerlink" title="编译与运行"></a>编译与运行</h2><p>创建main.go,如下:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> main</div><div class="line"></div><div class="line"><span class="keyword">import</span> (</div><div class="line">	<span class="string">"github.com/hashicorp/terraform/plugin"</span></div><div class="line">	<span class="string">"github.com/terraform-providers/terraform-provider-kafka/kafka"</span></div><div class="line">)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</div><div class="line">	plugin.Serve(&amp;plugin.ServeOpts&#123;</div><div class="line">		ProviderFunc: kafka.Provider&#125;)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>编译：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">go build -o terraform-provider-kafka</div></pre></td></tr></table></figure>
+<h2 id="源代码-amp-TODO"><a href="#源代码-amp-TODO" class="headerlink" title="源代码 &amp; TODO"></a>源代码 &amp; TODO</h2><p>到这儿你可能已经明白了如何搭建一个定制的Terraform Provider, 我想你也一定认为一个provider的复杂逻辑其实是取决于你要管理的resource的CRUD的逻辑。<br>本文中的resource是指kafka中的topic，逻辑不是很复杂，但一点我们没有提及的是security - 也就是说，如果kafka enable了ssl，那么管理topic的client API也需要相应地加上credential信息。</p>
+<p>最后，完整的源代码@ <a href="https://github.com/osswangxining/terraform-provider-kafka" target="_blank" rel="external">https://github.com/osswangxining/terraform-provider-kafka</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Xi Ning Wang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://osswangxining.github.io/writing-custom-terraform-provider/" title="写一个Terraform Provider">https://osswangxining.github.io/writing-custom-terraform-provider/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Kubernetes/" rel="tag"># Kubernetes</a>
+          
+            <a href="/tags/container/" rel="tag"># container</a>
+          
+            <a href="/tags/容器/" rel="tag"># 容器</a>
+          
+            <a href="/tags/Terraform/" rel="tag"># Terraform</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/envoy/" rel="next" title="巧用Envoy+Docker打造轻量级Sidecar代理">
+                <i class="fa fa-chevron-left"></i> 巧用Envoy+Docker打造轻量级Sidecar代理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/nginx-grpc/" rel="prev" title="Service Mesh利器：NGINX+gRPC">
+                Service Mesh利器：NGINX+gRPC <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/bio.png"
+                alt="Xi Ning Wang" />
+            
+              <p class="site-author-name" itemprop="name">Xi Ning Wang</p>
+              <p class="site-description motion-element" itemprop="description">专注于分布式高性能技术架构、容器|K8S、IoT云平台，支持语言：Java(script) | Python | Golang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/osswangxining" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:osswangxining@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://plus.google.com/osswangxining" target="_blank" title="Google">
+                      
+                        <i class="fa fa-fw fa-google"></i>Google</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/osswangxining" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://istio.io" title="Istio" target="_blank">Istio</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://grpc.io/" title="gRPC" target="_blank">gRPC</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Terraform"><span class="nav-number">1.</span> <span class="nav-text">Terraform</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Writing-a-Terraform-provider"><span class="nav-number">2.</span> <span class="nav-text">Writing a Terraform provider</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Project-Structure"><span class="nav-number">3.</span> <span class="nav-text">Project Structure</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#The-provider"><span class="nav-number">4.</span> <span class="nav-text">The provider</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Schema"><span class="nav-number">4.1.</span> <span class="nav-text">Schema</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#providerConfigure"><span class="nav-number">4.2.</span> <span class="nav-text">providerConfigure</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Resource"><span class="nav-number">5.</span> <span class="nav-text">Resource</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译与运行"><span class="nav-number">6.</span> <span class="nav-text">编译与运行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#源代码-amp-TODO"><span class="nav-number">7.</span> <span class="nav-text">源代码 & TODO</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xi Ning Wang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=5.1.4"></script>
+
+
+</body>
+</html>

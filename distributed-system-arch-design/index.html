@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="分布式,架构设计," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="基于之前的版本更新. 如何有效设计分布式系统结合实例分享分布式系统架构设计的经验">
+<meta name="keywords" content="分布式,架构设计">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式系统架构设计">
+<meta property="og:url" content="https://osswangxining.github.io/distributed-system-arch-design/index.html">
+<meta property="og:site_name" content="Technical Blog">
+<meta property="og:description" content="基于之前的版本更新. 如何有效设计分布式系统结合实例分享分布式系统架构设计的经验">
+<meta property="og:image" content="https://osswangxining.github.io/images/distributed-arch-design.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/spring-config-server-client-bus.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/gateway-filters.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/distributed-tracing.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/elk.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/statsd-graphite-grafana.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/service-resillence.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/rate-limiter.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/distributed-transaction-1.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/distributed-transaction-2.png">
+<meta property="og:image" content="https://osswangxining.github.io/images/distributed-lock.png">
+<meta property="og:updated_time" content="2018-04-05T08:58:11.412Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="分布式系统架构设计">
+<meta name="twitter:description" content="基于之前的版本更新. 如何有效设计分布式系统结合实例分享分布式系统架构设计的经验">
+<meta name="twitter:image" content="https://osswangxining.github.io/images/distributed-arch-design.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://osswangxining.github.io/distributed-system-arch-design/"/>
+
+
+
+
+
+  <title>分布式系统架构设计 | Technical Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Technical Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Welcome to my world! 有问题请osswangxining（at）163.com</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://osswangxining.github.io/distributed-system-arch-design/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/bio.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">分布式系统架构设计</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-01T12:46:25+00:00">
+                2018-01-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式&云计算</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/分布式-云计算/分布式技术架构/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式技术架构</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>基于之前的<a href="/README">版本</a>更新.</p>
+<h2 id="如何有效设计分布式系统"><a href="#如何有效设计分布式系统" class="headerlink" title="如何有效设计分布式系统"></a>如何有效设计分布式系统</h2><p>结合实例分享分布式系统架构设计的经验</p>
+<p><img src="/images/distributed-arch-design.png" alt=""></p>
+<a id="more"></a>
+<h2 id="分布式配置管理"><a href="#分布式配置管理" class="headerlink" title="分布式配置管理"></a>分布式配置管理</h2><ul>
+<li><a href="/consul">Consul</a> | etcd</li>
+<li><a href="/archaius">Archaius动态管理</a></li>
+<li><a href="/kubernetes-configmap/">Kubernetes ConfigMap</a></li>
+<li><a href="/kubernetes-secrets/">Kubernetes Secrets</a></li>
+</ul>
+<p>配置的集中管理：采用consul的KV，将所有微服务的application.properties中的配置内容存入consul。</p>
+<p>配置的动态管理：采用archaius，将consul上的配置信息读到spring的PropertySource和archaius的PollResult中，当修改了配置信息后，经常改变的值通过DynamicFactory来获取，不经常改变的值可以通过其他方式获取. 大部分情况下，修改了consul上的配置信息后，相应的项目不需要重启，也会读到最新的值。</p>
+<h3 id="Spring-Cloud-Config"><a href="#Spring-Cloud-Config" class="headerlink" title="Spring Cloud Config"></a>Spring Cloud Config</h3><ul>
+<li>集中管理的需求：一个使用微服务架构的应用系统可能会包括成百上千个微服务，因此集中管理很有必要</li>
+<li>不同环境不同配置：例如数据源在不同的环境（开发，测试，生产）是不同的</li>
+<li>运行期间可以动态调整。例如根据各个微服务的负载状况，动态调整数据源连接池大小或者熔断阀值，并且调整时不停止微服务</li>
+<li>配置修改后可以自动更新</li>
+</ul>
+<p>Spring Cloud Config主要是为了分布式系统的外部配置提供了服务器端和客户端的支持，只要包括Config Server和Config Client两部分。由于Config Server和Config Client都实现了对Spring Environment和PropertySource抽象的映射，因此Spring Cloud Config很适合spring应用程序。</p>
+<ul>
+<li>Config Server: 是一个看横向扩展的，集中式的配置服务器，它用于集中管理应用程序各个环境下配置，默认使用Git存储配置内容。</li>
+<li>Config Client: 是一个Config Server的客户端，用于操作存储在Config Server上的配置属性，所有微服务都指向Config Server,启动的时候会请求它获取所需要的配置属性，然后缓存这些属性以提高性能。</li>
+</ul>
+<p>尽管使用/refresh 端点手动刷新配置，但是如果所有微服务节点的配置都需要手动去刷新的话，那必然是一个繁琐的工作，并且随着系统的不断扩张，会变得越来越难以维护。因此，实现配置的自动刷新是很有必要的，Spring Cloud Bus实现配置的自动刷新机制是一旦接收到RefreshEvent，就会启动ContextRefresher.refresh。</p>
+<h4 id="RefreshEventListener"><a href="#RefreshEventListener" class="headerlink" title="RefreshEventListener"></a>RefreshEventListener</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">public class RefreshEventListener &#123;</div><div class="line">	private static Log log = LogFactory.getLog(RefreshEventListener.class);</div><div class="line">	private ContextRefresher refresh;</div><div class="line">	private AtomicBoolean ready = new AtomicBoolean(false);</div><div class="line"></div><div class="line">	public RefreshEventListener(ContextRefresher refresh) &#123;</div><div class="line">		this.refresh = refresh;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@EventListener</div><div class="line">	public void handle(ApplicationReadyEvent event) &#123;</div><div class="line">		this.ready.compareAndSet(false, true);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	@EventListener</div><div class="line">	public void handle(RefreshEvent event) &#123;</div><div class="line">		if (this.ready.get()) &#123; // don&apos;t handle events before app is ready</div><div class="line">			log.debug(&quot;Event received &quot; + event.getEventDesc());</div><div class="line">			Set&lt;String&gt; keys = this.refresh.refresh();</div><div class="line">			log.info(&quot;Refresh keys changed: &quot; + keys);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Spring Cloud Bus提供了批量刷新配置的机制，它使用轻量级的消息代理（例如RabbitMQ、Kafka等）连接分布式系统的节点，这样就可以通过Spring Cloud Bus广播配置的变化或者其他的管理指令。<br><img src="/images/spring-config-server-client-bus.png" alt=""></p>
+<p>代码可以参考： <a href="https://github.com/osswangxining/spring-cloud-config/tree/1.4.x" target="_blank" rel="external">https://github.com/osswangxining/spring-cloud-config/tree/1.4.x</a></p>
+<p>具体操作如下：</p>
+<h4 id="启动RabiitMQ-作为Spring-Cloud-Bus，也可以选择Kafka"><a href="#启动RabiitMQ-作为Spring-Cloud-Bus，也可以选择Kafka" class="headerlink" title="启动RabiitMQ (作为Spring Cloud Bus，也可以选择Kafka):"></a>启动RabiitMQ (作为Spring Cloud Bus，也可以选择Kafka):</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run -d -p 5671:5671 -p 5672:5672 -p 4369:4369 -p 25672:25672  --hostname my-rabbit --name myrabbit rabbitmq</div></pre></td></tr></table></figure>
+<h4 id="git-clone-spring-cloud-config-我使用了1-4-1-BUILD-SNAPSHOT；注意，2-x开始spring-cloud-bus均有变化，截止目前版本还不稳定。"><a href="#git-clone-spring-cloud-config-我使用了1-4-1-BUILD-SNAPSHOT；注意，2-x开始spring-cloud-bus均有变化，截止目前版本还不稳定。" class="headerlink" title="git clone spring-cloud-config, 我使用了1.4.1.BUILD-SNAPSHOT；注意，2.x开始spring-cloud-bus均有变化，截止目前版本还不稳定。"></a>git clone spring-cloud-config, 我使用了1.4.1.BUILD-SNAPSHOT；注意，2.x开始spring-cloud-bus均有变化，截止目前版本还不稳定。</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cd spring-cloud-config</div><div class="line">./mvnw install</div></pre></td></tr></table></figure>
+<h4 id="启动config-server"><a href="#启动config-server" class="headerlink" title="启动config server"></a>启动config server</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cd spring-cloud-config-server/</div><div class="line">../mvnw spring-boot:run</div></pre></td></tr></table></figure>
+<p>如果启动多个config server, 可以通过修改端口实现：-Dserver.port=9999</p>
+<p>查看运行结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line">curl localhost:8888/foo/development |  python -m json.tool</div><div class="line">  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current</div><div class="line">                                 Dload  Upload   Total   Spent    Left  Speed</div><div class="line">100   708    0   708    0     0   1114      0 --:--:-- --:--:-- --:--:--  1114</div><div class="line">&#123;</div><div class="line">    &quot;label&quot;: null,</div><div class="line">    &quot;name&quot;: &quot;foo&quot;,</div><div class="line">    &quot;profiles&quot;: [</div><div class="line">        &quot;development&quot;</div><div class="line">    ],</div><div class="line">    &quot;propertySources&quot;: [</div><div class="line">        &#123;</div><div class="line">            &quot;name&quot;: &quot;https://github.com/spring-cloud-samples/config-repo/foo-development.properties&quot;,</div><div class="line">            &quot;source&quot;: &#123;</div><div class="line">                &quot;bar&quot;: &quot;spam&quot;,</div><div class="line">                &quot;foo&quot;: &quot;from foo development&quot;</div><div class="line">            &#125;</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">            &quot;name&quot;: &quot;https://github.com/spring-cloud-samples/config-repo/foo.properties&quot;,</div><div class="line">            &quot;source&quot;: &#123;</div><div class="line">                &quot;democonfigclient.message&quot;: &quot;hello spring io&quot;,</div><div class="line">                &quot;foo&quot;: &quot;from foo props&quot;</div><div class="line">            &#125;</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">            &quot;name&quot;: &quot;https://github.com/spring-cloud-samples/config-repo/application.yml&quot;,</div><div class="line">            &quot;source&quot;: &#123;</div><div class="line">                &quot;eureka.client.serviceUrl.defaultZone&quot;: &quot;http://localhost:8761/eureka/&quot;,</div><div class="line">                &quot;foo&quot;: &quot;baz&quot;,</div><div class="line">                &quot;info.description&quot;: &quot;Spring Cloud Samples&quot;,</div><div class="line">                &quot;info.url&quot;: &quot;https://github.com/spring-cloud-samples&quot;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    ],</div><div class="line">    &quot;state&quot;: null,</div><div class="line">    &quot;version&quot;: &quot;a611374438e75aa1b9808908c57833480944e1a8&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="运行spring-cloud-config-sample"><a href="#运行spring-cloud-config-sample" class="headerlink" title="运行spring-cloud-config-sample"></a>运行spring-cloud-config-sample</h4><p>如果config server启用了HA，例如通过nginx做负载均衡，那么bootstrap.yml文件中的spring.cloud.config.uri应该指向nginx暴露的地址。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cd spring-cloud-config-sample</div><div class="line">../mvnw spring-boot:run</div></pre></td></tr></table></figure>
+<p>查看运行结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl localhost:8080/configprops</div></pre></td></tr></table></figure></p>
+<p>如果出现如下信息，则是需要修改security配置。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    &quot;timestamp&quot;: 1514452991317,</div><div class="line">    &quot;status&quot;: 401,</div><div class="line">    &quot;error&quot;: &quot;Unauthorized&quot;,</div><div class="line">    &quot;message&quot;: &quot;Full authentication is required to access this resource.&quot;,</div><div class="line">    &quot;path&quot;: &quot;/bus/refresh&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>在config client/server的yml文件添加：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">management:</div><div class="line">  context_path: /admin</div><div class="line">  security:</div><div class="line">    enabled: false</div></pre></td></tr></table></figure></p>
+<h4 id="手工或者通过git-repository的webhook自动触发"><a href="#手工或者通过git-repository的webhook自动触发" class="headerlink" title="手工或者通过git repository的webhook自动触发"></a>手工或者通过git repository的webhook自动触发</h4><p>手工触发：curl -X POST {nginx | localhost:8888}/admin/bus/refresh</p>
+<p>一旦某个config server上/bus/refresh被触发，则该config server会向spring cloud bus发布RefreshRemoteApplicationEvent事件。<br>与此同时，其他的config server和config client会接收到该事件进行刷新，执行如下逻辑:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">17:39:18.101  INFO 48866 --- [nio-8888-exec-9] s.c.a.AnnotationConfigApplicationContext : Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@5e4125d3: startup date [Thu Dec 28 17:39:18 CST 2017]; root of context hierarchy</div><div class="line">17:39:18.108  INFO 48866 --- [nio-8888-exec-9] o.s.c.c.s.e.NativeEnvironmentRepository  : Adding property source: file:/var/folders/zp/kmj0tf897hndh27m457zkzv40000gn/T/config-repo-4824252633476331455/bar.properties</div><div class="line">17:39:18.108  INFO 48866 --- [nio-8888-exec-9] o.s.c.c.s.e.NativeEnvironmentRepository  : Adding property source: file:/var/folders/zp/kmj0tf897hndh27m457zkzv40000gn/T/config-repo-4824252633476331455/application.yml</div><div class="line">17:39:18.108  INFO 48866 --- [nio-8888-exec-9] s.c.a.AnnotationConfigApplicationContext : Closing org.springframework.context.annotation.AnnotationConfigApplicationContext@5e4125d3: startup date [Thu Dec 28 17:39:18 CST 2017]; root of context hierarchy</div></pre></td></tr></table></figure></p>
+<h2 id="分布式服务治理"><a href="#分布式服务治理" class="headerlink" title="分布式服务治理"></a>分布式服务治理</h2><h3 id="服务注册与发现"><a href="#服务注册与发现" class="headerlink" title="服务注册与发现"></a>服务注册与发现</h3><ul>
+<li><a href="/consul/">Consul</a></li>
+<li>Eureka | Zookeeper | etcd <a href="/servicediscovery">对比</a></li>
+<li><a href="/kubernetes/#service">Kubernetes Service</a></li>
+</ul>
+<h3 id="负载均衡"><a href="#负载均衡" class="headerlink" title="负载均衡"></a>负载均衡</h3><ul>
+<li>Netflix Ribbon（Spring Cloud）</li>
+<li><p><a href="/kubernetes/#service">Kubernetes Service</a></p>
+<p>客户端负载均衡的常用算法如下：</p>
+<ul>
+<li>1.Round Robbin（轮询）<ul>
+<li>最古老的算法最可信的算法，缺点是有状态，必须在并发之下记住上一次到谁了。</li>
+</ul>
+</li>
+<li>2.Random（随机）<ul>
+<li>最简单的，无状态的算法。</li>
+</ul>
+</li>
+<li>3.Least Load（最小负载）<ul>
+<li>可以实现某种程度上的智能调节。具体的实现包括最少在途请求数（发出去了还没收到应答的请求），最少并发连接数，最小平均响应时间等等。</li>
+</ul>
+</li>
+<li>4.Hash （参数哈希）<ul>
+<li>根据参数进行哈希，一来有分区的效果（参见单元化架构，可改善数据库连接，缓存热度等），二来可以Stick Session（可本机进行防刷运算等）</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="API网关与智能路由"><a href="#API网关与智能路由" class="headerlink" title="API网关与智能路由"></a>API网关与智能路由</h3><ul>
+<li>Netflix Zuul（SpringCloud）</li>
+<li><a href="/kubernetes/#service">Kubernetes Service</a></li>
+<li><p><a href="/kubernetes-ingress/">Kubernetes Ingress</a></p>
+<p>[Gateway]<br><img src="/images/gateway-filters.png" alt="zuul"></p>
+</li>
+</ul>
+<h2 id="分布式系统链路追踪"><a href="#分布式系统链路追踪" class="headerlink" title="分布式系统链路追踪"></a>分布式系统链路追踪</h2><ul>
+<li>Zipkin</li>
+<li><p>SpringCloud Sleuth</p>
+<p><img src="/images/distributed-tracing.png" alt="分布式链路追踪"></p>
+<p><a href="/zipkin/">Zipkin</a> is a distributed tracing system. It helps gather timing data needed to troubleshoot latency problems in microservice architectures. It manages both the collection and lookup of this data. Zipkin’s design is based on the Google Dapper paper.</p>
+<p>Applications are instrumented to report timing data to Zipkin. The Zipkin UI also presents a Dependency diagram showing how many traced requests went through each application. If you are troubleshooting latency problems or errors, you can filter or sort all traces based on the application, length of trace, annotation, or timestamp. Once you select a trace, you can see the percentage of the total trace time each span takes which allows you to identify the problem application.</p>
+</li>
+</ul>
+<h2 id="实时日志分析与度量监控"><a href="#实时日志分析与度量监控" class="headerlink" title="实时日志分析与度量监控"></a>实时日志分析与度量监控</h2><h3 id="日志管理"><a href="#日志管理" class="headerlink" title="日志管理"></a>日志管理</h3><ul>
+<li><p>ELK Stack（LogStash -&gt; ES -&gt; Kibana）</p>
+<p><img src="/images/elk.png" alt=""></p>
+</li>
+</ul>
+<h3 id="监控与度量"><a href="#监控与度量" class="headerlink" title="监控与度量"></a>监控与度量</h3><ul>
+<li><p>Application/Infrastructure monitoring using StatsD + Graphite + Grafana</p>
+<p><a href="/sgg/">StatsD + Graphite + Grafana</a></p>
+<p><img src="/images/statsd-graphite-grafana.png" alt=""></p>
+</li>
+</ul>
+<h2 id="弹性服务与容错处理"><a href="#弹性服务与容错处理" class="headerlink" title="弹性服务与容错处理"></a>弹性服务与容错处理</h2><h3 id="Hystrix架构设计"><a href="#Hystrix架构设计" class="headerlink" title="Hystrix架构设计"></a>Hystrix架构设计</h3><ul>
+<li>弹性服务<ul>
+<li>Hystrix可以为分布式服务提供弹性保护，通过命令模式封装调用，来实现弹性保护，继承HystrixCommand并且实现run方法，就完成了最简单的封装。</li>
+<li>实现getFallBack方法可以为熔断或者异常提供后备处理方法。</li>
+</ul>
+</li>
+<li>服务降级<ul>
+<li>提供熔断器组件,可以自动运行或手动调用,停止当前依赖一段时间(10秒)，熔断器默认 错误 率阈值为50%,超过将自动运行。</li>
+</ul>
+</li>
+<li>线程池/信号隔离<ul>
+<li>为每个依赖提供一个小的线程池（或信号），如果线程池已满调用将被立即拒绝，默认不采用排队.加速失败判定时间。</li>
+</ul>
+</li>
+<li>快速解决依赖隔离<ul>
+<li>可配置依赖调用 超时 时间,超时时间一般设为比99.5%平均时间略高即可.当调用超时时，直接返回或执行fallback逻辑。</li>
+</ul>
+</li>
+</ul>
+<p>弹性服务与容错处理的本质就是指使用命令模式（如HystrixCommand）包装依赖调用逻辑，每个命令在单独线程中/信号授权下执行。</p>
+<p> <img src="/images/service-resillence.png" alt=""><br> <a href="/Hystrix/">Hystrix架构设计</a></p>
+<h3 id="单个应用的熔断监控"><a href="#单个应用的熔断监控" class="headerlink" title="单个应用的熔断监控"></a>单个应用的熔断监控</h3><p>代码参见： <a href="https://github.com/osswangxining/resilience-dependencyisolation-spring-boot" target="_blank" rel="external">https://github.com/osswangxining/resilience-dependencyisolation-spring-boot</a></p>
+<p>在使用Spring Boot添加依赖时，需要注意spring-boot-starter-actuator，否则就不能访问hystrix的一些endpoint，如：</p>
+<ul>
+<li>提供hystrix 监控界面的<a href="http://{ip}:{port}/hystrix" target="_blank" rel="external">http://{ip}:{port}/hystrix</a></li>
+<li>以及返回流式数据的API： <a href="http://{ip}:{port}/hystrix.stream" target="_blank" rel="external">http://{ip}:{port}/hystrix.stream</a> 等。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">	&lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">	&lt;artifactId&gt;spring-cloud-starter-hystrix&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">	&lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">	&lt;artifactId&gt;spring-cloud-starter-hystrix-dashboard&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">	&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</div><div class="line">	&lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure>
+<h3 id="Turbine"><a href="#Turbine" class="headerlink" title="Turbine"></a>Turbine</h3><p>在复杂的分布式系统中，相同服务的节点经常需要部署上百甚至上千个，很多时候，运维人员希望能够把相同服务的节点状态以一个整体集群的形式展现出来，这样可以更好的把握整个系统的状态。 为此，Netflix提供了一个开源项目（Turbine）来提供把多个hystrix.stream的内容聚合为一个数据源供Dashboard展示。</p>
+<ul>
+<li>添加依赖, 包括2个trubine相关的依赖：<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">		&lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">		&lt;artifactId&gt;spring-cloud-starter-turbine&lt;/artifactId&gt;</div><div class="line">	&lt;/dependency&gt;</div><div class="line">	&lt;dependency&gt;</div><div class="line">		&lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</div><div class="line">		&lt;artifactId&gt;spring-cloud-netflix-turbine&lt;/artifactId&gt;</div><div class="line">	&lt;/dependency&gt;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>代码参见： <a href="https://github.com/osswangxining/resilience-dependencyisolation-spring-boot" target="_blank" rel="external">https://github.com/osswangxining/resilience-dependencyisolation-spring-boot</a></p>
+<ul>
+<li><p>配置文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">spring.application.name=hystrix-dashboard-turbine</div><div class="line">server.port=6688</div><div class="line">turbine.appConfig=node01,node02</div><div class="line">turbine.aggregator.clusterConfig= default</div><div class="line">turbine.clusterNameExpression= new String(&quot;default&quot;)</div><div class="line">turbine.combine-host-port=true</div></pre></td></tr></table></figure>
+<ul>
+<li>turbine.appConfig ：配置Eureka中的serviceId列表，表明监控哪些服务</li>
+<li>turbine.aggregator.clusterConfig ：指定聚合哪些集群，多个使用”,”分割，默认为default。可使用<a href="http://.../turbine.stream?cluster={clusterConfig之一}访问" target="_blank" rel="external">http://.../turbine.stream?cluster={clusterConfig之一}访问</a></li>
+<li>turbine.clusterNameExpression ：参数指定了集群名称为default，当我们服务数量非常多的时候，可以启动多个Turbine服务来构建不同的聚合集群，而该参数可以用来区分这些不同的聚合集群，同时该参数值可以在Hystrix仪表盘中用来定位不同的聚合集群，只需要在Hystrix Stream的URL中通过cluster参数来指定；</li>
+<li>turbine.combine-host-port参数设置为true，可以让同一主机上的服务通过主机名与端口号的组合来进行区分，默认情况下会以host来区分不同的服务，这会使得在本地调试的时候，本机上的不同服务聚合成一个服务来统计。</li>
+</ul>
+</li>
+<li><p>默认情况下是通过HTTP收集聚合</p>
+</li>
+<li><p>此外可以通过消息代理收集聚合</p>
+<ul>
+<li>可以将所有需要收集的监控信息都输出到消息代理中，然后Turbine服务再从消息代理中异步的获取这些监控信息，最后将这些监控信息聚合并输出到Hystrix Dashboard中。</li>
+</ul>
+</li>
+</ul>
+<h3 id="流量控制"><a href="#流量控制" class="headerlink" title="流量控制"></a>流量控制</h3><p><img src="/images/rate-limiter.png" alt=""></p>
+<h4 id="使用令牌捅算法进行限流"><a href="#使用令牌捅算法进行限流" class="headerlink" title="使用令牌捅算法进行限流"></a>使用令牌捅算法进行限流</h4><p>guava库里的RateLimiter类内部采用令牌捅算法实现.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;!--核心代码片段--&gt;</div><div class="line">private RateLimiter rateLimiter = RateLimiter.create(400);//400表示每秒允许处理的量是400</div><div class="line"> if(rateLimiter.tryAcquire()) &#123;</div><div class="line">   //逻辑在此处</div><div class="line"> &#125;</div></pre></td></tr></table></figure></p>
+<p>本人实现了一个基于Guava的Spring Boot Starter，参见<a href="https://github.com/osswangxining/ratelimiter-spring-boot-starter" target="_blank" rel="external">ratelimiter-spring-boot-starter</a></p>
+<p>显然，该方式是最快捷且有效的，单节点模式下，使用RateLimiter进行限流一点问题都没有。但分布式系统总请求就是节点数x400/s，限流效果失效。</p>
+<h4 id="使用redis进行限流"><a href="#使用redis进行限流" class="headerlink" title="使用redis进行限流"></a>使用redis进行限流</h4><p>使用redis进行限流，其很好地解决了分布式环境下多实例所导致的并发问题。因为使用redis设置的计时器和计数器均是全局唯一的，不管多少个节点，它们使用的都是同样的计时器和计数器，因此可以做到非常精准的流控。</p>
+<p>另外，可以使用Redis+Lua或者Nginx+Lua来实现。因为Redis是单线程模型，能确保限流服务是线程安全的。</p>
+<h2 id="分布式事务、分布式锁"><a href="#分布式事务、分布式锁" class="headerlink" title="分布式事务、分布式锁"></a>分布式事务、分布式锁</h2><h3 id="分布式事务"><a href="#分布式事务" class="headerlink" title="分布式事务"></a>分布式事务</h3><p>分布式事务本质上是依赖于可靠的分布式消息系统，以及本地的数据库事务共同完成的。</p>
+<p> <img src="/images/distributed-transaction-1.png" alt=""></p>
+<p> <img src="/images/distributed-transaction-2.png" alt=""></p>
+<h3 id="分布式锁"><a href="#分布式锁" class="headerlink" title="分布式锁"></a>分布式锁</h3><ul>
+<li><p><a href="/distributed-lock/">分布式锁</a></p>
+<p><img src="/images/distributed-lock.png" alt=""></p>
+</li>
+</ul>
+<h2 id="分布式存储与计算"><a href="#分布式存储与计算" class="headerlink" title="分布式存储与计算"></a>分布式存储与计算</h2><h3 id="分布式存储"><a href="#分布式存储" class="headerlink" title="分布式存储"></a>分布式存储</h3><h4 id="持久化-分布式文件系统"><a href="#持久化-分布式文件系统" class="headerlink" title="持久化 - 分布式文件系统"></a>持久化 - 分布式文件系统</h4><ul>
+<li><a href="/hdfs/">HDFS分布式文件系统</a></li>
+</ul>
+<h4 id="持久化-分布式数据库"><a href="#持久化-分布式数据库" class="headerlink" title="持久化 - 分布式数据库"></a>持久化 - 分布式数据库</h4><ul>
+<li>[传统关系型数据库集群,如MySQL Cluster]</li>
+<li><a href="/mongo/">Mongo</a></li>
+<li><a href="/hbase/">Cassandra,HBase</a></li>
+</ul>
+<h4 id="非持久化-分布式缓存-消息系统"><a href="#非持久化-分布式缓存-消息系统" class="headerlink" title="非持久化 - 分布式缓存/消息系统"></a>非持久化 - 分布式缓存/消息系统</h4><ul>
+<li><a href="/kafka/">Kafka</a></li>
+<li>[Redis]</li>
+</ul>
+<h3 id="分布式计算框架"><a href="#分布式计算框架" class="headerlink" title="分布式计算框架"></a>分布式计算框架</h3><ul>
+<li><a href="/yarn/">YARN分布式计算框架</a></li>
+<li><a href="/yarn-appdev/">YARN应用开发的几种方式</a></li>
+<li><a href="/running-spark-on-yarn/">Running Spark on YARN</a></li>
+<li><a href="/spark/">Spark Big Data Analytics</a></li>
+</ul>
+<h3 id="任务工作管理"><a href="#任务工作管理" class="headerlink" title="任务工作管理"></a>任务工作管理</h3><ul>
+<li>Spring Batch</li>
+<li><a href="/kubernetes/#Job">Kubernetes Jobs</a></li>
+</ul>
+<h2 id="服务安全"><a href="#服务安全" class="headerlink" title="服务安全"></a>服务安全</h2><ul>
+<li>SpringCloud Security</li>
+</ul>
+<h2 id="Auto-Scaling"><a href="#Auto-Scaling" class="headerlink" title="Auto Scaling"></a>Auto Scaling</h2><ul>
+<li><a href="/kubernetes/#Autoscaling">Kubernetes Autoscaling</a></li>
+</ul>
+<h2 id="打包部署和调度部署"><a href="#打包部署和调度部署" class="headerlink" title="打包部署和调度部署"></a>打包部署和调度部署</h2><ul>
+<li>Spring Boot；</li>
+<li><a href="/kubernetes/#Deployment">Docker／Rkt、Kubernetes Scheduler&amp;Deployment</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Xi Ning Wang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://osswangxining.github.io/distributed-system-arch-design/" title="分布式系统架构设计">https://osswangxining.github.io/distributed-system-arch-design/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/分布式/" rel="tag"># 分布式</a>
+          
+            <a href="/tags/架构设计/" rel="tag"># 架构设计</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/architect-view-on-docker/" rel="next" title="以架构师的角度看Docker">
+                <i class="fa fa-chevron-left"></i> 以架构师的角度看Docker
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/spring-cloud-bus-stream-rocketmq/" rel="prev" title="Spring Cloud Bus based on RocketMQ">
+                Spring Cloud Bus based on RocketMQ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/bio.png"
+                alt="Xi Ning Wang" />
+            
+              <p class="site-author-name" itemprop="name">Xi Ning Wang</p>
+              <p class="site-description motion-element" itemprop="description">专注于分布式高性能技术架构、容器|K8S、IoT云平台，支持语言：Java(script) | Python | Golang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/osswangxining" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:osswangxining@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://plus.google.com/osswangxining" target="_blank" title="Google">
+                      
+                        <i class="fa fa-fw fa-google"></i>Google</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/osswangxining" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://istio.io" title="Istio" target="_blank">Istio</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://grpc.io/" title="gRPC" target="_blank">gRPC</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#如何有效设计分布式系统"><span class="nav-number">1.</span> <span class="nav-text">如何有效设计分布式系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式配置管理"><span class="nav-number">2.</span> <span class="nav-text">分布式配置管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Spring-Cloud-Config"><span class="nav-number">2.1.</span> <span class="nav-text">Spring Cloud Config</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#RefreshEventListener"><span class="nav-number">2.1.1.</span> <span class="nav-text">RefreshEventListener</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动RabiitMQ-作为Spring-Cloud-Bus，也可以选择Kafka"><span class="nav-number">2.1.2.</span> <span class="nav-text">启动RabiitMQ (作为Spring Cloud Bus，也可以选择Kafka):</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#git-clone-spring-cloud-config-我使用了1-4-1-BUILD-SNAPSHOT；注意，2-x开始spring-cloud-bus均有变化，截止目前版本还不稳定。"><span class="nav-number">2.1.3.</span> <span class="nav-text">git clone spring-cloud-config, 我使用了1.4.1.BUILD-SNAPSHOT；注意，2.x开始spring-cloud-bus均有变化，截止目前版本还不稳定。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动config-server"><span class="nav-number">2.1.4.</span> <span class="nav-text">启动config server</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#运行spring-cloud-config-sample"><span class="nav-number">2.1.5.</span> <span class="nav-text">运行spring-cloud-config-sample</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#手工或者通过git-repository的webhook自动触发"><span class="nav-number">2.1.6.</span> <span class="nav-text">手工或者通过git repository的webhook自动触发</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式服务治理"><span class="nav-number">3.</span> <span class="nav-text">分布式服务治理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#服务注册与发现"><span class="nav-number">3.1.</span> <span class="nav-text">服务注册与发现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#负载均衡"><span class="nav-number">3.2.</span> <span class="nav-text">负载均衡</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#API网关与智能路由"><span class="nav-number">3.3.</span> <span class="nav-text">API网关与智能路由</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式系统链路追踪"><span class="nav-number">4.</span> <span class="nav-text">分布式系统链路追踪</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实时日志分析与度量监控"><span class="nav-number">5.</span> <span class="nav-text">实时日志分析与度量监控</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#日志管理"><span class="nav-number">5.1.</span> <span class="nav-text">日志管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#监控与度量"><span class="nav-number">5.2.</span> <span class="nav-text">监控与度量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#弹性服务与容错处理"><span class="nav-number">6.</span> <span class="nav-text">弹性服务与容错处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Hystrix架构设计"><span class="nav-number">6.1.</span> <span class="nav-text">Hystrix架构设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#单个应用的熔断监控"><span class="nav-number">6.2.</span> <span class="nav-text">单个应用的熔断监控</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Turbine"><span class="nav-number">6.3.</span> <span class="nav-text">Turbine</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#流量控制"><span class="nav-number">6.4.</span> <span class="nav-text">流量控制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#使用令牌捅算法进行限流"><span class="nav-number">6.4.1.</span> <span class="nav-text">使用令牌捅算法进行限流</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用redis进行限流"><span class="nav-number">6.4.2.</span> <span class="nav-text">使用redis进行限流</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式事务、分布式锁"><span class="nav-number">7.</span> <span class="nav-text">分布式事务、分布式锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#分布式事务"><span class="nav-number">7.1.</span> <span class="nav-text">分布式事务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分布式锁"><span class="nav-number">7.2.</span> <span class="nav-text">分布式锁</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式存储与计算"><span class="nav-number">8.</span> <span class="nav-text">分布式存储与计算</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#分布式存储"><span class="nav-number">8.1.</span> <span class="nav-text">分布式存储</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#持久化-分布式文件系统"><span class="nav-number">8.1.1.</span> <span class="nav-text">持久化 - 分布式文件系统</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#持久化-分布式数据库"><span class="nav-number">8.1.2.</span> <span class="nav-text">持久化 - 分布式数据库</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#非持久化-分布式缓存-消息系统"><span class="nav-number">8.1.3.</span> <span class="nav-text">非持久化 - 分布式缓存/消息系统</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分布式计算框架"><span class="nav-number">8.2.</span> <span class="nav-text">分布式计算框架</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#任务工作管理"><span class="nav-number">8.3.</span> <span class="nav-text">任务工作管理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务安全"><span class="nav-number">9.</span> <span class="nav-text">服务安全</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Auto-Scaling"><span class="nav-number">10.</span> <span class="nav-text">Auto Scaling</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#打包部署和调度部署"><span class="nav-number">11.</span> <span class="nav-text">打包部署和调度部署</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xi Ning Wang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=5.1.4"></script>
+
+
+</body>
+</html>

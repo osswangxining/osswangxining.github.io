@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Java,ssl,TLS," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="使用keytool创建密钥库使用双向认证的SSL/TLS协议通信，客户端和服务器端都要设置用于证实自己身份的安全证书，并且还要设置信任对方的哪些安全证书。理论上一共需要准备四个文件，两个keystore文件和两个truststore文件。通信双方分别拥有一个keystore和一个truststore，keystore用于存放自己的密钥和公钥，truststore用于存放所有需要信任方的公钥。">
+<meta name="keywords" content="Java,ssl,TLS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java-JSSE-SSL&#x2F;TLS编程代码实例-双向认证">
+<meta property="og:url" content="https://osswangxining.github.io/java-tls/index.html">
+<meta property="og:site_name" content="Technical Blog">
+<meta property="og:description" content="使用keytool创建密钥库使用双向认证的SSL/TLS协议通信，客户端和服务器端都要设置用于证实自己身份的安全证书，并且还要设置信任对方的哪些安全证书。理论上一共需要准备四个文件，两个keystore文件和两个truststore文件。通信双方分别拥有一个keystore和一个truststore，keystore用于存放自己的密钥和公钥，truststore用于存放所有需要信任方的公钥。">
+<meta property="og:updated_time" content="2018-04-05T08:58:11.416Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java-JSSE-SSL&#x2F;TLS编程代码实例-双向认证">
+<meta name="twitter:description" content="使用keytool创建密钥库使用双向认证的SSL/TLS协议通信，客户端和服务器端都要设置用于证实自己身份的安全证书，并且还要设置信任对方的哪些安全证书。理论上一共需要准备四个文件，两个keystore文件和两个truststore文件。通信双方分别拥有一个keystore和一个truststore，keystore用于存放自己的密钥和公钥，truststore用于存放所有需要信任方的公钥。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://osswangxining.github.io/java-tls/"/>
+
+
+
+
+
+  <title>Java-JSSE-SSL/TLS编程代码实例-双向认证 | Technical Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Technical Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Welcome to my world! 有问题请osswangxining（at）163.com</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://osswangxining.github.io/java-tls/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xi Ning Wang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/bio.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Technical Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java-JSSE-SSL/TLS编程代码实例-双向认证</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-05-27T12:46:25+00:00">
+                2016-05-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/微服务/" itemprop="url" rel="index">
+                    <span itemprop="name">微服务</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="使用keytool创建密钥库"><a href="#使用keytool创建密钥库" class="headerlink" title="使用keytool创建密钥库"></a>使用keytool创建密钥库</h2><p>使用双向认证的SSL/TLS协议通信，客户端和服务器端都要设置用于证实自己身份的安全证书，并且还要设置信任对方的哪些安全证书。<br>理论上一共需要准备四个文件，两个keystore文件和两个truststore文件。<br>通信双方分别拥有一个keystore和一个truststore，keystore用于存放自己的密钥和公钥，truststore用于存放所有需要信任方的公钥。<br><a id="more"></a></p>
+<h3 id="生成keystore和truststore"><a href="#生成keystore和truststore" class="headerlink" title="生成keystore和truststore"></a>生成keystore和truststore</h3><p>首先使用JDK自带的keytool工具来生成keystore和truststore。</p>
+<ul>
+<li>1）创建server的keystore文件，生成server的公钥/私钥密钥对。需要指定keystore的密码(storepass)和密钥对的密码(keypass)。<br>访问keystore需要storepass。访问密钥对需要keypass。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ keytool -genkey -alias myserver -keyalg rsa -keysize 1024 -sigalg sha256withrsa -keypass myserver -keystore ~/tempkey</div><div class="line">Enter keystore password:</div><div class="line">Re-enter new password:</div><div class="line">What is your first and last name?</div><div class="line">  [Unknown]:  osswangxining</div><div class="line">What is the name of your organizational unit?</div><div class="line">  [Unknown]:  osswangxn</div><div class="line">What is the name of your organization?</div><div class="line">  [Unknown]:  oss</div><div class="line">What is the name of your City or Locality?</div><div class="line">  [Unknown]:  bj</div><div class="line">What is the name of your State or Province?</div><div class="line">  [Unknown]:  bj</div><div class="line">What is the two-letter country code for this unit?</div><div class="line">  [Unknown]:  CN</div><div class="line">Is CN=osswangxining, OU=osswangxn, O=oss, L=bj, ST=bj, C=CN correct?</div><div class="line">  [no]:  yes</div></pre></td></tr></table></figure>
+<ul>
+<li>2) 创建client的keystore文件。同样需要指定keystore的密码和密钥对的密码。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ keytool -genkey -alias myclient -keyalg rsa -keysize 1024 -sigalg sha256withrsa -keypass myclient -keystore ~/tempkey4client  -storepass 123456</div><div class="line">What is your first and last name?</div><div class="line">  [Unknown]:  myclient</div><div class="line">What is the name of your organizational unit?</div><div class="line">  [Unknown]:  mmyyclient</div><div class="line">What is the name of your organization?</div><div class="line">  [Unknown]:  mmyy</div><div class="line">What is the name of your City or Locality?</div><div class="line">  [Unknown]:  nyc</div><div class="line">What is the name of your State or Province?</div><div class="line">  [Unknown]:  nyc</div><div class="line">What is the two-letter country code for this unit?</div><div class="line">  [Unknown]:  US</div><div class="line">Is CN=myclient, OU=mmyyclient, O=mmyy, L=nyc, ST=nyc, C=US correct?</div><div class="line">  [no]:  yes</div></pre></td></tr></table></figure>
+<ul>
+<li>3）从server的keystore中导出server的证书（其中包括server的公钥）。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">keytool -export -alias myserver -keystore ~/tempkey -storepass 123456 -file ~/temp20151019/myserver.cer  </div><div class="line">Certificate stored in file &lt;/Users/xiningwang/temp20151019/myserver.cer&gt;</div></pre></td></tr></table></figure>
+<ul>
+<li>4）从client的keystore中导出client的证书（其中包括client的公钥）。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">keytool -export -alias myclient -keystore ~/tempkey4client -storepass 123456 -file ~/temp20151019/myclient.cer  </div><div class="line">Certificate stored in file &lt;/Users/xiningwang/temp20151019/myclient.cer&gt;</div></pre></td></tr></table></figure>
+<ul>
+<li>5）创建server的truststore文件并导入client的证书（其中包括client的公钥）。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">xis-macbook-pro:~ xiningwang$ keytool -import -alias myclient -keystore ~/temp20151019/myservertrust.keystore -storepass 12345678 -file ~/temp20151019/myclient.cer</div><div class="line">Owner: CN=myclient, OU=mmyyclient, O=mmyy, L=nyc, ST=nyc, C=US</div><div class="line">Issuer: CN=myclient, OU=mmyyclient, O=mmyy, L=nyc, ST=nyc, C=US</div><div class="line">Serial number: 6a74a7e6</div><div class="line">Valid from: Thu Oct 19 15:09:11 CST 2017 until: Wed Jan 17 15:09:11 CST 2018</div><div class="line">Certificate fingerprints:</div><div class="line">       	 MD5:  3F:4D:D7:79:AC:A7:4B:D1:15:2B:CC:19:8C:08:66:CC</div><div class="line">       	 SHA1: 2A:16:D8:5A:0B:BE:D8:D0:49:B6:82:1D:29:31:46:B4:5F:B1:9A:88</div><div class="line">       	 SHA256: 84:E2:FC:F2:7B:E6:81:DB:A2:D8:52:5C:7C:35:FF:69:D0:46:8D:A0:07:42:F1:DC:69:CE:85:4B:1F:2F:FC:2F</div><div class="line">       	 Signature algorithm name: SHA256withRSA</div><div class="line">       	 Version: 3</div><div class="line"></div><div class="line">Extensions:</div><div class="line"></div><div class="line">#1: ObjectId: 2.5.29.14 Criticality=false</div><div class="line">SubjectKeyIdentifier [</div><div class="line">KeyIdentifier [</div><div class="line">0000: 83 E7 88 05 77 C5 50 80   22 CA 2E 12 B3 A7 AA C7  ....w.P.&quot;.......</div><div class="line">0010: 15 86 FC DA                                        ....</div><div class="line">]</div><div class="line">]</div><div class="line"></div><div class="line">Trust this certificate? [no]:  yes</div><div class="line">Certificate was added to keystore</div></pre></td></tr></table></figure>
+<ul>
+<li>6）创建client的truststore文件并导入server的证书（其中包括server的公钥）。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">keytool -import -alias myserver -keystore ~/temp20151019/myclienttrust.keystore -storepass 12345678 -file ~/temp20151019/myserver.cer</div><div class="line"></div><div class="line">xis-macbook-pro:~ xiningwang$ keytool -import -alias myserver -keystore ~/temp20151019/myclienttrust.keystore -storepass 12345678 -file ~/temp20151019/myserver.cer</div><div class="line">Owner: CN=osswangxining, OU=osswangxn, O=oss, L=bj, ST=bj, C=CN</div><div class="line">Issuer: CN=osswangxining, OU=osswangxn, O=oss, L=bj, ST=bj, C=CN</div><div class="line">Serial number: 4f223106</div><div class="line">Valid from: Thu Oct 19 15:04:57 CST 2017 until: Wed Jan 17 15:04:57 CST 2018</div><div class="line">Certificate fingerprints:</div><div class="line">       	 MD5:  3B:0E:F6:5A:E8:00:FF:04:86:83:2D:5E:1D:C1:89:8C</div><div class="line">       	 SHA1: 34:EB:12:16:94:B9:24:B5:7D:76:BF:BF:C6:8C:06:B7:4A:FA:34:23</div><div class="line">       	 SHA256: 99:92:BB:4B:23:58:27:EF:B6:64:3C:14:64:EA:14:79:1B:B3:D9:8B:90:78:40:3A:BA:CC:00:55:11:AE:EE:A2</div><div class="line">       	 Signature algorithm name: SHA256withRSA</div><div class="line">       	 Version: 3</div><div class="line"></div><div class="line">Extensions:</div><div class="line"></div><div class="line">#1: ObjectId: 2.5.29.14 Criticality=false</div><div class="line">SubjectKeyIdentifier [</div><div class="line">KeyIdentifier [</div><div class="line">0000: 30 9E DC 33 B3 FF 6A EA   02 3C 88 21 E9 ED 94 D0  0..3..j..&lt;.!....</div><div class="line">0010: 6B B7 17 A7                                        k...</div><div class="line">]</div><div class="line">]</div><div class="line"></div><div class="line">Trust this certificate? [no]:  yes</div><div class="line">Certificate was added to keystore</div></pre></td></tr></table></figure>
+<h2 id="server端处理流程和代码"><a href="#server端处理流程和代码" class="headerlink" title="server端处理流程和代码"></a>server端处理流程和代码</h2><ul>
+<li><p>1)加载server的keystore文件，需要指定keystore的密码(storepass)。<br>KeyStore类型有如下三种：<br>jceks - The proprietary keystore implementation provided by the SunJCE provider.<br>jks - The proprietary keystore implementation provided by the SUN provider.<br>pkcs12 - The transfer syntax for personal identity information as defined in PKCS #12.</p>
+</li>
+<li><p>2)加载server的truststore文件，需要指定truststore的密码(storepass)。</p>
+</li>
+<li><p>3)创建KeyManagerFactory对象并用1）中加载的keystore和server密钥对的密码(keypass)来初始化。</p>
+</li>
+<li><p>4)创建TrustManagerFactory对象并用2）中加载的truststore来初始化。truststore中存的是client的公钥，不需要keypass也可以访问。</p>
+</li>
+<li><p>5）创建SSLContext并用3）和4）中创建的KeyManagerFactory和TrustManagerFactory对象来初始化。</p>
+</li>
+</ul>
+<p>创建SSLContext是需要给出SSLContext Algorithms。上面这个链接中给出了合法的SSLContext Algorithms，有如下可用值。<br>SSL - Supports some version of SSL; may support other versions<br>SSLv2 - Supports SSL version 2 or later; may support other versions<br>SSLv3 - Supports SSL version 3; may support other versions<br>TLS - Supports some version of TLS; may support other versions<br>TLSv1 - Supports RFC 2246: TLS version 1.0 ; may support other versions<br>TLSv1.1 - Supports RFC 4346: TLS version 1.1 ; may support other versions<br>TLSv1.2 - Supports RFC 5246: TLS version 1.2 ; may support other versions</p>
+<ul>
+<li><p>6）创建SSLServerSocketFactory，在指定的端口上创建SSLServerSocket并设定需要客户端证书：setNeedClientAuth(true)</p>
+</li>
+<li><p>7）在SSLServerSocket对象上调用accept()方法等待客户端的连接。<br>客户端连上来之后这个函数会返回一个SSLSocket对象，在这个对象的输入输出流上进行读写。<br>在这个SSLSocket对象上可以添加一个HandshakeCompletedListener的监听器，SSL/TLS握手结束后这个监听器的handshakeCompleted方法就会被调用。<br>客户端有三种方法会触发握手：</p>
+<ul>
+<li>显式调用startHandshake方法</li>
+<li>在socket对象上进行read或write操作</li>
+<li>在socket对象上调用getSession方法</li>
+</ul>
+</li>
+</ul>
+<p>代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div></pre></td><td class="code"><pre><div class="line">package ssl;</div><div class="line"></div><div class="line">import java.io.BufferedReader;  </div><div class="line">import java.io.FileInputStream;  </div><div class="line">import java.io.IOException;  </div><div class="line">import java.io.InputStreamReader;  </div><div class="line">import java.io.PrintWriter;  </div><div class="line">import java.net.Socket;  </div><div class="line">import java.security.KeyStore;  </div><div class="line">import java.security.cert.X509Certificate;  </div><div class="line"></div><div class="line">import javax.net.ssl.HandshakeCompletedEvent;  </div><div class="line">import javax.net.ssl.HandshakeCompletedListener;  </div><div class="line">import javax.net.ssl.KeyManagerFactory;  </div><div class="line">import javax.net.ssl.SSLContext;  </div><div class="line">import javax.net.ssl.SSLPeerUnverifiedException;  </div><div class="line">import javax.net.ssl.SSLServerSocket;  </div><div class="line">import javax.net.ssl.SSLServerSocketFactory;  </div><div class="line">import javax.net.ssl.SSLSocket;  </div><div class="line">import javax.net.ssl.TrustManagerFactory;  </div><div class="line"></div><div class="line">public class MySSLServer implements Runnable, HandshakeCompletedListener &#123;  </div><div class="line"></div><div class="line">    public static final int SERVER_PORT = 11123;  </div><div class="line"></div><div class="line">    private final Socket _s;  </div><div class="line">    private String peerCerName;  </div><div class="line"></div><div class="line">    public MySSLServer(Socket s) &#123;  </div><div class="line">        _s = s;  </div><div class="line">    &#125;  </div><div class="line"></div><div class="line">    public static void main(String[] args) throws Exception &#123;  </div><div class="line">        String serverKeyStoreFile = &quot;/Users/xiningwang/temp20151019/tempkey&quot;;  </div><div class="line">        String serverKeyStorePwd = &quot;123456&quot;;  </div><div class="line">        String myServerKeyPwd = &quot;myserver&quot;;  </div><div class="line">        String serverTrustKeyStoreFile = &quot;/Users/xiningwang/temp20151019/myservertrust.keystore&quot;;  </div><div class="line">        String serverTrustKeyStorePwd = &quot;12345678&quot;;  </div><div class="line"></div><div class="line">        KeyStore serverKeyStore = KeyStore.getInstance(&quot;JKS&quot;);  </div><div class="line">        serverKeyStore.load(new FileInputStream(serverKeyStoreFile), serverKeyStorePwd.toCharArray());  </div><div class="line"></div><div class="line">        KeyStore serverTrustKeyStore = KeyStore.getInstance(&quot;JKS&quot;);  </div><div class="line">        serverTrustKeyStore.load(new FileInputStream(serverTrustKeyStoreFile), serverTrustKeyStorePwd.toCharArray());  </div><div class="line"></div><div class="line">        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());  </div><div class="line">        kmf.init(serverKeyStore, myServerKeyPwd.toCharArray());  </div><div class="line"></div><div class="line">        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());  </div><div class="line">        tmf.init(serverTrustKeyStore);  </div><div class="line"></div><div class="line">        SSLContext sslContext = SSLContext.getInstance(&quot;TLSv1&quot;);  </div><div class="line">        sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);  </div><div class="line"></div><div class="line">        SSLServerSocketFactory sslServerSocketFactory = sslContext.getServerSocketFactory();  </div><div class="line">        SSLServerSocket sslServerSocket = (SSLServerSocket) sslServerSocketFactory.createServerSocket(SERVER_PORT);  </div><div class="line">        sslServerSocket.setNeedClientAuth(true);  </div><div class="line"></div><div class="line">        while (true) &#123;  </div><div class="line">            SSLSocket s = (SSLSocket)sslServerSocket.accept();  </div><div class="line">            MySSLServer cs = new MySSLServer(s);  </div><div class="line">            s.addHandshakeCompletedListener(cs);  </div><div class="line">            new Thread(cs).start();  </div><div class="line">        &#125;  </div><div class="line">    &#125;  </div><div class="line"></div><div class="line">    @Override  </div><div class="line">    public void run() &#123;  </div><div class="line">        try &#123;  </div><div class="line">            BufferedReader reader = new BufferedReader(new InputStreamReader(_s.getInputStream()));  </div><div class="line">            PrintWriter writer = new PrintWriter(_s.getOutputStream(), true);  </div><div class="line"></div><div class="line">            writer.println(&quot;Welcome~, enter exit to leave.&quot;);  </div><div class="line">            String s;  </div><div class="line">            while ((s = reader.readLine()) != null &amp;&amp; !s.trim().equalsIgnoreCase(&quot;exit&quot;)) &#123;  </div><div class="line">                writer.println(&quot;Echo: &quot; + s);  </div><div class="line">            &#125;  </div><div class="line">            writer.println(&quot;Bye~, &quot; + peerCerName);  </div><div class="line">        &#125; catch (Exception e) &#123;  </div><div class="line">            e.printStackTrace();  </div><div class="line">        &#125; finally &#123;  </div><div class="line">            try &#123;  </div><div class="line">                _s.close();  </div><div class="line">            &#125; catch (IOException e) &#123;  </div><div class="line">                e.printStackTrace();  </div><div class="line">            &#125;  </div><div class="line">        &#125;  </div><div class="line">    &#125;  </div><div class="line"></div><div class="line">    @Override  </div><div class="line">    public void handshakeCompleted(HandshakeCompletedEvent event) &#123;  </div><div class="line">        try &#123;  </div><div class="line">            X509Certificate cert = (X509Certificate) event.getPeerCertificates()[0];  </div><div class="line">            peerCerName = cert.getSubjectX500Principal().getName();  </div><div class="line">        &#125; catch (SSLPeerUnverifiedException ex) &#123;  </div><div class="line">            ex.printStackTrace();  </div><div class="line">        &#125;  </div><div class="line">    &#125;  </div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="client端处理流程和代码"><a href="#client端处理流程和代码" class="headerlink" title="client端处理流程和代码"></a>client端处理流程和代码</h2><ul>
+<li><p>1）加载client的keystore文件。</p>
+</li>
+<li><p>2）加载client的truststore文件。</p>
+</li>
+<li><p>3) 创建KeyManagerFactory对象并初始化。</p>
+</li>
+<li><p>4) 创建TrustManagerFactory对象并初始化。truststore中存的是server的公钥，不需要keypass也可以访问。</p>
+</li>
+<li><p>5）创建SSLContext并用3）和4）中创建的KeyManagerFactory和TrustManagerFactory对象来初始化。</p>
+</li>
+<li><p>6）创建SSLSocketFactory，在指定的网络地址和端口上创建SSLSocket。</p>
+</li>
+<li><p>7）在这个SSLSocket对象的输入输出流上进行读写。</p>
+</li>
+</ul>
+<p>代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div></pre></td><td class="code"><pre><div class="line">package ssl;</div><div class="line"></div><div class="line">import java.io.BufferedReader;  </div><div class="line">import java.io.FileInputStream;  </div><div class="line">import java.io.IOException;  </div><div class="line">import java.io.InputStreamReader;  </div><div class="line">import java.io.PrintWriter;  </div><div class="line">import java.net.Socket;  </div><div class="line">import java.security.KeyStore;  </div><div class="line"></div><div class="line">import javax.net.ssl.KeyManagerFactory;  </div><div class="line">import javax.net.ssl.SSLContext;  </div><div class="line">import javax.net.ssl.SSLSocketFactory;  </div><div class="line">import javax.net.ssl.TrustManagerFactory;  </div><div class="line"></div><div class="line">public class MySSLClient &#123;  </div><div class="line">    public static void main(String[] args) throws Exception &#123;  </div><div class="line">        String clientKeyStoreFile = &quot;/Users/xiningwang/temp20151019/tempkey4client&quot;;  </div><div class="line">        String clientKeyStorePwd = &quot;123456&quot;;  </div><div class="line">        String myclientKeyPwd = &quot;myclient&quot;;  </div><div class="line">        String clientTrustKeyStoreFile = &quot;/Users/xiningwang/temp20151019/myclienttrust.keystore&quot;;  </div><div class="line">        String clientTrustKeyStorePwd = &quot;12345678&quot;;  </div><div class="line"></div><div class="line">        KeyStore clientKeyStore = KeyStore.getInstance(&quot;JKS&quot;);  </div><div class="line">        clientKeyStore.load(new FileInputStream(clientKeyStoreFile), clientKeyStorePwd.toCharArray());  </div><div class="line"></div><div class="line">        KeyStore clientTrustKeyStore = KeyStore.getInstance(&quot;JKS&quot;);  </div><div class="line">        clientTrustKeyStore.load(new FileInputStream(clientTrustKeyStoreFile), clientTrustKeyStorePwd.toCharArray());  </div><div class="line"></div><div class="line">        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());  </div><div class="line">        kmf.init(clientKeyStore, myclientKeyPwd.toCharArray());  </div><div class="line"></div><div class="line">        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());  </div><div class="line">        tmf.init(clientTrustKeyStore);  </div><div class="line"></div><div class="line">        SSLContext sslContext = SSLContext.getInstance(&quot;TLSv1&quot;);  </div><div class="line">        sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);  </div><div class="line"></div><div class="line">        SSLSocketFactory socketFactory = sslContext.getSocketFactory();  </div><div class="line">        Socket socket = socketFactory.createSocket(&quot;localhost&quot;, MySSLServer.SERVER_PORT);  </div><div class="line"></div><div class="line">        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);  </div><div class="line">        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));  </div><div class="line"></div><div class="line">        send(&quot;hello&quot;, out);  </div><div class="line">        Thread.sleep(5000);</div><div class="line">        send(&quot;exit&quot;, out);  </div><div class="line">        receive(in);  </div><div class="line">        socket.close();  </div><div class="line">    &#125;  </div><div class="line"></div><div class="line">    public static void send(String s, PrintWriter out) throws IOException &#123;  </div><div class="line">        System.out.println(&quot;Sending: &quot; + s);       </div><div class="line">        out.println(s);  </div><div class="line">    &#125;  </div><div class="line"></div><div class="line">    public static void receive(BufferedReader in) throws IOException &#123;  </div><div class="line">        String s;  </div><div class="line">        while ((s = in.readLine()) != null) &#123;  </div><div class="line">            System.out.println(&quot;Reveived: &quot; + s);  </div><div class="line">        &#125;  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Xi Ning Wang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://osswangxining.github.io/java-tls/" title="Java-JSSE-SSL/TLS编程代码实例-双向认证">https://osswangxining.github.io/java-tls/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/ssl/" rel="tag"># ssl</a>
+          
+            <a href="/tags/TLS/" rel="tag"># TLS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/kafka/" rel="next" title="Kafka">
+                <i class="fa fa-chevron-left"></i> Kafka
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/zipkin/" rel="prev" title="分布式跟踪系统">
+                分布式跟踪系统 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/bio.png"
+                alt="Xi Ning Wang" />
+            
+              <p class="site-author-name" itemprop="name">Xi Ning Wang</p>
+              <p class="site-description motion-element" itemprop="description">专注于分布式高性能技术架构、容器|K8S、IoT云平台，支持语言：Java(script) | Python | Golang</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/osswangxining" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:osswangxining@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://plus.google.com/osswangxining" target="_blank" title="Google">
+                      
+                        <i class="fa fa-fw fa-google"></i>Google</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://stackoverflow.com/osswangxining" target="_blank" title="StackOverflow">
+                      
+                        <i class="fa fa-fw fa-stack-overflow"></i>StackOverflow</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://istio.io" title="Istio" target="_blank">Istio</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://grpc.io/" title="gRPC" target="_blank">gRPC</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用keytool创建密钥库"><span class="nav-number">1.</span> <span class="nav-text">使用keytool创建密钥库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#生成keystore和truststore"><span class="nav-number">1.1.</span> <span class="nav-text">生成keystore和truststore</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#server端处理流程和代码"><span class="nav-number">2.</span> <span class="nav-text">server端处理流程和代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#client端处理流程和代码"><span class="nav-number">3.</span> <span class="nav-text">client端处理流程和代码</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xi Ning Wang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/exturl.js?v=5.1.4"></script>
+
+
+</body>
+</html>
